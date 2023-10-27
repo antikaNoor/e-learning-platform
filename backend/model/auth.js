@@ -28,7 +28,7 @@ const authSchema = new mongoose.Schema({
         default: false
     },
     educationalCertificates: {
-        type: String, // Store the file path or URL of the uploaded PDF certificate
+        type: String,
         default: null
     },
     isBanned: {
@@ -36,6 +36,10 @@ const authSchema = new mongoose.Schema({
         default: false
     },
     enrolledCourses: {
+        type: [mongoose.Types.ObjectId],
+        ref: "Course"
+    },
+    completedCourses: {
         type: [mongoose.Types.ObjectId],
         ref: "Course"
     },

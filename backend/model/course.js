@@ -28,15 +28,15 @@ const courseSchema = new mongoose.Schema({
     requirement: {
         type: [String]
     },
-    category_ref: {
+    categoryReference: {
         type: mongoose.Types.ObjectId,
         ref: "Category"
     },
-    review_ref: {
+    reviewReference: {
         type: [mongoose.Types.ObjectId],
         ref: "Review"
     },
-    course_content_ref: {
+    courseContent: {
         type: [mongoose.Types.ObjectId],
         ref: "Lesson"
     }

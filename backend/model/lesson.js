@@ -14,12 +14,31 @@ const lessonSchema = new mongoose.Schema({
     },
     videoFileName: {
         type: String,
-        // required: [true, "Video file name should be provided"]
     },
     videoFilePath: {
         type: String,
-        // required: [true, "Video file path should be provided"]
     },
+    // Unenrolled students cannot watch all the lessons. They may access just the intro video.
+    accessibleToUnenrolled: {
+        type: Boolean,
+        default: false
+    },
+    // To keep track of the exact moment the video was paused by an enrolled student.
+    progress: [{
+        userReference: {
+            type: mongoose.Types.ObjectId,
+            ref: "User"
+        },
+        videoLastPlayedDuration: {
+            type: Number, // Store the video duration where the student left off
+            default: 0 // Default value is 0 seconds
+        }
+    }],
+    courseReference: {
+        type: mongoose.Types.ObjectId,
+        ref: "Course",
+        required: true,
+    }
 
 }, { timestamps: true })
 
