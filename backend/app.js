@@ -4,6 +4,8 @@ const databaseConnection = require('./config/database')
 const dotenv = require('dotenv')
 dotenv.config()
 
+const authRouter = require('./routes/authRoutes')
+
 const app = express()
 app.use(cors({ origin: "*" }))
 // app.use(cors())
@@ -17,6 +19,23 @@ app.use((err, req, res, next) => {
     }
     next()
 })
+
+app.use("/auth", authRouter)
+
+// using route() method to get the invalid routes
+app.route('*')
+    .get((req, res) => {
+        res.status(400).send("Invalid route!")
+    })
+    .put((req, res) => {
+        res.status(400).send("Invalid route!")
+    })
+    .post((req, res) => {
+        res.status(400).send("Invalid route!")
+    })
+    .delete((req, res) => {
+        res.status(400).send("Invalid route!")
+    })
 
 databaseConnection(() => {
     app.listen(3000, () => {

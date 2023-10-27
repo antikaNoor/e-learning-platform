@@ -23,6 +23,10 @@ const authSchema = new mongoose.Schema({
         required: true,
         default: "student"
     },
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
     isApprovedInstructor: {
         type: Boolean,
         default: false
@@ -62,7 +66,6 @@ const authSchema = new mongoose.Schema({
     user: {
         type: mongoose.Types.ObjectId,
         ref: "User",
-        required: true
     },
 
 }, { timestamps: true })

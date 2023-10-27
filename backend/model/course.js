@@ -22,11 +22,19 @@ const courseSchema = new mongoose.Schema({
     language: {
         type: String
     },
-    learing_outcome: {
+    learingOutcome: {
         type: String
     },
     requirement: {
         type: [String]
+    },
+    isPremium: {
+        type: Boolean,
+        default: false
+    },
+    numberOfStudentsEnrolled: {
+        type: Number,
+        default: 0
     },
     categoryReference: {
         type: mongoose.Types.ObjectId,

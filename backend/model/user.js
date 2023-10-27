@@ -19,10 +19,18 @@ const userSchema = new mongoose.Schema({
         required: true,
         default: "student"
     },
-    enrolledCourses: {
-        type: [mongoose.Types.ObjectId],
-        ref: "Course"
-    },
+    enrolledCourses: [{
+        course: {
+            type: mongoose.Types.ObjectId,
+            ref: "Course"
+        },
+        progress: {
+            type: Number,
+            default: 0,
+            min: 0,
+            max: 100
+        }
+    }],
     completedCourses: {
         type: [mongoose.Types.ObjectId],
         ref: "Course"
