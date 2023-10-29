@@ -6,11 +6,12 @@ const success = (message, data = null) => {
     }
 }
 
-const failure = (message, error = null) => {
+const failure = (message, error = null, resendLink = null) => {
     return {
         success: false,
         message: message,
-        error: error
+        error: error,
+        resendLink: resendLink
     }
 }
 

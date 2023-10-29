@@ -27,10 +27,6 @@ const authSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    isApprovedInstructor: {
-        type: Boolean,
-        default: false
-    },
     educationalCertificates: {
         type: String,
         default: null
@@ -39,13 +35,13 @@ const authSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    enrolledCourses: {
-        type: [mongoose.Types.ObjectId],
-        ref: "Course"
+    emailVerificationToken: {
+        type: String || null,
+        default: null
     },
-    completedCourses: {
-        type: [mongoose.Types.ObjectId],
-        ref: "Course"
+    emailVerificationTokenExpired: {
+        type: Date || null,
+        default: null
     },
     loginAttempt: {
         type: Number,

@@ -5,6 +5,8 @@ const dotenv = require('dotenv')
 dotenv.config()
 
 const authRouter = require('./routes/authRoutes')
+const courseRouter = require('./routes/courseRoutes')
+const lessonRouter = require('./routes/lessonRoutes')
 
 const app = express()
 app.use(cors({ origin: "*" }))
@@ -21,6 +23,8 @@ app.use((err, req, res, next) => {
 })
 
 app.use("/auth", authRouter)
+app.use("/course", courseRouter)
+app.use("/lesson", lessonRouter)
 
 // using route() method to get the invalid routes
 app.route('*')

@@ -9,18 +9,19 @@ const courseSchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        unique: true,
         required: [true, "Decsription should be provided"]
     },
     price: {
         type: Number,
         required: [true, "Price should be provided"]
     },
-    instructor: {
-        type: String
+    instructorID: {
+        type: mongoose.Types.ObjectId,
+        ref: "User"
     },
     language: {
-        type: String
+        type: String,
+        enum: ["English", "Bangla"],
     },
     learingOutcome: {
         type: String
@@ -35,6 +36,10 @@ const courseSchema = new mongoose.Schema({
     numberOfStudentsEnrolled: {
         type: Number,
         default: 0
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
     },
     categoryReference: {
         type: mongoose.Types.ObjectId,

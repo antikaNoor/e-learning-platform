@@ -9,7 +9,6 @@ const lessonSchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        unique: true,
         required: [true, "Decsription should be provided"]
     },
     videoFileName: {
@@ -37,7 +36,7 @@ const lessonSchema = new mongoose.Schema({
     courseReference: {
         type: mongoose.Types.ObjectId,
         ref: "Course",
-        required: true,
+        default: null
     }
 
 }, { timestamps: true })
