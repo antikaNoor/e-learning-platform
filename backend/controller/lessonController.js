@@ -74,7 +74,7 @@ class LessonController {
                 return res.status(400).send(failure("Please enter the lesson's ID."))
             }
 
-            const existingLesson = await lessonModel.findOne({ _id: new mongoose.Types.ObjectId(lessonID) })
+            let existingLesson = await lessonModel.findOne({ _id: new mongoose.Types.ObjectId(lessonID) })
             if (!existingLesson) {
                 return res.status(400).send(failure("The specified lesson does not exist. Please enter a valid lesson."))
             }
@@ -89,8 +89,8 @@ class LessonController {
                 existingCourse.courseContent = existingCourse.courseContent.filter(id => id.toString() !== lessonID);
                 await existingCourse.save();
             }
-            existingLesson.courseReference = null
-            await existingLesson.save()
+
+            await lessonModel.deleteOne({ _id: lessonID });
 
             return res.status(200).send(success("Lesson deleted successfully."))
 

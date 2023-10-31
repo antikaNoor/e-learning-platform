@@ -11,10 +11,6 @@ const courseSchema = new mongoose.Schema({
         type: String,
         required: [true, "Decsription should be provided"]
     },
-    price: {
-        type: Number,
-        required: [true, "Price should be provided"]
-    },
     instructorID: {
         type: mongoose.Types.ObjectId,
         ref: "User"

@@ -24,9 +24,9 @@ class CourseController {
     async createCourse(req, res) {
         try {
 
-            const { title, description, price, instructorID, language, learingOutcome, requirement, isPremium } = req.body
+            const { title, description, instructorID, language, learingOutcome, requirement, isPremium } = req.body
 
-            if (!title || !description || !price || !instructorID || !language || !learingOutcome || !requirement || !isPremium) {
+            if (!title || !description || !instructorID || !language || !learingOutcome || !requirement || !isPremium) {
                 return res.status(400).send(failure("Please fill all the fields"))
             }
 
@@ -54,7 +54,6 @@ class CourseController {
             const course = new courseModel({
                 title,
                 description,
-                price,
                 instructorID,
                 language,
                 learingOutcome,
