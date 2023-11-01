@@ -1,5 +1,5 @@
-const courseModel = require("../model/course")
-const lessonModel = require("../model/lesson")
+const courseModel = require("../model/courseModel/course")
+const lessonModel = require("../model/courseModel/lesson")
 const { success, failure } = require("../utils/successError")
 const express = require('express')
 const mongoose = require("mongoose")

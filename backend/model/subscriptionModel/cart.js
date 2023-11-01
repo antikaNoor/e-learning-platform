@@ -5,9 +5,6 @@ const cartSchema = new mongoose.Schema({
         type: mongoose.Types.ObjectId,
         ref: "User",
     },
-    estimatedPrice: {
-        type: Number,
-    },
     courseReference: {
         type: [mongoose.Types.ObjectId],
         ref: "Course",

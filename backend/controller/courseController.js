@@ -1,10 +1,9 @@
-const courseModel = require("../model/course")
-const authModel = require("../model/auth")
+const courseModel = require("../model/courseModel/course")
+const authModel = require("../model/authModel/auth")
 const { success, failure } = require("../utils/successError")
 const express = require('express')
 const mongoose = require("mongoose")
 const { validationResult } = require('express-validator')
-// const fileTypes = require("../constants/fileTypes")
 const fs = require('fs')
 const path = require('path')
 
@@ -73,8 +72,8 @@ class CourseController {
         try {
             const { courseID } = req.body
 
-            const existingCourse = await courseModel.findOne({_id: new mongoose.Types.ObjectId(courseID)})
-            if(!existingCourse) {
+            const existingCourse = await courseModel.findOne({ _id: new mongoose.Types.ObjectId(courseID) })
+            if (!existingCourse) {
                 return res.status(400).send(failure("This course does not exist. Please enter a valid course."))
             }
 
@@ -83,8 +82,8 @@ class CourseController {
             await existingCourse.save()
 
             return res.status(200).send(success("Course deleted successfully"))
-            
-        } catch(error) {
+
+        } catch (error) {
             console.log("error", error)
             return res.status(500).send(failure("Internal server error"))
         }

@@ -29,7 +29,11 @@ class AuthController {
     // sign up
     async signUp(req, res) {
         try {
-            const { username, email, password } = req.body;
+            const { username, email, password, role } = req.body;
+
+            if (!username || !email || !password || !role) {
+                return res.status(400).send(failure("Please fill all the fields"))
+            }
 
             const user = await authModel.findOne({ email });
             if (user) {
@@ -42,14 +46,14 @@ class AuthController {
             const userInfo = await userModel.create({
                 username,
                 email,
-                role: "student",
+                role
             })
 
             const authUser = await authModel.create({
                 username,
                 email,
                 password: hashedPassword,
-                role: "student",
+                role,
                 user: userInfo._id
             });
 

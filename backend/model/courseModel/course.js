@@ -29,6 +29,10 @@ const courseSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    isApproved: {
+        type: Boolean,
+        default: false
+    },
     numberOfStudentsEnrolled: {
         type: Number,
         default: 0
@@ -48,7 +52,11 @@ const courseSchema = new mongoose.Schema({
     courseContent: {
         type: [mongoose.Types.ObjectId],
         ref: "Lesson"
-    }
+    },
+    // enrolledStudents: {
+    //     type: [mongoose.Types.ObjectId],
+    //     ref: "User"
+    // },
 
 }, { timestamps: true })
 
