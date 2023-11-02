@@ -26,10 +26,6 @@ const authSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    educationalCertificates: {
-        type: String,
-        default: null
-    },
     isBanned: {
         type: Boolean,
         default: false

@@ -45,6 +45,10 @@ const courseSchema = new mongoose.Schema({
         type: mongoose.Types.ObjectId,
         ref: "Category"
     },
+    topicReference: {
+        type: mongoose.Types.ObjectId,
+        ref: "Topic"
+    },
     reviewReference: {
         type: [mongoose.Types.ObjectId],
         ref: "Review"

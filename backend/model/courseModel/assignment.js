@@ -29,7 +29,15 @@ const assignmentSchema = new mongoose.Schema({
         submissionDate: {
             type: Date
         }
-    }]
+    }],
+    totalMarks: {
+        type: Number,
+        required: true
+    },
+    passMarks: {
+        type: Number,
+        required: true
+    }
 }, { timestamps: true });
 
 const Assignment = mongoose.model("Assignment", assignmentSchema);

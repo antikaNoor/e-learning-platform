@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema({
         required: true,
         default: "student"
     },
+    // for students
     enrolledCourses: [{
         course: {
             type: mongoose.Types.ObjectId,
@@ -37,6 +38,44 @@ const userSchema = new mongoose.Schema({
     favouriteCourses: {
         type: [mongoose.Types.ObjectId],
         ref: "Course"
+    },
+
+    //for teachers
+    coursesTaught: {
+        type: [mongoose.Types.ObjectId],
+        ref: "Course"
+    },
+    educationalBackground: [{
+        univesity: {
+            type: String,
+            default: null
+        },
+        major: {
+            type: String,
+        },
+        cgpa: {
+            type: Number,
+        }
+    }],
+    teachingExperience: [{
+        institution: {
+            type: String,
+            default: null
+        },
+        duration: {
+            type: String,
+        },
+        description: {
+            type: String
+        }
+    }],
+    isTeacher: {
+        type: Boolean,
+        default: false
+    },
+    approvalDate: {
+        type: Date,
+        default: null
     }
 
 }, { timestamps: true })
