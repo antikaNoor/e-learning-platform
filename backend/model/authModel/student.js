@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 
-const userSchema = new mongoose.Schema({
+const studentSchema = new mongoose.Schema({
     username: {
         type: String,
         maxLength: 50,
@@ -35,50 +35,12 @@ const userSchema = new mongoose.Schema({
         type: [mongoose.Types.ObjectId],
         ref: "Course"
     },
-    favouriteCourses: {
+    wishList: {
         type: [mongoose.Types.ObjectId],
         ref: "Course"
     },
-
-    //for teachers
-    coursesTaught: {
-        type: [mongoose.Types.ObjectId],
-        ref: "Course"
-    },
-    educationalBackground: [{
-        univesity: {
-            type: String,
-            default: null
-        },
-        major: {
-            type: String,
-        },
-        cgpa: {
-            type: Number,
-        }
-    }],
-    teachingExperience: [{
-        institution: {
-            type: String,
-            default: null
-        },
-        duration: {
-            type: String,
-        },
-        description: {
-            type: String
-        }
-    }],
-    isTeacher: {
-        type: Boolean,
-        default: false
-    },
-    approvalDate: {
-        type: Date,
-        default: null
-    }
 
 }, { timestamps: true })
 
-const User = mongoose.model("User", userSchema);
-module.exports = User;
+const Student = mongoose.model("Student", studentSchema);
+module.exports = Student;

@@ -1,5 +1,6 @@
-const authModel = require("../model/auth")
-const userModel = require("../model/user")
+const authModel = require("../model/authModel/auth")
+const studentModel = require("../model/authModel/student")
+const teacherModel = require("../model/authModel/teacher")
 const { success, failure } = require("../utils/successError")
 const mongoose = require("mongoose")
 const bcrypt = require("bcrypt")
@@ -11,6 +12,7 @@ const ejs = require('ejs');
 const ejsRenderFile = promisify(ejs.renderFile)
 const { sendMail } = require('../config/sendMail')
 const { validationResult } = require("express-validator")
+const { userInfo } = require("os")
 
 class AuthController {
     // validation
@@ -42,12 +44,22 @@ class AuthController {
 
             const hashedPassword = await bcrypt.hash(password, 10);
 
+            let userInfo;
 
-            const userInfo = await userModel.create({
-                username,
-                email,
-                role
-            })
+            if(role === "student") {
+                userInfo = await studentModel.create({
+                    username,
+                    email,
+                    role
+                });
+
+            } else if(role === "teacher") {
+                userInfo = await teacherModel.create({
+                    username,
+                    email,
+                    role
+                });
+            }
 
             const authUser = await authModel.create({
                 username,
@@ -56,6 +68,8 @@ class AuthController {
                 role,
                 user: userInfo._id
             });
+
+            console.log("userInfo", userInfo)
 
             await authUser.save();
             await userInfo.save();

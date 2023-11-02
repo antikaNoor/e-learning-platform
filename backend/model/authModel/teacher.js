@@ -1,11 +1,22 @@
 const mongoose = require("mongoose");
 
 const teacherSchema = new mongoose.Schema({
-    user: {
-        type: mongoose.Types.ObjectId,
-        ref: "Auth", // Reference to the authentication schema
+    username: {
+        type: String,
+        maxLength: 50,
+        unique: true,
+        required: [true, "Username should be provided"]
+    },
+    email: {
+        type: String,
+        maxLength: 100,
+        unique: true,
+        required: [true, "Email should be provided"]
+    },
+    role: {
+        type: String,
         required: true,
-        unique: true
+        default: "student"
     },
     coursesTaught: {
         type: [mongoose.Types.ObjectId],

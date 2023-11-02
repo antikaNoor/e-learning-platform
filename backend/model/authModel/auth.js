@@ -54,10 +54,14 @@ const authSchema = new mongoose.Schema({
         type: Date || null,
         default: null
     },
-    user: {
+    studentRef: {
         type: mongoose.Types.ObjectId,
-        ref: "User",
+        ref: "Student",
     },
+    teacherRef: {
+        type: mongoose.Types.ObjectId,
+        ref: "Teacher",
+    }
 
 }, { timestamps: true })
 
