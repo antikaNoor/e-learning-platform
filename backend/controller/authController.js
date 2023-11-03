@@ -45,29 +45,40 @@ class AuthController {
             const hashedPassword = await bcrypt.hash(password, 10);
 
             let userInfo;
+            let authUser;
 
-            if(role === "student") {
+            if (role === "student") {
                 userInfo = await studentModel.create({
                     username,
                     email,
                     role
                 });
 
-            } else if(role === "teacher") {
+                authUser = await authModel.create({
+                    username,
+                    email,
+                    password: hashedPassword,
+                    role,
+                    studentRef: userInfo._id
+                });
+
+            } else if (role === "teacher") {
                 userInfo = await teacherModel.create({
                     username,
                     email,
                     role
                 });
+
+                authUser = await authModel.create({
+                    username,
+                    email,
+                    password: hashedPassword,
+                    role,
+                    teacherRef: userInfo._id
+                });
             }
 
-            const authUser = await authModel.create({
-                username,
-                email,
-                password: hashedPassword,
-                role,
-                user: userInfo._id
-            });
+
 
             console.log("userInfo", userInfo)
 
