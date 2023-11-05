@@ -7,7 +7,14 @@ const topicSchema = new mongoose.Schema({
         unique: true,
         required: [true, "Topic name should be provided"]
     },
-
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
+    categoryID: {
+        type: mongoose.Types.ObjectId,
+        ref: "Category"
+    }
 })
 
 const Topic = mongoose.model("Topic", topicSchema);

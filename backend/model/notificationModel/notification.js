@@ -3,17 +3,22 @@ const mongoose = require("mongoose");
 const notificationSchema = new mongoose.Schema({
     type: {
         type: String,
-        enum: ["course_creation", "subscription_request", "subscription_approval", "content_update"],
+        enum: ["course_creation", "subscription_request", "subscription_approval", "course_approval"],
         required: true
     },
     message: {
         type: String,
         required: true
     },
-    userId: {
+    userID: {
         type: mongoose.Types.ObjectId,
         ref: "Auth",
         required: true
+    },
+    courseID: {
+        type: mongoose.Types.ObjectId,
+        ref: "Course",
+        default: null
     },
     status: {
         type: String,

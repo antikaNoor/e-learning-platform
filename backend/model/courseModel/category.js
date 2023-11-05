@@ -7,7 +7,10 @@ const categorySchema = new mongoose.Schema({
         unique: true,
         required: [true, "Category name should be provided"]
     },
-
+    isDeleted: {
+        type: Boolean,
+        default: false
+    }
 })
 
 const Category = mongoose.model("Category", categorySchema);

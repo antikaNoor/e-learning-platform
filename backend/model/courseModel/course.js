@@ -4,16 +4,15 @@ const courseSchema = new mongoose.Schema({
     title: {
         type: String,
         maxLength: 100,
-        unique: true,
         required: [true, "Course title should be provided"]
     },
     description: {
         type: String,
         required: [true, "Decsription should be provided"]
     },
-    instructorID: {
+    teacherID: {
         type: mongoose.Types.ObjectId,
-        ref: "User"
+        ref: "Teacher"
     },
     language: {
         type: String,
@@ -25,11 +24,11 @@ const courseSchema = new mongoose.Schema({
     requirement: {
         type: [String]
     },
-    isPremium: {
+    isApproved: {
         type: Boolean,
         default: false
     },
-    isApproved: {
+    isPublished: {
         type: Boolean,
         default: false
     },
@@ -41,19 +40,15 @@ const courseSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    categoryReference: {
-        type: mongoose.Types.ObjectId,
-        ref: "Category"
-    },
-    topicReference: {
+    topicID: {
         type: mongoose.Types.ObjectId,
         ref: "Topic"
     },
-    reviewReference: {
+    reviewID: {
         type: [mongoose.Types.ObjectId],
         ref: "Review"
     },
-    courseContent: {
+    lessonID: {
         type: [mongoose.Types.ObjectId],
         ref: "Lesson"
     },

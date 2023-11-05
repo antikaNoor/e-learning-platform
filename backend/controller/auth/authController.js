@@ -1,7 +1,7 @@
-const authModel = require("../model/authModel/auth")
-const studentModel = require("../model/authModel/student")
-const teacherModel = require("../model/authModel/teacher")
-const { success, failure } = require("../utils/successError")
+const authModel = require("../../model/authModel/auth")
+const studentModel = require("../../model/authModel/student")
+const teacherModel = require("../../model/authModel/teacher")
+const { success, failure } = require("../../utils/successError")
 const mongoose = require("mongoose")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
@@ -10,9 +10,8 @@ const path = require("path")
 const { promisify } = require('util')
 const ejs = require('ejs');
 const ejsRenderFile = promisify(ejs.renderFile)
-const { sendMail } = require('../config/sendMail')
+const { sendMail } = require('../../config/sendMail')
 const { validationResult } = require("express-validator")
-const { userInfo } = require("os")
 
 class AuthController {
     // validation
@@ -59,8 +58,11 @@ class AuthController {
                     email,
                     password: hashedPassword,
                     role,
-                    studentRef: userInfo._id
+                    studentID: userInfo._id
                 });
+
+                await authUser.save();
+                await userInfo.save();
 
             } else if (role === "teacher") {
                 userInfo = await teacherModel.create({
@@ -74,16 +76,23 @@ class AuthController {
                     email,
                     password: hashedPassword,
                     role,
-                    teacherRef: userInfo._id
+                    teacherID: userInfo._id
                 });
+
+                await authUser.save();
+                await userInfo.save();
             }
 
+            else if (role === "admin") {
+                authUser = await authModel.create({
+                    username,
+                    email,
+                    password: hashedPassword,
+                    role
+                });
 
-
-            console.log("userInfo", userInfo)
-
-            await authUser.save();
-            await userInfo.save();
+                await authUser.save();
+            }
 
             // Create a verification token
             const token = crypto.randomBytes(32).toString('hex');
@@ -96,7 +105,7 @@ class AuthController {
             const emailVerificationURL = path.join(process.env.BACKEND_AUTH_URL, "verify-email", authUser._id.toString(), token);
 
             // Compose the email content using EJS
-            const htmlBody = await ejsRenderFile(path.join(__dirname, '../views/emailVerification.ejs'), {
+            const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/emailVerification.ejs'), {
                 name: authUser.username,
                 emailVerificationURL: emailVerificationURL,
             });
@@ -108,7 +117,6 @@ class AuthController {
                 const responseAuth = authUser.toObject();
                 delete responseAuth.password;
                 delete responseAuth.loginAttempt;
-                delete responseAuth.user;
                 delete responseAuth.__v;
                 delete responseAuth.createdAt;
                 delete responseAuth.updatedAt;
@@ -146,7 +154,7 @@ class AuthController {
 
             const emailVerificationURL = path.join(process.env.BACKEND_AUTH_URL, "verify-email", user._id.toString(), newToken);
 
-            const htmlBody = await ejsRenderFile(path.join(__dirname, '../views/emailVerification.ejs'), {
+            const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/emailVerification.ejs'), {
                 name: user.username,
                 emailVerificationURL: emailVerificationURL,
             });
@@ -289,7 +297,7 @@ class AuthController {
 
             const resetPasswordURL = path.join(process.env.BACKEND_AUTH_URL, "reset-password", auth._id.toString(), resetToken);
 
-            const htmlBody = await ejsRenderFile(path.join(__dirname, '../views/forgotPassword.ejs'), {
+            const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/forgotPassword.ejs'), {
                 name: auth.username,
                 resetPasswordURL: resetPasswordURL
             })

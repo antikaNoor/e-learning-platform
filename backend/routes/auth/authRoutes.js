@@ -1,7 +1,7 @@
 const express = require('express')
 const routes = express()
-const AuthController = require('../controller/authController')
-const authValidator = require('../middleware/validation')
+const AuthController = require('../../controller/auth/authController')
+const authValidator = require('../../middleware/validation')
 
 routes.post("/signup", authValidator.signup, AuthController.createValiadtion, AuthController.signUp)
 routes.post("/resend-verification-email", AuthController.resendVerificationEmail)

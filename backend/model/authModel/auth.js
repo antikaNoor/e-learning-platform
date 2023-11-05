@@ -54,11 +54,11 @@ const authSchema = new mongoose.Schema({
         type: Date || null,
         default: null
     },
-    studentRef: {
+    studentID: {
         type: mongoose.Types.ObjectId,
         ref: "Student",
     },
-    teacherRef: {
+    teacherID: {
         type: mongoose.Types.ObjectId,
         ref: "Teacher",
     }

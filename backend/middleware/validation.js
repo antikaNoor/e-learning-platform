@@ -39,4 +39,18 @@ const authValidator = {
     ]
 }
 
+// const courseValidator = {
+//     addCourse: [
+//         body("title")
+//             .isString()
+//             .withMessage("Title must be a string.")
+//             .custom((value) => {
+//                 if (value === "") {
+//                     throw new Error("Name cannot be empty")
+//                 }
+//                 return true
+//             }),
+//     ]
+// }
+
 module.exports = authValidator

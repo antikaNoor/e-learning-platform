@@ -1,14 +1,14 @@
 const mongoose = require("mongoose");
 
 const evaluationSchema = new mongoose.Schema({
-    courseReference: {
+    courseID: {
         type: mongoose.Types.ObjectId,
         ref: "Course",
         required: true
     },
-    studentReference: {
+    studentID: {
         type: mongoose.Types.ObjectId,
-        ref: "User",
+        ref: "Student",
         required: true
     },
     quizScore: {

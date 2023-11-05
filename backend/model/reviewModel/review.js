@@ -1,14 +1,14 @@
 const mongoose = require("mongoose");
 
 const reviewSchema = new mongoose.Schema({
-    courseReference: {
+    courseID: {
         type: mongoose.Types.ObjectId,
         ref: "Course",
         required: true,
     },
-    userReference: {
+    userID: {
         type: mongoose.Types.ObjectId,
-        ref: "User",
+        ref: "Auth",
         required: true,
     },
     rating: {
@@ -22,11 +22,11 @@ const reviewSchema = new mongoose.Schema({
     },
     likes: {
         type: [mongoose.Types.ObjectId],
-        ref: "User"
+        ref: "Auth"
     },
     dislikes: {
         type: [mongoose.Types.ObjectId],
-        ref: "User"
+        ref: "Auth"
     }
 }, { timestamps: true });
 
