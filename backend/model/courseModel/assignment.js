@@ -21,7 +21,7 @@ const assignmentSchema = new mongoose.Schema({
     responses: [{
         studentID: {
             type: mongoose.Types.ObjectId,
-            ref: "User"
+            ref: "Student",
         },
         answer: {
             type: String

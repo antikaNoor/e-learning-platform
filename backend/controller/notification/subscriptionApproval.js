@@ -1,5 +1,6 @@
 const courseModel = require("../../model/courseModel/course")
 const authModel = require("../../model/authModel/auth")
+const studentModel = require("../../model/authModel/student")
 const notificationModel = require("../../model/notificationModel/notification")
 const { success, failure } = require("../../utils/successError")
 const express = require('express')
@@ -13,7 +14,7 @@ const ejs = require('ejs');
 const ejsRenderFile = promisify(ejs.renderFile)
 const { sendMail } = require('../../config/sendMail')
 
-class courseApprovalController {
+class SubscriptionApprovalController {
     async createValiadtion(req, res, next) {
         try {
             const validation = validationResult(req).array()
@@ -26,36 +27,47 @@ class courseApprovalController {
         }
     }
 
-    // publish a course 
-    async publishCourse(req, res) {
+    // request for subscription
+    async requestForSubscription(req, res) {
         try {
             const { courseID } = req.body
 
             const existingCourse = await courseModel.findOne({ _id: new mongoose.Types.ObjectId(courseID) })
-            if (!existingCourse || existingCourse.isDeleted === true) {
-                return res.status(400).send(failure("This course does not exist. Please enter a valid course."))
+            if (!existingCourse || existingCourse.isDeleted === true || existingCourse.isPublished === false) {
+                return res.status(400).send(failure("This course does not exist or is not published. Please enter a valid course."))
             }
 
-            //only the teacher who created the course can publish the course
-            if (!existingCourse.teacherID.equals(req.user._id)) {
-                return res.status(400).send(failure("Only the teacher who created the course can publish the course."))
+            // check is student is already enrolled in the course
+            const student = await authModel.findOne({ _id: req.user._id })
+                .populate({
+                    path: "studentID",
+                    select: "email",
+                });
+
+            // find the student in student model using the email
+            if (!student) {
+                return res.status(400).send(failure("Student not found"))
             }
 
-            // now admin can review the course for approval
-            existingCourse.isPublished = true
-            await existingCourse.save()
+            console.log("Student", student)
 
-            //send notification to admin for approval
-            const admin = await authModel.findOne({ role: "admin" })
-            if (!admin) {
-                return res.status(400).send(failure("Admin not found"))
+            const existingStudent = await studentModel.findOne({ email: student.email })
+
+            console.log("existingStudent", existingStudent)
+
+            if (!existingStudent) {
+                return res.status(400).send(failure("Student not found"))
+            }
+
+            if (existingStudent.enrolledCourses.includes(existingCourse._id)) {
+                return res.status(400).send(failure("You are already enrolled in this course."))
             }
 
             const notification = {
-                type: "course_approval",
-                userID: existingCourse.teacherID,
+                type: "subscription_request",
+                userID: student._id,
                 courseID: existingCourse._id,
-                message: `${req.user.username} has published a new course, ${existingCourse.title}.`,
+                message: `${req.user.username} has requested to subscribe for a course, ${existingCourse.title}.`,
             }
 
             await notificationModel.create(notification)
@@ -68,7 +80,7 @@ class courseApprovalController {
     }
 
     // show all notification (for admin)
-    async showAllNotification(req, res) {
+    async showAllSubscriptionRequest(req, res) {
         try {
             const notifications = await notificationModel.find()
             return res.status(200).send(success(notifications))
@@ -78,9 +90,8 @@ class courseApprovalController {
         }
     }
 
-    // accept or reject a course
-    // accept or reject a course
-    async acceptOrRejectCourse(req, res) {
+    // accept or reject a subscription
+    async acceptOrRejectSubscription(req, res) {
         try {
             const { notificationID, action } = req.body;
 
@@ -88,7 +99,7 @@ class courseApprovalController {
                 return res.status(400).send(failure("Please provide all the fields."));
             }
 
-            const isCourseApproved = action === 'approve' ? true : false;
+            let isSubscriptionApproved = action === 'approve' ? true : false;
 
             const existingNotification = await notificationModel
                 .findOne({ _id: new mongoose.Types.ObjectId(notificationID) })
@@ -96,6 +107,8 @@ class courseApprovalController {
                     path: "userID",
                     select: "username email",
                 });
+
+            console.log(existingNotification)
 
             if (!existingNotification) {
                 return res.status(400).send(failure("This notification does not exist. Please enter a valid notification."));
@@ -107,19 +120,30 @@ class courseApprovalController {
                 return res.status(400).send(failure("This course does not exist."));
             }
 
-            if (existingCourse.isApproved === true) {
-                return res.status(400).send(failure("This course has already been approved."));
+            if (existingCourse.isApproved !== true) {
+                return res.status(400).send(failure("This course has not been approved by admin."));
+            }
+
+            const existingStudent = await studentModel.findOne({ email: existingNotification.userID.email });
+
+            if (!existingStudent) {
+                return res.status(400).send(failure("Student not found"))
+            }
+
+            if (existingStudent.enrolledCourses.includes(existingCourse._id)) {
+                return res.status(400).send(failure("You are already enrolled in this course."))
             }
 
             if (action === 'approve') {
-                existingCourse.isApproved = true;
+                // add the course to the enrolledCourses of the student
+                isSubscriptionApproved = true
+                existingStudent.enrolledCourses.push(existingCourse._id);
+                await existingStudent.save();
             } else if (action === 'reject') {
-                existingCourse.isApproved = false;
+                isSubscriptionApproved = false
             } else {
                 return res.status(400).send(failure("Invalid action. Please provide 'approve' or 'reject'."));
             }
-
-            await existingCourse.save();
 
             existingNotification.status = "read";
             await existingNotification.save();
@@ -129,24 +153,24 @@ class courseApprovalController {
             }
 
             // Create an email
-            const courseApprovalEmailURL = path.join(process.env.BACKEND_AUTH_URL, "course-approval");
+            const SubscriptionApprovalEmailURL = path.join(process.env.BACKEND_AUTH_URL, "subscription-approval");
 
             // Compose the email
-            const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/courseApprovalEmail.ejs'), {
+            const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/SubscriptionApprovalEmail.ejs'), {
                 name: existingNotification.userID.username,
                 courseName: existingCourse.title,
-                isCourseApproved: isCourseApproved,
-                courseApprovalEmailURL: courseApprovalEmailURL,
+                isSubscriptionApproved: isSubscriptionApproved,
+                SubscriptionApprovalEmailURL: SubscriptionApprovalEmailURL,
             });
 
             // Send the email
-            const emailResult = await sendMail(existingNotification.userID.email, "Course Approval", htmlBody);
+            const emailResult = await sendMail(existingNotification.userID.email, "Subscription Approval", htmlBody);
 
             if (!emailResult) {
                 return res.status(400).send(failure("Failed to send email."));
             }
 
-            return res.status(200).send(success(`Course has been ${action === 'approve' ? 'approved' : 'rejected'} successfully.`));
+            return res.status(200).send(success(`Subscription has been ${action === 'approve' ? 'approved' : 'rejected'} successfully.`));
 
         } catch (error) {
             console.log("error", error);
@@ -155,4 +179,4 @@ class courseApprovalController {
     }
 
 }
-module.exports = new courseApprovalController()
+module.exports = new SubscriptionApprovalController()

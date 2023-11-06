@@ -8,9 +8,9 @@ const jwt = require("jsonwebtoken")
 const authModel = require("../../model/authModel/auth")
 const studentModel = require("../../model/authModel/student")
 const courseModel = require("../../model/courseModel/course")
-const cartModel = require("../../model/subscriptionModel/cart")
+const wishListModel = require("../../model/subscriptionModel/cart")
 
-class cartController {
+class wishListController {
 
     // validation
     async create(req, res, next) {
@@ -25,8 +25,8 @@ class cartController {
         }
     }
 
-    //add to cart
-    async addToCart(req, res) {
+    //add to wish-list
+    async addToWishList(req, res) {
         try {
             const { courseID } = req.body
 
@@ -54,11 +54,11 @@ class cartController {
                 return res.status(400).send(failure("Student not found."))
             }
 
-            //check if the student has a cart
-            const existingCart = await cartModel.findOne({ studentID: new mongoose.Types.ObjectId(studentID) })
+            //check if the student has a wish-list
+            const existingWish = await wishListModel.findOne({ studentID: new mongoose.Types.ObjectId(studentID) })
 
-            if (!existingCart) {
-                // create a new cart
+            if (!existingWish) {
+                // create a new wish-list
                 const cart = new cartModel({
                     studentID: new mongoose.Types.ObjectId(studentID),
                     courseID: [existingCourse._id]
@@ -67,9 +67,9 @@ class cartController {
                 return res.status(200).send(success("Course added to cart successfully."))
             }
 
-            // if there is already a cart against the student, just push into the array
-            existingCart.courseID.push(existingCourse._id)
-            await existingCart.save()
+            // if there is already a wish-list against the student, just push into the array
+            existingWish.courseID.push(existingCourse._id)
+            await existingWish.save()
 
             return res.status(200).send(success("Course added to cart successfully."))
 
@@ -374,4 +374,4 @@ class cartController {
     }
 }
 
-module.exports = new cartController()
+module.exports = new wishListController()
