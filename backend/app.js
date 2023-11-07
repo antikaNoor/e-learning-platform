@@ -12,6 +12,7 @@ const topicRouter = require('./routes/course/topicRoutes')
 const cartRouter = require('./routes/subscription/cartRoutes')
 const courseApprovalRouter = require('./routes/notification/courseApprovalRoutes')
 const subscriptionApprovalRouter = require('./routes/notification/subscriptionApprocalRoutes')
+const teacherApprovalRouter = require('./routes/notification/teacherApprovalRoutes')
 
 const app = express()
 app.use(cors({ origin: "*" }))
@@ -34,6 +35,7 @@ app.use("/topic", topicRouter)
 app.use("/cart", cartRouter)
 app.use("/notification", courseApprovalRouter)
 app.use("/notification", subscriptionApprovalRouter)
+app.use("/notification", teacherApprovalRouter)
 
 // using route() method to get the invalid routes
 app.route('*')

@@ -46,10 +46,6 @@ const teacherSchema = new mongoose.Schema({
             type: String
         }
     }],
-    certification: {
-        type: String,
-        default: null
-    },
     isApproved: {
         type: Boolean,
         default: false
