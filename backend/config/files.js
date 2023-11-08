@@ -11,7 +11,7 @@ const { S3_REGION, S3_BUCKET, S3_BASE_URL } = process.env;
 const uploadFile = async function (file, folderName) {
     const s3Client = new S3Client({ region: S3_REGION });
     const key = folderName
-        ? `${folderName}/${Date.now()}-${file.originalname}`
+        ? `${folderName}/${Date.now()}-${file.originalname.replace(' ', '_')}`
         : `${Date.now()}-${file.originalname}`;
     const s3Params = {
         Bucket: S3_BUCKET,

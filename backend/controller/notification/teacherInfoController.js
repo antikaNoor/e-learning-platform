@@ -42,7 +42,7 @@ class TeacherController {
 
             // if the fields are already filled up, ask the teacher to edit it.
             if (existingTeacher.educationalBackground.length > 0 || existingTeacher.teachingExperience.length > 0) {
-                return res.status(400).send(failure("Teacher information already filled up."));
+                return res.status(400).send(failure("Teacher information already filled up and admin has been notified."));
             }
 
             // Create an array of education background
@@ -112,6 +112,9 @@ class TeacherController {
                 return res.status(400).send(failure("This teacher has already been approved."));
             }
 
+            existingNotification.status = "read";
+            await existingNotification.save()
+
             if (action === 'approve') {
                 existingTeacher.isApproved = true;
                 existingTeacher.approvalDate = new Date();
@@ -123,7 +126,7 @@ class TeacherController {
                 // Compose the email
                 const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/teacherApprovalEmail.ejs'), {
                     name: existingNotification.userID.username,
-                    isTeacherApproved: true,
+                    isTeacherApproved: isTeacherApproved,
                     teacherApprovalEmailURL: teacherApprovalEmailURL,
                 });
 
@@ -138,15 +141,13 @@ class TeacherController {
             }
 
             if (action === 'reject') {
-                console.log("Rejected")
-
                 // Create an email
                 const teacherApprovalEmailURL = path.join(process.env.BACKEND_AUTH_URL, "teacher-approval");
 
                 // Compose the email
                 const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/teacherApprovalEmail.ejs'), {
                     name: existingNotification.userID.username,
-                    isTeacherApproved: true,
+                    isTeacherApproved: isTeacherApproved,
                     teacherApprovalEmailURL: teacherApprovalEmailURL,
                 });
 

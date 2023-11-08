@@ -49,11 +49,7 @@ class SubscriptionApprovalController {
                 return res.status(400).send(failure("Student not found"))
             }
 
-            console.log("Student", student)
-
             const existingStudent = await studentModel.findOne({ email: student.email })
-
-            console.log("existingStudent", existingStudent)
 
             if (!existingStudent) {
                 return res.status(400).send(failure("Student not found"))
@@ -108,8 +104,6 @@ class SubscriptionApprovalController {
                     select: "username email",
                 });
 
-            console.log(existingNotification)
-
             if (!existingNotification) {
                 return res.status(400).send(failure("This notification does not exist. Please enter a valid notification."));
             }
@@ -134,43 +128,55 @@ class SubscriptionApprovalController {
                 return res.status(400).send(failure("You are already enrolled in this course."))
             }
 
+            existingNotification.status = "read";
+            await existingNotification.save()
+
             if (action === 'approve') {
                 // add the course to the enrolledCourses of the student
-                isSubscriptionApproved = true
                 existingStudent.enrolledCourses.push(existingCourse._id);
                 await existingStudent.save();
+
+                // Create an email
+                const SubscriptionApprovalEmailURL = path.join(process.env.BACKEND_AUTH_URL, "subscription-approval");
+
+                // Compose the email
+                const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/SubscriptionApprovalEmail.ejs'), {
+                    name: existingNotification.userID.username,
+                    courseName: existingCourse.title,
+                    isSubscriptionApproved: isSubscriptionApproved,
+                    SubscriptionApprovalEmailURL: SubscriptionApprovalEmailURL,
+                });
+
+                // Send the email
+                const emailResult = await sendMail(existingNotification.userID.email, "Subscription Approval", htmlBody);
+
+                if (!emailResult) {
+                    return res.status(400).send(failure("Failed to send email."));
+                }
+
+                return res.status(200).send(success(`Subscription request for ${existingCourse.title} has been approved successfully.`));
             } else if (action === 'reject') {
-                isSubscriptionApproved = false
-            } else {
-                return res.status(400).send(failure("Invalid action. Please provide 'approve' or 'reject'."));
+                // Create an email
+                const SubscriptionApprovalEmailURL = path.join(process.env.BACKEND_AUTH_URL, "subscription-approval");
+
+                // Compose the email
+                const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/SubscriptionApprovalEmail.ejs'), {
+                    name: existingNotification.userID.username,
+                    courseName: existingCourse.title,
+                    isSubscriptionApproved: isSubscriptionApproved,
+                    SubscriptionApprovalEmailURL: SubscriptionApprovalEmailURL,
+                });
+
+                // Send the email
+                const emailResult = await sendMail(existingNotification.userID.email, "Subscription Rejection", htmlBody);
+
+                if (!emailResult) {
+                    return res.status(400).send(failure("Failed to send email."));
+                }
+
+                return res.status(200).send(success(`Subscription request for ${existingCourse.title} has been rejected.`));
             }
-
-            existingNotification.status = "read";
-            await existingNotification.save();
-
-            if (existingNotification.status === "read") {
-                return res.status(400).send(failure("This course has been reviewed already."));
-            }
-
-            // Create an email
-            const SubscriptionApprovalEmailURL = path.join(process.env.BACKEND_AUTH_URL, "subscription-approval");
-
-            // Compose the email
-            const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/SubscriptionApprovalEmail.ejs'), {
-                name: existingNotification.userID.username,
-                courseName: existingCourse.title,
-                isSubscriptionApproved: isSubscriptionApproved,
-                SubscriptionApprovalEmailURL: SubscriptionApprovalEmailURL,
-            });
-
-            // Send the email
-            const emailResult = await sendMail(existingNotification.userID.email, "Subscription Approval", htmlBody);
-
-            if (!emailResult) {
-                return res.status(400).send(failure("Failed to send email."));
-            }
-
-            return res.status(200).send(success(`Subscription has been ${action === 'approve' ? 'approved' : 'rejected'} successfully.`));
+            return res.status(400).send(failure("Invalid action. Please provide 'approve' or 'reject'."));
 
         } catch (error) {
             console.log("error", error);

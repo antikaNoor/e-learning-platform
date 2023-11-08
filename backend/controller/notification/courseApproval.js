@@ -1,5 +1,6 @@
 const courseModel = require("../../model/courseModel/course")
 const authModel = require("../../model/authModel/auth")
+const teacherModel = require("../../model/authModel/teacher")
 const notificationModel = require("../../model/notificationModel/notification")
 const { success, failure } = require("../../utils/successError")
 const express = require('express')
@@ -107,47 +108,72 @@ class courseApprovalController {
                 return res.status(400).send(failure("This course does not exist."));
             }
 
+            if (existingCourse.isPublished !== true) {
+                return res.status(400).send(failure("This course has not been published."));
+            }
+
             if (existingCourse.isApproved === true) {
                 return res.status(400).send(failure("This course has already been approved."));
             }
 
-            if (action === 'approve') {
-                existingCourse.isApproved = true;
-            } else if (action === 'reject') {
-                existingCourse.isApproved = false;
-            } else {
-                return res.status(400).send(failure("Invalid action. Please provide 'approve' or 'reject'."));
-            }
+            const existingTeacher = await teacherModel.findOne({ email: existingNotification.userID.email });
 
-            await existingCourse.save();
+            if (!existingTeacher && existingTeacher.isApproved !== true) {
+                return res.status(400).send(failure("Teacher not found"))
+            }
 
             existingNotification.status = "read";
-            await existingNotification.save();
+            await existingNotification.save()
 
-            if (existingNotification.status === "read") {
-                return res.status(400).send(failure("This course has been reviewed already."));
+            if (action === 'approve') {
+                existingCourse.isApproved = true;
+                await existingCourse.save()
+                // enter the course into teacher's coursesTaught
+                existingTeacher.coursesTaught.push(existingCourse._id);
+                await existingTeacher.save();
+
+                // Create an email
+                const courseApprovalEmailURL = path.join(process.env.BACKEND_AUTH_URL, "course-approval");
+
+                // Compose the email
+                const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/courseApprovalEmail.ejs'), {
+                    name: existingNotification.userID.username,
+                    courseName: existingCourse.title,
+                    isCourseApproved: isCourseApproved,
+                    courseApprovalEmailURL: courseApprovalEmailURL,
+                });
+
+                // Send the email
+                const emailResult = await sendMail(existingNotification.userID.email, "Course Approval", htmlBody);
+
+                if (!emailResult) {
+                    return res.status(400).send(failure("Failed to send email."));
+                }
+
+                return res.status(200).send(success(`Course has been approved successfully.`));
+
+            } else if (action === 'reject') {
+                // Create an email
+                const courseApprovalEmailURL = path.join(process.env.BACKEND_AUTH_URL, "course-approval");
+
+                // Compose the email
+                const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/courseApprovalEmail.ejs'), {
+                    name: existingNotification.userID.username,
+                    courseName: existingCourse.title,
+                    isCourseApproved: isCourseApproved,
+                    courseApprovalEmailURL: courseApprovalEmailURL,
+                });
+
+                // Send the email
+                const emailResult = await sendMail(existingNotification.userID.email, "Course Approval", htmlBody);
+
+                if (!emailResult) {
+                    return res.status(400).send(failure("Failed to send email."));
+                }
+
+                return res.status(200).send(success(`Course has been rejected.`));
             }
-
-            // Create an email
-            const courseApprovalEmailURL = path.join(process.env.BACKEND_AUTH_URL, "course-approval");
-
-            // Compose the email
-            const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/courseApprovalEmail.ejs'), {
-                name: existingNotification.userID.username,
-                courseName: existingCourse.title,
-                isCourseApproved: isCourseApproved,
-                courseApprovalEmailURL: courseApprovalEmailURL,
-            });
-
-            // Send the email
-            const emailResult = await sendMail(existingNotification.userID.email, "Course Approval", htmlBody);
-
-            if (!emailResult) {
-                return res.status(400).send(failure("Failed to send email."));
-            }
-
-            return res.status(200).send(success(`Course has been ${action === 'approve' ? 'approved' : 'rejected'} successfully.`));
-
+            return res.status(400).send(failure("Invalid action. Please provide 'approve' or 'reject'."));
         } catch (error) {
             console.log("error", error);
             return res.status(500).send(failure("Internal server error"));

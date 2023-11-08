@@ -53,4 +53,25 @@ const authValidator = {
 //     ]
 // }
 
-module.exports = authValidator
+const reviewValidator = {
+    addReview: [
+        body("rating")
+            .isNumeric()
+            .withMessage("Rating must be a number.")
+            .custom((value) => {
+                if (value < 1 || value > 5) {
+                    throw new Error("Rating must be between 1 and 5.")
+                }
+                return true
+            }),
+
+        body("text")
+            .isString()
+            .withMessage("Text must be a string."),
+    ]
+}
+
+module.exports = {
+    authValidator,
+    reviewValidator
+}

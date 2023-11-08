@@ -4,10 +4,9 @@ const TopicController = require('../../controller/course/topicController')
 const { isUserLoggedIn,
     isUserAdmin,
     isUserStudent,
-    isUserTeacher,
-    isUserVerified } = require('../../middleware/auth')
+    isUserTeacher } = require('../../middleware/auth')
 
-routes.post("/create-topic", isUserLoggedIn, isUserAdmin, isUserVerified, TopicController.createTopic)
-routes.post("/delete-topic", isUserLoggedIn, isUserAdmin, isUserVerified, TopicController.deleteTopic)
+routes.post("/create-topic", isUserLoggedIn, isUserAdmin, TopicController.createTopic)
+routes.post("/delete-topic", isUserLoggedIn, isUserAdmin, TopicController.deleteTopic)
 
 module.exports = routes 

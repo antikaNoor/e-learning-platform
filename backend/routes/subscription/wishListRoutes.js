@@ -1,11 +1,11 @@
 const express = require('express')
 const routes = express()
-const CartController = require('../../controller/subscription/cartController')
+const WishListController = require('../../controller/subscription/wishListController')
 const { isUserLoggedIn,
     isUserAdmin,
     isUserStudent,
     isUserTeacher } = require('../../middleware/auth')
 
-routes.post("/add-to-cart", isUserLoggedIn, isUserStudent, CartController.addToCart)
+routes.post("/add-to-wishlist", isUserLoggedIn, isUserStudent, WishListController.addToWishList)
 
 module.exports = routes 

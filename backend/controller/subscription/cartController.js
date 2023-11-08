@@ -1,4 +1,3 @@
-
 const { success, failure } = require('../../utils/successError')
 const express = require('express')
 const { validationResult } = require('express-validator')
@@ -65,6 +64,13 @@ class cartController {
                 })
                 await cart.save()
                 return res.status(200).send(success("Course added to cart successfully."))
+            }
+
+            // check if the course is already added to the cart
+            const existingCourseInCart = existingCart.courseID.find(course => course.equals(existingCourse._id))
+
+            if (existingCourseInCart) {
+                return res.status(400).send(failure("Course already added to cart."))
             }
 
             // if there is already a cart against the student, just push into the array

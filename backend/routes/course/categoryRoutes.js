@@ -4,10 +4,9 @@ const CategoryController = require('../../controller/course/categoryController')
 const { isUserLoggedIn,
     isUserAdmin,
     isUserStudent,
-    isUserTeacher,
-    isUserVerified } = require('../../middleware/auth')
+    isUserTeacher } = require('../../middleware/auth')
 
-routes.post("/create-category", isUserLoggedIn, isUserAdmin, isUserVerified, CategoryController.createCategory)
-routes.post("/delete-category", isUserLoggedIn, isUserAdmin, isUserVerified, CategoryController.deleteCategory)
+routes.post("/create-category", isUserLoggedIn, isUserAdmin, CategoryController.createCategory)
+routes.post("/delete-category", isUserLoggedIn, isUserAdmin, CategoryController.deleteCategory)
 
 module.exports = routes 

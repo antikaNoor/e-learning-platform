@@ -1,24 +1,28 @@
 const mongoose = require("mongoose");
 
 const forumSchema = new mongoose.Schema({
+    courseID: {
+        type: mongoose.Types.ObjectId,
+        ref: "Course",
+        required: true
+    },
     userWithQuestion: {
         type: mongoose.Types.ObjectId,
         ref: "Auth",
-        required: true
-    },
-    userWithAnswer: {
-        type: mongoose.Types.ObjectId,
-        ref: "Auth",
-        required: true
     },
     question: {
         type: String,
         required: true
     },
-    answer: {
-        type: String,
-        default: null
-    },
+    answers: [{
+        userWithAnswer: {
+            type: mongoose.Types.ObjectId,
+            ref: "Auth",
+        },
+        answer: {
+            type: String
+        }
+    }],
     isAnswered: {
         type: Boolean,
         default: false

@@ -7,7 +7,7 @@ const quizSchema = new mongoose.Schema({
         required: true
     },
     questions: [{
-        questionText: {
+        question: {
             type: String,
             required: true
         },
@@ -22,11 +22,12 @@ const quizSchema = new mongoose.Schema({
     }],
     totalMarks: {
         type: Number,
-        required: true
     },
     passMarks: {
         type: Number,
-        required: true
+    },
+    duration: {
+        type: Number,
     }
 }, { timestamps: true });
 
