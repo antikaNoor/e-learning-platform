@@ -17,7 +17,7 @@ routes.post("/request-for-subscription", isUserLoggedIn, isUserStudent, Subscrip
 routes.post("/subscription-approval", isUserLoggedIn, isUserAdmin, SubscriptionApprovalController.acceptOrRejectSubscription)
 
 // teacher approval
-routes.post("/teacher-request", isUserLoggedIn, isUserTeacher, TeacherApprovalController.addTeacherInfo)
+routes.post("/teacher-request", isUserLoggedIn, TeacherApprovalController.addTeacherInfo)
 routes.post("/teacher-approval", isUserLoggedIn, isUserAdmin, TeacherApprovalController.acceptOrRejectTeacher)
 
 module.exports = routes 

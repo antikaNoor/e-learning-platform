@@ -13,6 +13,8 @@ const { uploadFile, deleteFile, deleteFolder } = require("../../config/files")
 const fs = require('fs')
 const path = require('path')
 
+let endQuizTime = null
+
 class QuizController {
     async createValiadtion(req, res, next) {
         try {
@@ -146,14 +148,55 @@ class QuizController {
     }
 
     //start quiz countdown
-    // async startQuizCountdown(req, res) {
-    //     try {
+    async startQuizCountdown(req, res) {
+        try {
+            const { quizID } = req.params;
+            const existingQuiz = await quizModel.findOne({ _id: new mongoose.Types.ObjectId(quizID) });
 
-    //     } catch(error) {
-    //         console.error("Error", error);
-    //         return res.status(500).send(failure("Internal server error"));
-    //     }
-    // }
+            if (!existingQuiz) {
+                return res.status(400).send(failure("Quiz not found"));
+            }
+
+            // store the exact time of hitting this api
+            const time = Date.now();
+
+            // add this time with duration
+            endQuizTime = time + existingQuiz.duration * 60 * 1000;
+
+            const formattedEndTime = new Date(endQuizTime).toLocaleString();
+
+            return res.status(200).send(success("Quiz countdown started successfully", {
+                time: formattedEndTime
+            }))
+
+        } catch (error) {
+            console.error("Error", error);
+            return res.status(500).send(failure("Internal server error"));
+        }
+    }
+
+    // Submiting a quiz
+    async submitQuiz(req, res) {
+        try {
+            // const { quizID } = req.params;
+            const { quizID, answer } = req.body;
+            const existingQuiz = await quizModel.findOne({ _id: new mongoose.Types.ObjectId(quizID) });
+
+            if (!existingQuiz) {
+                return res.status(400).send(failure("Quiz not found"));
+            }
+
+            if (Date.now() > endQuizTime) {
+                return res.status(400).send(failure("Sorry, time's up!"));
+            }
+
+            // calculate student's mark and enter into evaluation model
+
+        } catch (error) {
+            console.error("Error", error);
+            return res.status(500).send(failure("Internal server error"));
+        }
+    }
 }
 
 module.exports = new QuizController()

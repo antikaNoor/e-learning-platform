@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken")
 const { success, failure } = require("../utils/successError")
 
 const authModel = require('../model/authModel/auth')
+const teacherModel = require("../model/authModel/teacher")
 
 const isUserLoggedIn = async (req, res, next) => {
     try {
@@ -134,7 +135,13 @@ const isUserTeacher = async (req, res, next) => {
             return res.status(400).send(failure("User not found"))
         }
 
-        if (user.role !== "teacher" || user.isBanned || !user.isVerified || !user.isApproved) {
+        if (user.role !== "teacher" || user.isBanned || !user.isVerified) {
+            return res.status(400).send(failure("Authorization failed!"))
+        }
+
+        const teacher = await teacherModel.findOne({ email: user.email })
+
+        if (!teacher || !teacher.isApproved) {
             return res.status(400).send(failure("Authorization failed!"))
         }
 
