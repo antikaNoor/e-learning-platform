@@ -66,6 +66,7 @@ const reviewValidator = {
             }),
 
         body("text")
+            .optional()
             .isString()
             .withMessage("Text must be a string."),
     ]

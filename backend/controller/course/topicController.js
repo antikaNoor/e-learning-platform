@@ -93,6 +93,42 @@ class TopicController {
       return res.status(500).send(failure("Internal server error"));
     }
   }
+
+  // get all topics
+  async getTopics(req, res) {
+    try {
+      const topics = await topicModel.find({ isDeleted: false })
+        .select("topicName");
+
+      if (!topics) {
+        return res.status(400).send(failure("Topics not found."));
+      }
+
+      return res.status(200).send(success("All topics", topics));
+    } catch (error) {
+      console.log("error", error);
+      return res.status(500).send(failure("Internal server error"));
+    }
+  }
+
+  // get all courses under a topic
+  async getCoursesUnderTopic(req, res) {
+    try {
+      const { topicID } = req.params;
+
+      // find all courses under this topic
+      const courses = await courseModel.find({ topicID: new mongoose.Types.ObjectId(topicID), isApproved: true, isDeleted: false })
+
+      if (!courses) {
+        return res.status(400).send(failure("Courses not found."));
+      }
+
+      return res.status(200).send(success("All courses under this topic", courses));
+    } catch (error) {
+      console.log("error", error);
+      return res.status(500).send(failure("Internal server error"));
+    }
+  }
 }
 
 module.exports = new TopicController();

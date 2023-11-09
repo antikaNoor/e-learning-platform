@@ -1,15 +1,16 @@
 const mongoose = require("mongoose");
 
 const evaluationSchema = new mongoose.Schema({
-    courseID: {
-        type: mongoose.Types.ObjectId,
-        ref: "Course",
-        required: true
-    },
     studentID: {
         type: mongoose.Types.ObjectId,
         ref: "Student",
         required: true
+    },
+    endQuizTime: {
+        type: Date
+    },
+    quizAnswer: {
+        type: [String],
     },
     quizScore: {
         type: Number,
@@ -19,7 +20,15 @@ const evaluationSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
-    isPassed: {
+    isPassedInQuiz: {
+        type: Boolean,
+        default: false
+    },
+    chance: {
+        type: Number,
+        default: 0
+    },
+    isPassedInAssignment: {
         type: Boolean,
         default: false
     }

@@ -8,5 +8,8 @@ const { isUserLoggedIn,
 
 routes.post("/create-category", isUserLoggedIn, isUserAdmin, CategoryController.createCategory)
 routes.post("/delete-category", isUserLoggedIn, isUserAdmin, CategoryController.deleteCategory)
+routes.get("/get-all-categories", CategoryController.getAllCategories)
+routes.get("/get-topics-under-category/:categoryID", CategoryController.getTopicsUnderCategory)
+routes.get("/get-courses-under-category/:categoryID", CategoryController.getCoursesUnderCategory)
 
 module.exports = routes 

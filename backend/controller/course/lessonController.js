@@ -46,17 +46,17 @@ class LessonController {
             const uploadRes = await uploadFile(file, folderName)
 
             const lesson = await lessonModel.create({
-                title, 
-                description, 
+                title,
+                description,
                 isAccessibleToUnenrolled,
-                courseID, 
+                courseID,
                 videoFilePath: uploadRes,
             });
 
             await lesson.save();
 
             const responseLesson = lesson.toObject();
-            
+
             delete responseLesson.isAccessibleToUnenrolled;
             delete responseLesson.isDeleted;
 

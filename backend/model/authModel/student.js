@@ -37,7 +37,11 @@ const studentSchema = new mongoose.Schema({
     },
     wishList: {
         type: [mongoose.Types.ObjectId],
-        ref: "Course"
+        ref: "WishList"
+    },
+    Cart: {
+        type: [mongoose.Types.ObjectId],
+        ref: "Cart"
     },
 
 }, { timestamps: true })

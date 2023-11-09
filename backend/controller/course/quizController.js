@@ -3,6 +3,7 @@ const studentModel = require("../../model/authModel/student")
 const teacherModel = require("../../model/authModel/teacher")
 const courseModel = require("../../model/courseModel/course")
 const quizModel = require("../../model/courseModel/quiz")
+const evaluationModel = require("../../model/courseModel/evaluation")
 
 const { success, failure } = require("../../utils/successError")
 const express = require('express')
@@ -12,9 +13,6 @@ const { uploadFile, deleteFile, deleteFolder } = require("../../config/files")
 // const fileTypes = require("../constants/fileTypes")
 const fs = require('fs')
 const path = require('path')
-
-let endQuizTime = null
-
 class QuizController {
     async createValiadtion(req, res, next) {
         try {
@@ -161,7 +159,14 @@ class QuizController {
             const time = Date.now();
 
             // add this time with duration
-            endQuizTime = time + existingQuiz.duration * 60 * 1000;
+            const endQuizTime = time + existingQuiz.duration * 60 * 1000;
+            const evaluation = await evaluationModel.create({
+                courseID: existingQuiz.courseID,
+                studentID: req.user._id,
+                endQuizTime
+            })
+
+            await evaluation.save();
 
             const formattedEndTime = new Date(endQuizTime).toLocaleString();
 
@@ -175,28 +180,86 @@ class QuizController {
         }
     }
 
-    // Submiting a quiz
+    // Submitting a quiz
     async submitQuiz(req, res) {
         try {
-            // const { quizID } = req.params;
-            const { quizID, answer } = req.body;
+            const { quizID } = req.params;
+            const { quizAnswer } = req.body;
+
+            if (!quizAnswer) {
+                return res.status(400).send(failure("Provide a valid answer"));
+            }
+
             const existingQuiz = await quizModel.findOne({ _id: new mongoose.Types.ObjectId(quizID) });
 
             if (!existingQuiz) {
                 return res.status(400).send(failure("Quiz not found"));
             }
 
-            if (Date.now() > endQuizTime) {
-                return res.status(400).send(failure("Sorry, time's up!"));
+            const evaluation = await evaluationModel.findOne({ quizID: existingQuiz.quizID, studentID: req.user._id });
+
+            if (!evaluation) {
+                return res.status(400).send(failure("Start the countdown first."));
             }
 
-            // calculate student's mark and enter into evaluation model
+            // Check if the quiz has expired
+            if (Date.now() > evaluation.endQuizTime) {
+                return res.status(400).send(failure("Quiz expired. You cannot attempt it again."));
+            }
+
+            const correctAnsArray = existingQuiz.questions.map(question => question.correctOption);
+
+            if (evaluation.isPassedInQuiz) {
+                return res.status(200).send(success("You have already passed this quiz. You cannot attempt it again.", {
+                    score: evaluation.quizScore,
+                    answer: evaluation.quizAnswer,
+                    correctAns: correctAnsArray
+                }));
+            }
+
+            // Calculate student's mark and update evaluation model
+            const score = quizAnswer.reduce((totalScore, studentAnswer, index) => {
+                if (studentAnswer === correctAnsArray[index]) {
+                    return totalScore + 1;
+                }
+                return totalScore;
+            }, 0);
+            evaluation.quizScore = score;
+            evaluation.quizAnswer = quizAnswer;
+
+            await evaluation.save();
+
+            // Check if the student has passed
+            if (score >= existingQuiz.passMarks) {
+                evaluation.isPassedInQuiz = true;
+                await evaluation.save();
+                return res.status(200).send(success("Congratulations! You have passed the quiz.", {
+                    score
+                }));
+            }
+
+            // If the student has not passed and has chances left
+            if (evaluation.chance < 1) {
+                evaluation.chance++;
+                await evaluation.save();
+                return res.status(200).send(success("You have not passed. You have one more chance to attend the quiz.", {
+                    score
+                }));
+            }
+
+            // If the student has not passed and has no more chances left
+            evaluation.isPassedInQuiz = false;
+            await evaluation.save();
+            return res.status(200).send(failure("You have not passed. Your chances are gone.", {
+                score
+            }));
 
         } catch (error) {
             console.error("Error", error);
             return res.status(500).send(failure("Internal server error"));
         }
     }
+
 }
 
 module.exports = new QuizController()

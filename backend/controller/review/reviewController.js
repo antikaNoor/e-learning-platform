@@ -23,7 +23,7 @@ class reviewClass {
         }
     }
 
-    //add data
+    //add review (optional) and rating
     async addReview(req, res) {
         try {
             const { courseID, rating, text } = req.body
@@ -68,7 +68,7 @@ class reviewClass {
                 courseID,
                 userID: user._id,
                 rating,
-                text
+                text: text || null
             })
 
             await review.save()
@@ -85,6 +85,103 @@ class reviewClass {
             return res.status(500).send(failure("internal server error."))
         }
     }
+
+    // edit a review
+    async editReview(req, res) {
+        try {
+            const { reviewID } = req.params
+            const { rating, text } = req.body
+
+            if (!reviewID) {
+                return res.status(400).send(failure("Please enter a valid review id."))
+            }
+
+            const existingReview = await reviewModel.findOne({ _id: new mongoose.Types.ObjectId(reviewID) })
+
+            if (!existingReview) {
+                return res.status(400).send(failure("Review not found."))
+            }
+
+            const student = await authModel.findOne({ _id: new mongoose.Types.ObjectId(req.user._id) })
+
+            if (student._id.toString() !== existingReview.userID.toString()) {
+                return res.status(400).send(failure("You are not authorized to edit this review."))
+            }
+
+            await reviewModel.updateOne({ _id: new mongoose.Types.ObjectId(reviewID) }, { rating, text })
+
+            return res.status(200).send(success("Review edited successfully."))
+        } catch (error) {
+            console.error("Error", error);
+            return res.status(500).send(failure("internal server error."))
+        }
+    }
+
+    // delete review and rating
+    async deleteReview(req, res) {
+        try {
+            const { reviewID } = req.params
+
+            if (!reviewID) {
+                return res.status(400).send(failure("Please enter a valid review id."))
+            }
+
+            const existingReview = await reviewModel.findOne({ _id: new mongoose.Types.ObjectId(reviewID) })
+
+            if (!existingReview) {
+                return res.status(400).send(failure("Review not found."))
+            }
+
+            const student = await authModel.findOne({ _id: new mongoose.Types.ObjectId(req.user._id) })
+
+            if (student._id.toString() !== existingReview.userID.toString()) {
+                return res.status(400).send(failure("You are not authorized to delete this review."))
+            }
+
+            await reviewModel.deleteOne({ _id: new mongoose.Types.ObjectId(reviewID) })
+
+            return res.status(200).send(success("Review deleted successfully."))
+        } catch (error) {
+            console.error("Error while deleting review:", error);
+            return res.status(500).send(failure("internal server error."))
+        }
+    }
+
+    // delete review text but keep the rating
+    async deleteReviewText(req, res) {
+        try {
+            const { reviewID } = req.params
+            if (!reviewID) {
+                return res.status(400).send(failure("Please enter a valid review id."))
+            }
+
+            const existingReview = await reviewModel.findOne({ _id: new mongoose.Types.ObjectId(reviewID) })
+
+            if (!existingReview) {
+                return res.status(400).send(failure("Review not found."))
+            }
+
+            const student = await authModel.findOne({ _id: new mongoose.Types.ObjectId(req.user._id) })
+
+            if (student._id.toString() !== existingReview.userID.toString()) {
+                return res.status(400).send(failure("You are not authorized to delete this review."))
+            }
+
+            if (existingReview.text === null) {
+                return res.status(400).send(failure("Review text is already deleted."))
+            }
+
+            existingReview.text = null
+            await existingReview.save()
+
+            return res.status(200).send(success("Review text deleted successfully."))
+
+        } catch (error) {
+            console.error("Error", error);
+            return res.status(500).send(failure("internal server error."))
+        }
+    }
+
 }
 
 module.exports = new reviewClass()

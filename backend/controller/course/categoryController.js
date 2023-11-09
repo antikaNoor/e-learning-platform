@@ -1,5 +1,6 @@
 const categoryModel = require("../../model/courseModel/category")
 const topicModel = require("../../model/courseModel/topic")
+const courseModel = require("../../model/courseModel/course")
 const { success, failure } = require("../../utils/successError")
 const express = require('express')
 const mongoose = require("mongoose")
@@ -72,6 +73,69 @@ class CategoryController {
             await existingCategory.save()
             return res.status(200).send(success("Category deleted successfully"))
 
+        } catch (error) {
+            console.log("error", error)
+            return res.status(500).send(failure("Internal server error"))
+        }
+    }
+
+    // get all categories
+    async getAllCategories(req, res) {
+        try {
+            const categories = await categoryModel.find({ isDeleted: false })
+                .select("categoryName")
+
+            if (!categories) {
+                return res.status(400).send(failure("Categories not found."))
+            }
+
+            return res.status(200).send(success("All categories", categories))
+        } catch (error) {
+            console.log("error", error)
+            return res.status(500).send(failure("Internal server error"))
+        }
+    }
+
+    // get all topics under this category
+    async getTopicsUnderCategory(req, res) {
+        try {
+            const { categoryID } = req.params
+            const topics = await topicModel.find({ categoryID: new mongoose.Types.ObjectId(categoryID), isDeleted: false })
+                .select("topicName")
+
+            if (!topics) {
+                return res.status(400).send(failure("Topics not found."))
+            }
+
+            return res.status(200).send(success("All topics under this category", topics))
+        } catch (error) {
+            console.log("error", error)
+            return res.status(500).send(failure("Internal server error"))
+        }
+    }
+
+    // get all courses under a category
+    async getCoursesUnderCategory(req, res) {
+        try {
+            const { categoryID } = req.params
+
+            // find all topics under this category
+            const topics = await topicModel.find({ categoryID: new mongoose.Types.ObjectId(categoryID), isDeleted: false })
+
+            if (!topics) {
+                return res.status(400).send(failure("Topics not found."))
+            }
+            console.log("topics", topics)
+
+            // find all courses under these topics
+            const courses = await courseModel.find({ topicID: { $in: topics.map(topic => topic._id) }, isApproved: true, isDeleted: false })
+            console.log("courses", courses)
+
+            if (!courses) {
+                return res.status(400).send(failure("Courses not found."))
+            }
+
+            return res.status(200).send(success("All courses under this category", courses))
         } catch (error) {
             console.log("error", error)
             return res.status(500).send(failure("Internal server error"))

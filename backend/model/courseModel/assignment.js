@@ -12,24 +12,14 @@ const assignmentSchema = new mongoose.Schema({
     },
     question: {
         type: String,
+    },
+    document: {
+        type: String
+    },
+    duration: {
+        type: Number,
         required: true
     },
-    deadline: {
-        type: Date,
-        required: true
-    },
-    responses: [{
-        studentID: {
-            type: mongoose.Types.ObjectId,
-            ref: "Student",
-        },
-        answer: {
-            type: String
-        },
-        submissionDate: {
-            type: Date
-        }
-    }],
     totalMarks: {
         type: Number,
         required: true
