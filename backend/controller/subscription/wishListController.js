@@ -8,6 +8,7 @@ const authModel = require("../../model/authModel/auth")
 const studentModel = require("../../model/authModel/student")
 const courseModel = require("../../model/courseModel/course")
 const wishListModel = require("../../model/subscriptionModel/wishList")
+const cartModel = require("../../model/subscriptionModel/cart")
 
 class wishListController {
 
@@ -39,27 +40,19 @@ class wishListController {
                 return res.status(400).send(failure("Course not found."))
             }
 
-            const studentID = req.user._id
-
-            const student = await authModel.findOne({ _id: studentID })
-
-            if (!student) {
-                return res.status(400).send(failure("Student not found."))
-            }
-
-            const existingStudent = await studentModel.findOne({ email: student.email })
+            const existingStudent = await studentModel.findOne({ email: req.user.email })
 
             if (!existingStudent) {
                 return res.status(400).send(failure("Student not found."))
             }
 
             //check if the student has a wish-list
-            const existingWish = await wishListModel.findOne({ studentID: new mongoose.Types.ObjectId(studentID) })
+            const existingWish = await wishListModel.findOne({ studentID: new mongoose.Types.ObjectId(req.user._id) })
 
             if (!existingWish) {
                 // create a new wish-list
                 const wishlist = new wishListModel({
-                    studentID: new mongoose.Types.ObjectId(studentID),
+                    studentID: new mongoose.Types.ObjectId(req.user._id),
                     courseID: [existingCourse._id]
                 })
                 await wishlist.save()
@@ -73,6 +66,20 @@ class wishListController {
                 return res.status(400).send(failure("Course already added to wish-list."))
             }
 
+            //check if student has this course in cart
+            const existingCart = await cartModel.findOne({ studentID: new mongoose.Types.ObjectId(req.user._id), courseID: new mongoose.Types.ObjectId(existingCourse._id) })
+
+            if (existingCart) {
+                return res.status(400).send(failure("Course already added to cart."))
+            }
+
+            //check if student is enrolled in this course
+            const enrolledCourse = existingStudent.enrolledCourses.find(course => course._id.equals(existingCourse._id))
+
+            if (enrolledCourse) {
+                return res.status(400).send(failure("You are already enrolled in this course."))
+            }
+
             // if there is already a wish-list against the student, just push into the array
             existingWish.courseID.push(existingCourse._id)
             await existingWish.save()
@@ -80,6 +87,130 @@ class wishListController {
             return res.status(200).send(success("Course added to wish-list successfully."))
 
 
+        } catch (error) {
+            console.error("Error", error);
+            return res.status(500).send(failure("Internal server error"))
+        }
+    }
+
+    // remove courses from wish-list individually
+    async removeFromWishList(req, res) {
+        try {
+            const { wishlistID, courseID } = req.params
+
+            if (!wishlistID || !courseID) {
+                return res.status(400).send(failure("Provide a valid wishlist ID and course ID"))
+            }
+
+            const existingWish = await wishListModel.findOne({ _id: new mongoose.Types.ObjectId(wishlistID) })
+
+            if (!existingWish) {
+                return res.status(400).send(failure("Wish-list not found."))
+            }
+
+            const student = await authModel.findOne({ _id: new mongoose.Types.ObjectId(req.user._id) })
+
+            if (!student) {
+                return res.status(400).send(failure("Student not found."))
+            }
+
+            if (student._id.toString() !== existingWish.studentID.toString()) {
+                return res.status(400).send(failure("You are not authorized to remove this course from wish-list."))
+            }
+
+            //check if course exists in wish-list
+            const existingCourse = existingWish.courseID.find(course => course.equals(new mongoose.Types.ObjectId(courseID)))
+
+            if (!existingCourse) {
+                return res.status(400).send(failure("Course not found in wish-list."))
+            }
+
+            existingWish.courseID.pull(courseID)
+
+            // check if the courseID array is empty
+            if (existingWish.courseID.length === 0) {
+                await wishListModel.deleteOne({ _id: new mongoose.Types.ObjectId(wishlistID) })
+                return res.status(200).send(success("Course removed from wish-list successfully."))
+            }
+            await existingWish.save()
+
+            return res.status(200).send(success("Course removed from wish-list successfully."))
+
+        } catch (error) {
+            console.error("Error", error);
+            return res.status(500).send(failure("Internal server error"))
+        }
+    }
+
+    // delete whole wish-list
+    async deleteWishList(req, res) {
+        try {
+            const { wishlistID } = req.params
+
+            if (!wishlistID) {
+                return res.status(400).send(failure("Please enter a valid wishlist id."))
+            }
+
+            // first check if there is any document in the wish-list
+            const existingWish = await wishListModel.findOne({ _id: new mongoose.Types.ObjectId(wishlistID) })
+
+            if (!existingWish) {
+                return res.status(400).send(failure("Wish-list not found."))
+            }
+
+            const student = await authModel.findOne({ _id: new mongoose.Types.ObjectId(req.user._id) })
+
+            if (!student) {
+                return res.status(400).send(failure("Student not found."))
+            }
+
+            if (student._id.toString() !== existingWish.studentID.toString()) {
+                return res.status(400).send(failure("You are not authorized to remove this course from wish-list."))
+            }
+
+            await wishListModel.deleteOne({ _id: new mongoose.Types.ObjectId(wishlistID) })
+
+            return res.status(200).send(success("Wish-list deleted successfully."))
+        } catch (error) {
+            console.error("Error", error);
+            return res.status(500).send(failure("Internal server error"))
+        }
+    }
+
+    // get your wishlist
+    async getYourWishList(req, res) {
+        try {
+
+            const existingWish = await wishListModel.findOne({
+                studentID: new mongoose.Types.ObjectId(req.user._id)
+            })
+                .select("-__v -createdAt -updatedAt")
+
+            if (!existingWish) {
+                return res.status(400).send(failure("Wish-list not found."))
+            }
+
+            return res.status(200).send(success("Wish-list fetched successfully.", existingWish))
+
+        } catch (error) {
+            console.error("Error", error);
+            return res.status(500).send(failure("Internal server error"))
+        }
+    }
+
+    // view all wishlist (this one's for the admin)
+    async getAllWishLists(req, res) {
+        try {
+            // if there is not data in the cart collection, throw error
+            const wishListCount = await wishListModel.estimatedDocumentCount()
+
+            if (wishListCount === 0) {
+                return res.status(400).send(failure("No wish-list found."))
+            }
+
+            const allWishLists = await wishListModel.find().select("-__v -createdAt -updatedAt")
+
+            return res.status(200).send(success("Wish-lists fetched successfully.", allWishLists))
         } catch (error) {
             console.error("Error", error);
             return res.status(500).send(failure("Internal server error"))

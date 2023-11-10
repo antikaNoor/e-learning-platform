@@ -7,9 +7,10 @@ const jwt = require("jsonwebtoken")
 const authModel = require("../../model/authModel/auth")
 const studentModel = require("../../model/authModel/student")
 const courseModel = require("../../model/courseModel/course")
+const wishListModel = require("../../model/subscriptionModel/wishList")
 const cartModel = require("../../model/subscriptionModel/cart")
 
-class cartController {
+class CartController {
 
     // validation
     async create(req, res, next) {
@@ -39,30 +40,35 @@ class cartController {
                 return res.status(400).send(failure("Course not found."))
             }
 
-            const studentID = req.user._id
-
-            const student = await authModel.findOne({ _id: studentID })
-
-            if (!student) {
-                return res.status(400).send(failure("Student not found."))
-            }
-
-            const existingStudent = await studentModel.findOne({ email: student.email })
+            const existingStudent = await studentModel.findOne({ email: req.user.email })
 
             if (!existingStudent) {
                 return res.status(400).send(failure("Student not found."))
             }
 
             //check if the student has a cart
-            const existingCart = await cartModel.findOne({ studentID: new mongoose.Types.ObjectId(studentID) })
+            const existingCart = await cartModel.findOne({ studentID: new mongoose.Types.ObjectId(req.user._id) })
+            const existingWish = await wishListModel.findOne({ studentID: new mongoose.Types.ObjectId(req.user._id) });
 
             if (!existingCart) {
                 // create a new cart
                 const cart = new cartModel({
-                    studentID: new mongoose.Types.ObjectId(studentID),
+                    studentID: new mongoose.Types.ObjectId(req.user._id),
                     courseID: [existingCourse._id]
                 })
                 await cart.save()
+
+                if (existingWish) {
+                    // Use equals for ObjectId comparison
+                    existingWish.courseID = existingWish.courseID.filter(course => !course.equals(courseID));
+
+                    // Check if the courseID array is empty
+                    if (existingWish.courseID.length === 0) {
+                        await wishListModel.deleteOne({ studentID: new mongoose.Types.ObjectId(req.user._id) });
+                    } else {
+                        await existingWish.save();
+                    }
+                }
                 return res.status(200).send(success("Course added to cart successfully."))
             }
 
@@ -71,6 +77,25 @@ class cartController {
 
             if (existingCourseInCart) {
                 return res.status(400).send(failure("Course already added to cart."))
+            }
+
+            if (existingWish) {
+                // Use equals for ObjectId comparison
+                existingWish.courseID = existingWish.courseID.filter(course => !course.equals(courseID));
+
+                // Check if the courseID array is empty
+                if (existingWish.courseID.length === 0) {
+                    await wishListModel.deleteOne({ studentID: new mongoose.Types.ObjectId(req.user._id) });
+                } else {
+                    await existingWish.save();
+                }
+            }
+
+            //check if student is enrolled in this course
+            const enrolledCourse = existingStudent.enrolledCourses.find(course => course._id.equals(existingCourse._id))
+
+            if (enrolledCourse) {
+                return res.status(400).send(failure("You are already enrolled in this course."))
             }
 
             // if there is already a cart against the student, just push into the array
@@ -86,298 +111,129 @@ class cartController {
         }
     }
 
-    async delete(req, res) {
+    // remove courses from cart individually
+    async removeFromCart(req, res) {
         try {
-            const { reader, bought_books } = req.body
-            if (!reader || !bought_books) {
-                return res.status(500).send(failure("Provide reader id and book id"))
+            const { cartID, courseID } = req.params
+
+            if (!cartID || !courseID) {
+                return res.status(400).send(failure("Provide a valid cart ID and course ID"))
             }
 
-            if (bought_books.amount === 0) {
-                return res.status(500).send(failure("Amount cannot be 0."))
-            }
-
-            let totalSpent = 0
-            let existingTransaction = await cartModel.findOne({ reader });
-
-            if (existingTransaction) {
-                let existingBookEntryIndex = -1
-                existingTransaction.bought_books.map(
-                    (entry, i) => {
-                        if (String(entry.id) === req.body.bought_books.id) {
-                            existingBookEntryIndex = i
-                        }
-                    }
-                );
-
-                if (existingBookEntryIndex >= 0) {
-                    //increase quantity
-                    console.log("increase quantity")
-
-                    let quantity_ = existingTransaction.bought_books[existingBookEntryIndex].quantity
-                    console.log(quantity_)
-
-                    // if delete amount is more than quantity, it will throw error
-                    if (bought_books.amount > quantity_) {
-                        return res.status(400).send(failure("Delete amount cannot be more than quantity."));
-                    }
-
-                    quantity_ -= bought_books.amount
-                    existingTransaction.bought_books[existingBookEntryIndex].quantity = quantity_
-
-                    // if quantity is 0 but bought_book length is not, i am removing the object from the array
-                    if (quantity_ === 0) {
-                        existingTransaction.bought_books.splice(existingBookEntryIndex, 1);
-                        await existingTransaction.save()
-                    }
-                }
-                else {
-                    console.log("entering new book for existing user")
-                    existingTransaction.bought_books.push({ id: new mongoose.Types.ObjectId(bought_books.id) })
-                }
-            }
-            else {
-                existingTransaction = new cartModel({ reader, bought_books })
-            }
-
-            // Calculate the total spent for this transaction
-            for (const book of existingTransaction.bought_books) {
-                const bookData = await bookModel.findById(book.id);
-                if (!bookData) {
-                    return res.status(400).send(failure("Book with ID ${book.title} not found"));
-                }
-
-                totalSpent += bookData.price * book.quantity;
-            }
-
-            // Update the total_spent field
-            existingTransaction.total_spent = totalSpent;
-
-            await existingTransaction.save();
-
-            const responseCart = existingTransaction.toObject()
-
-            delete responseCart._id
-            delete responseCart.__v
-
-            return res.status(200).send(success("Successfully deleted from cart", responseCart))
-        } catch (error) {
-            console.error("Error while deleting transaction:", error);
-            return res.status(500).send(failure("Internal server error"))
-        }
-    }
-
-    //get the reader's cart
-    async showCart(req, res) {
-        try {
-            const { authorization } = req.headers
-
-            const token = authorization.split(' ')[1]
-            const decodedToken = jwt.decode(token, { complete: true })
-
-            const readerIdFromToken = decodedToken.payload.reader_name
-
-            const existingReader = await readerModel.findOne({ reader_name: readerIdFromToken })
-            const existingCart = await cartModel.findOne({ reader: existingReader._id })
-                .populate("bought_books.id")
+            const existingCart = await cartModel.findOne({ _id: new mongoose.Types.ObjectId(cartID) })
 
             if (!existingCart) {
-                return res.status(400).send(failure("This cart does not exist."))
+                return res.status(400).send(failure("cart not found."))
             }
-            const responseCart = existingCart.toObject()
 
-            delete responseCart.__v
-            return res.status(200).send(success("Got the data from the cart", responseCart))
+            const student = await authModel.findOne({ _id: new mongoose.Types.ObjectId(req.user._id) })
 
+            if (!student) {
+                return res.status(400).send(failure("Student not found."))
+            }
+
+            if (student._id.toString() !== existingCart.studentID.toString()) {
+                return res.status(400).send(failure("You are not authorized to remove this course from cart."))
+            }
+
+            //check if course exists in cart
+            const existingCourse = existingCart.courseID.find(course => course.equals(new mongoose.Types.ObjectId(courseID)))
+
+            if (!existingCourse) {
+                return res.status(400).send(failure("Course not found in cart."))
+            }
+
+            existingCart.courseID.pull(courseID)
+
+            // check if the courseID array is empty
+            if (existingCart.courseID.length === 0) {
+                await cartModel.deleteOne({ _id: new mongoose.Types.ObjectId(cartID) })
+                return res.status(200).send(success("Course removed from cart successfully."))
+            }
+            await existingCart.save()
+
+            return res.status(200).send(success("Course removed from cart successfully."))
 
         } catch (error) {
-            console.log("error found", error)
-            if (error instanceof jwt.JsonWebTokenError) {
-                return res.status(500).send(failure("Token is invalid", error))
-            }
-            if (error instanceof jwt.TokenExpiredError) {
-                return res.status(500).send(failure("Token is expired", error))
-            }
-            res.status(500).send(failure("Internal server error"))
-        }
-    }
-
-    // checkout
-    async checkOut(req, res) {
-        try {
-            const { cart } = req.body
-            const { authorization } = req.headers
-
-            const token = authorization.split(' ')[1]
-            const decodedToken = jwt.decode(token, { complete: true })
-
-            const readerIdFromToken = decodedToken.payload.reader_name
-
-            const existingReader = await readerModel.findOne({ reader_name: readerIdFromToken })
-            const existingEntity = await cartModel.findOne({ reader: existingReader._id })
-
-            if (!existingEntity || !existingEntity.reader) {
-                return res.status(400).send(failure("Unauthorized reader"))
-            }
-
-            // if there is nothing in the body
-            if (!cart) {
-                return res.status(400).send(failure("Provide a cart id"))
-            }
-
-            let existingCart = await cartModel.findById(new mongoose.Types.ObjectId(cart))
-
-            if (existingEntity.reader.toString() !== existingCart.reader.toString()) {
-                return res.status(400).send(failure("Unauthorized reader"))
-            }
-            if (existingCart) {
-                // cart exists but the array is empty
-                if (existingCart.bought_books.length === 0) {
-                    return res.status(400).send(failure("Cart does not exist."))
-                }
-
-                // Calculate the price for this transaction
-                for (const book of existingCart.bought_books) {
-                    const bookData = await bookModel.findById(book.id);
-                    if (!bookData) {
-                        return res.status(400).send(failure("Book not found"));
-                    }
-
-                    let updateStock = bookData.stock
-
-                    if (updateStock - book.quantity < 0) {
-                        return res.status(400).send(failure("Sorry, low stock!"));
-                    }
-                    bookData.stock -= book.quantity
-
-                    await bookData.save();
-                }
-                const totalSpent = existingCart.total_spent
-                const reader = existingCart.reader
-
-
-                const existingReader = await readerModel.findOne(reader)
-                console.log(existingCart.total_spent)
-                // updating reader's balance from the reader schema
-                if (existingCart.total_spent >= existingReader.balance) {
-                    return res.status(400).send(failure("Sorry, low balance! Try updating your balance."));
-                }
-                existingReader.balance -= existingCart.total_spent
-                existingReader.save()
-
-                // adding to the order schema
-                const orderInfo = await orderModel.create({
-                    cart: cart,
-                    reader: reader,
-                    total_spent: totalSpent,
-                    bought_books: existingCart.bought_books
-                })
-
-                // deleting the cart from cart schema
-                await cartModel.findOneAndDelete(new mongoose.Types.ObjectId(cart))
-
-                const responseCart = existingCart.toObject()
-
-                delete responseCart._id
-                delete responseCart.__v
-
-                return res.status(200).send(success("Successfully checked out from cart", responseCart))
-            }
-            else {
-                return res.status(400).send(failure("cart does not exist"))
-            }
-
-        } catch (error) {
-            console.error("Error while checking out:", error);
-            if (error instanceof jwt.JsonWebTokenError) {
-                return res.status(500).send(failure("Token is invalid", error))
-            }
-            if (error instanceof jwt.TokenExpiredError) {
-                return res.status(500).send(failure("Token is expired", error))
-            }
+            console.error("Error", error);
             return res.status(500).send(failure("Internal server error"))
         }
     }
 
-    //show reader's transactions
-    async showTransaction(req, res) {
+    // delete whole cart
+    async deleteCart(req, res) {
         try {
-            const { authorization } = req.headers
+            const { cartID } = req.params
 
-            const token = authorization.split(' ')[1]
-            const decodedToken = jwt.decode(token, { complete: true })
-
-            const readerIdFromToken = decodedToken.payload.reader_name
-
-            const existingReader = await readerModel.findOne({ reader_name: readerIdFromToken })
-            const existingTransaction = await orderModel.find({ reader: existingReader._id })
-                .populate("bought_books.id")
-
-            if (!existingTransaction) {
-                return res.status(400).send(failure("The reader has not made any transactions."))
+            if (!cartID) {
+                return res.status(400).send(failure("Please enter a valid cart id."))
             }
-            console.log(existingTransaction)
-            // const responseCart = existingTransaction.toObject()
 
-            // delete responseCart._id
-            // delete responseCart.__v
-            return res.status(200).send(success("Got the data from transaction.", existingTransaction))
+            // first check if there is any document in the cart
+            const existingCart = await cartModel.findOne({ _id: new mongoose.Types.ObjectId(cartID) })
 
+            if (!existingCart) {
+                return res.status(400).send(failure("cart not found."))
+            }
 
+            const student = await authModel.findOne({ _id: new mongoose.Types.ObjectId(req.user._id) })
+
+            if (!student) {
+                return res.status(400).send(failure("Student not found."))
+            }
+
+            if (student._id.toString() !== existingCart.studentID.toString()) {
+                return res.status(400).send(failure("You are not authorized to remove this course from cart."))
+            }
+
+            await cartModel.deleteOne({ _id: new mongoose.Types.ObjectId(cartID) })
+
+            return res.status(200).send(success("cart deleted successfully."))
         } catch (error) {
-            console.log("error found", error)
-            if (error instanceof jwt.JsonWebTokenError) {
-                return res.status(500).send(failure("Token is invalid", error))
-            }
-            if (error instanceof jwt.TokenExpiredError) {
-                return res.status(500).send(failure("Token is expired", error))
-            }
+            console.error("Error", error);
             return res.status(500).send(failure("Internal server error"))
         }
     }
 
-    //get all data
-    async getAllTransactions(req, res) {
+    // get your wishlist
+    async getYourCart(req, res) {
         try {
-            const result = await orderModel.find({})
-                .populate({
-                    path: 'reader',
-                    select: 'reader_name reader_email', // Select the fields you want to populate for the reader
-                })
-                .populate({
-                    path: 'bought_books.id',
-                    select: 'title author genre image', // Select the fields you want to populate for the bought books
-                })
-                .select("-_id -__v")
 
-            if (result.length > 0) {
-                return res
-                    .status(200)
-                    .send(success("Successfully received all transactions", result));
+            const existingCart = await cartModel.findOne({
+                studentID: new mongoose.Types.ObjectId(req.user._id)
+            })
+                .select("-__v -createdAt -updatedAt")
+
+            if (!existingCart) {
+                return res.status(400).send(failure("Cart not found."))
             }
-            return res.status(400).send(failure("No transactions were found"));
+
+            return res.status(200).send(success("Cart fetched successfully.", existingCart))
 
         } catch (error) {
+            console.error("Error", error);
             return res.status(500).send(failure("Internal server error"))
         }
     }
 
-    // get all carts
+    // view all carts (this one's for the admin)
     async getAllCarts(req, res) {
         try {
-            const result = await cartModel.find({})
-                .select("-_id -__v")
-            if (result.length > 0) {
-                return res
-                    .status(200)
-                    .send(success("Successfully received all transactions", result));
-            }
-            return res.status(400).send(success("No cart was found"));
+            // if there is not data in the cart collection, throw error
+            const cartCount = await cartModel.estimatedDocumentCount()
 
+            if (cartCount === 0) {
+                return res.status(400).send(failure("No carts found."))
+            }
+
+            const allCarts = await cartModel.find().select("-__v -createdAt -updatedAt")
+
+            return res.status(200).send(success("Carts fetched successfully.", allCarts))
         } catch (error) {
+            console.error("Error", error);
             return res.status(500).send(failure("Internal server error"))
         }
     }
 }
 
-module.exports = new cartController()
+module.exports = new CartController()

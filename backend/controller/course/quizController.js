@@ -259,7 +259,6 @@ class QuizController {
             return res.status(500).send(failure("Internal server error"));
         }
     }
-
 }
 
 module.exports = new QuizController()

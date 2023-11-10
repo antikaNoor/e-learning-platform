@@ -2,6 +2,8 @@ const courseModel = require("../../model/courseModel/course")
 const authModel = require("../../model/authModel/auth")
 const studentModel = require("../../model/authModel/student")
 const notificationModel = require("../../model/notificationModel/notification")
+const cartModel = require("../../model/subscriptionModel/cart")
+const wishListModel = require("../../model/subscriptionModel/wishList")
 const { success, failure } = require("../../utils/successError")
 const express = require('express')
 const mongoose = require("mongoose")
@@ -59,6 +61,13 @@ class SubscriptionApprovalController {
                 return res.status(400).send(failure("You are already enrolled in this course."))
             }
 
+            // if the student has already requested for subscription
+            const existingRequest = await notificationModel.findOne({ userID: student._id, courseID: existingCourse._id });
+
+            if (existingRequest) {
+                return res.status(400).send(failure("You have already requested for subscription."))
+            }
+
             const notification = {
                 type: "subscription_request",
                 userID: student._id,
@@ -67,7 +76,7 @@ class SubscriptionApprovalController {
             }
 
             await notificationModel.create(notification)
-            return res.status(200).send(success("Course published successfully and notification has been sent to the admin for approval."))
+            return res.status(200).send(success("Requested successfully and notification has been sent to the admin for approval."))
 
         } catch (error) {
             console.log("error", error)
@@ -135,6 +144,21 @@ class SubscriptionApprovalController {
                 // add the course to the enrolledCourses of the student
                 existingStudent.enrolledCourses.push(existingCourse._id);
                 await existingStudent.save();
+
+                // remove from wish-list if the course is in the student's wish-list
+                const existingWish = await wishListModel.findOne({ studentID: new mongoose.Types.ObjectId(existingStudent._id) });
+                if (existingWish) {
+                    existingWish.courseID = existingWish.courseID.filter(course => !course.equals(existingCourse._id));
+                    await existingWish.save();
+                }
+
+                // remove from cart if the course is in the student's cart
+                const existingCart = await cartModel.findOne({ studentID: new mongoose.Types.ObjectId(existingStudent._id) });
+                if (existingCart) {
+                    // existingCart.courseID = existingCart.courseID.filter(course => !course.equals(existingCourse._id));
+                    existingCart.courseID.pull(existingCourse._id)
+                    await existingCart.save();
+                }
 
                 // Create an email
                 const SubscriptionApprovalEmailURL = path.join(process.env.BACKEND_AUTH_URL, "subscription-approval");

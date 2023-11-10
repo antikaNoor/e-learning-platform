@@ -59,10 +59,15 @@ const reviewValidator = {
             .isNumeric()
             .withMessage("Rating must be a number.")
             .custom((value) => {
-                if (value < 1 || value > 5) {
-                    throw new Error("Rating must be between 1 and 5.")
+                if (!Number.isInteger(Number(value))) {
+                    throw new Error("Rating must be a whole number.");
                 }
-                return true
+
+                if (value < 1 || value > 5) {
+                    throw new Error("Rating must be between 1 and 5.");
+                }
+
+                return true;
             }),
 
         body("text")
@@ -70,7 +75,8 @@ const reviewValidator = {
             .isString()
             .withMessage("Text must be a string."),
     ]
-}
+};
+
 
 module.exports = {
     authValidator,
