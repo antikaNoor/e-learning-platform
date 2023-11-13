@@ -11,7 +11,6 @@ type BoxProps = {
 };
 
 const ForgotPasswordBoxMolecule = ({ className }: BoxProps) => {
-    const { forgotPassword } = useAuth();
     const {
         handleSubmit,
         control,
@@ -19,13 +18,15 @@ const ForgotPasswordBoxMolecule = ({ className }: BoxProps) => {
     } = useForm({
         mode: 'onChange',
         defaultValues: {
-            recipient: '',
+            recipient: ''
         },
     });
 
+    const { forgotPassword } = useAuth();
+
     const onSubmit = async (data: FormData) => {
         console.log(data);
-        await forgotPassword(data)
+        await forgotPassword(data);
     };
 
     return (

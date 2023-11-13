@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import Button from '../atoms/Button';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
-import useAuth from '../../hooks/useAuthHooks';
+// import useAuth from '../../hooks/useAuthHooks';
+import { ResetPasswordApi, ValidateResetPasswordApi } from '../../ApiCalls/Auth/AuthApi';
 
 type FormData = {
     newPassword: string;
@@ -14,7 +15,10 @@ type BoxProps = {
 };
 
 const ResetPasswordBoxMolecule = ({ className }: BoxProps) => {
-    const { resetPassword } = useAuth();
+
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
     const {
         handleSubmit,
         control,
@@ -28,8 +32,7 @@ const ResetPasswordBoxMolecule = ({ className }: BoxProps) => {
         },
     });
 
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    // const { resetPassword, validateResetPassword } = useAuth();
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
@@ -39,9 +42,10 @@ const ResetPasswordBoxMolecule = ({ className }: BoxProps) => {
         setShowConfirmPassword(!showConfirmPassword);
     };
 
-    const onSubmit = async(data: FormData) => {
+    const onSubmit = async (data: FormData) => {
         console.log(data);
-        await resetPassword(data);
+        await ValidateResetPasswordApi();
+        await ResetPasswordApi(data);
     };
 
     return (

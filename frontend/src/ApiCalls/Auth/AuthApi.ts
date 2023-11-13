@@ -2,7 +2,8 @@
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
-
+import { useDispatch } from 'react-redux';
+import { saveLogin, removeLogin } from "../../redux/slices/AuthSlice";
 import {
     LOGIN_URL,
     SIGNUP_URL,
@@ -10,7 +11,7 @@ import {
     // RESEND_VERIFICATION_EMAIL_URL,
     FORGOT_PASSWORD_URL,
     RESET_PASSWORD_URL,
-    // RESET_PASSWORD_URL
+    VALIDATE_RESET_REQUEST_URL
 } from "../../utils/constants";
 
 type FormData = {
@@ -37,6 +38,7 @@ type FormDataResetPassword = {
 
 
 export const SignupApi = async (formData: FormData) => {
+    const dispatch = useDispatch();
     try {
         const response = await axios.post(SIGNUP_URL, formData);
         const data = response.data;
@@ -45,6 +47,7 @@ export const SignupApi = async (formData: FormData) => {
             toast.error(data.message);
         } else if (data.success === true) {
             toast.success(data.message);
+            dispatch(saveLogin(data));
             return data;
         }
     } catch (error) {
@@ -53,14 +56,17 @@ export const SignupApi = async (formData: FormData) => {
 };
 
 export const LoginApi = async (formData: FormDataLogin) => {
+    const dispatch = useDispatch();
     try {
         const response = await axios.post(LOGIN_URL, formData);
         const data = response.data;
+
 
         if (data.success === false) {
             toast.error(data.message);
         } else if (data.success === true) {
             toast.success(data.message);
+            dispatch(saveLogin(data));
             return data;
         }
     } catch (error) {
@@ -88,7 +94,7 @@ export const ResetPasswordApi = async (formData: FormDataResetPassword) => {
     try {
         const { token, userId } = useParams();
 
-        const response = await axios.post(`${RESET_PASSWORD_URL}/${token}/${userId}`, formData);
+        const response = await axios.post(`${RESET_PASSWORD_URL}/${userId}/${token}`, formData);
         const data = response.data;
 
         if (data.success === false) {
@@ -100,4 +106,30 @@ export const ResetPasswordApi = async (formData: FormDataResetPassword) => {
     } catch (error) {
         console.error(error);
     }
+};
+
+export const ValidateResetPasswordApi = async () => {
+    try {
+        const { token, userId } = useParams();
+
+        const response = await axios.get(`${VALIDATE_RESET_REQUEST_URL}/${userId}/${token}`);
+        const data = response.data;
+
+        if (data.success === false) {
+            toast.error(data.message);
+        } else if (data.success === true) {
+            toast.success(data.message);
+            return data;
+        }
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+export const logout = () => {
+    const dispatch = useDispatch();
+    // Dispatch the logout action to clear user data
+    dispatch(removeLogin());
+    // Redirect to the login page
+
 };

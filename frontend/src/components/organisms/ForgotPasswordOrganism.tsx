@@ -2,7 +2,7 @@
 import ForgotPasswordBoxMolecule from '../molecules/ForgotPasswordBoxMolecule'
 import WelcomeBoxMolecule from '../molecules/WelcomeBoxMolecule'
 
-const LoginOrganism = ({}) => {
+const LoginOrganism = ({ }) => {
     return (
         <div className="sm:flex justify-center items-center h-screen">
             <ForgotPasswordBoxMolecule className="flex-1" />

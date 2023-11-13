@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import Button from '../atoms/Button';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import useAuth from '../../hooks/useAuthHooks';
+import { logout } from '../../ApiCalls/Auth/AuthApi';
 
 type FormData = {
     email: string;
@@ -15,7 +16,11 @@ type BoxProps = {
 };
 
 const LoginBoxMolecule = ({ className }: BoxProps) => {
+
     const { login } = useAuth();
+
+    const [showPassword, setShowPassword] = useState(false);
+
     const {
         handleSubmit,
         control,
@@ -28,13 +33,11 @@ const LoginBoxMolecule = ({ className }: BoxProps) => {
         },
     });
 
-    const [showPassword, setShowPassword] = useState(false);
-
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
 
-    const onSubmit = async(data: FormData) => {
+    const onSubmit = async (data: FormData) => {
         console.log(data);
         await login(data)
     };
@@ -99,12 +102,15 @@ const LoginBoxMolecule = ({ className }: BoxProps) => {
                     />
                     {errors.password && <h5 className="text-red-500">{errors.password.message}</h5>}
                 </div>
- 
-                <div className="text-left text-blue-700"><Link to="/forgot-password">Forgot Password</Link></div>
+
+                <div className="text-left text-blue-700"><Link to="/forgot-password">Forgot Password?</Link></div>
 
                 <div className='text-center flex flex-col justify-center'>
                     <Button type="submit" value="Log in" additionalStyles="w-full mt-4" />
                     <p className='text-grey-700'>Not Registered? <Link to="/">Sign Up</Link></p>
+                </div>
+                <div style={{ cursor: 'pointer' }} onClick={logout}>
+                    Log out
                 </div>
             </form>
         </div>

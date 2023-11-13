@@ -2,7 +2,7 @@
 import LoginBoxMolecule from '../molecules/LoginBoxMolecule'
 import WelcomeBoxMolecule from '../molecules/WelcomeBoxMolecule'
 
-const LoginOrganism = ({}) => {
+const LoginOrganism = ({ }) => {
     return (
         <div className="sm:flex justify-center items-center h-screen">
             <LoginBoxMolecule className="flex-1" />

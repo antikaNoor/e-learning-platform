@@ -23,88 +23,129 @@ class reviewClass {
         }
     }
 
-    //add review (optional) and rating
     async addReview(req, res) {
         try {
-            const { courseID } = req.params
-            const { rating, text } = req.body
+            const { courseID } = req.params;
+            const { rating, text } = req.body;
 
             if (!courseID || !rating) {
-                return res.status(400).send(failure("Please enter a valid course id and rating."))
+                return res.status(400).send(failure("Please enter a valid course id and rating."));
             }
 
-            const existingCourse = await courseModel.findOne({ _id: new mongoose.Types.ObjectId(courseID) })
+            const existingCourse = await courseModel.findOne({ _id: new mongoose.Types.ObjectId(courseID) });
 
             if (!existingCourse) {
-                return res.status(400).send(failure("Course not found."))
+                return res.status(400).send(failure("Course not found."));
             }
 
             // check if student is enrolled in the course
-            const student = await studentModel.findOne({ email: req.user.email })
+            const student = await studentModel.findOne({ email: req.user.email });
 
             if (!student) {
-                return res.status(400).send(failure("Student not found."))
+                return res.status(400).send(failure("Student not found."));
             }
 
-            const completedCourses = student.completedCourses.find(course => course._id.toString() === courseID)
-
-            if (!completedCourses) {
-                return res.status(400).send(failure("You have not completed in this course."))
-            }
+            //check if student has completed the course
+            // if (!student.completedCourses.includes(courseID)) {
+            //     return res.status(400).send(failure("Student has not completed the course."));
+            // }
 
             // check if student has already given the review
-            const existingReview = await reviewModel.findOne({ courseID, userID: user._id })
+            const existingReview = await reviewModel.findOne({ courseID, userID: req.user._id });
 
             if (existingReview) {
-                return res.status(400).send(failure("You have already given a review for this course. You can edit it."))
+                return res.status(400).send(failure("You have already given a review for this course. You can edit it."));
             }
 
             const review = new reviewModel({
                 courseID,
-                userID: user._id,
+                userID: req.user._id,
                 rating,
-                text: text || null
-            })
+                text: text || null,
+            });
 
-            await review.save()
+            await review.save();
 
-            const response = review.toObject()
-            delete response.__v
-            delete response.updatedAt
-            delete response.createdAt
+            // Update the course's review array
+            existingCourse.reviews.push(review._id);
+            await existingCourse.save();
 
-            return res.status(200).send(success("Review added successfully.", response))
+            // Update the course's review array and calculate the new average rating
+            const averageReview = await reviewModel.aggregate([
+                {
+                    $match: {
+                        courseID: new mongoose.Types.ObjectId(courseID),
+                    },
+                },
+                {
+                    $group: {
+                        _id: null,
+                        averageRating: { $avg: "$rating" },
+                    },
+                },
+            ]);
+
+            // Update the course model with the new average rating
+            if (averageReview.length > 0) {
+                const newAverageRating = averageReview[0].averageRating;
+
+                await courseModel.updateOne(
+                    { _id: new mongoose.Types.ObjectId(courseID) },
+                    { $set: { rating: newAverageRating } }
+                );
+
+                const response = review.toObject();
+                delete response.__v;
+                delete response.updatedAt;
+                delete response.createdAt;
+
+                return res.status(200).send(success("Review added successfully.", response, { newAverageRating }));
+            }
+
+            // If there are no reviews, set the course rating to 0
+            await courseModel.updateOne(
+                { _id: new mongoose.Types.ObjectId(courseID) },
+                { $set: { rating: 0 } }
+            );
+
+            const response = review.toObject();
+            delete response.__v;
+            delete response.updatedAt;
+            delete response.createdAt;
+
+            return res.status(200).send(success("Review added successfully.", response, { newAverageRating: 0 }));
 
         } catch (error) {
             console.error("Error while entering review:", error);
-            return res.status(500).send(failure("internal server error."))
+            return res.status(500).send(failure("Internal server error."));
         }
     }
+
 
     // edit a review
     async editReview(req, res) {
         try {
-            const { reviewID } = req.params
-            const { rating, text } = req.body
+            const { reviewID } = req.params;
+            const { rating, text } = req.body;
 
             if (!rating) {
-                return res.status(400).send(failure("Please enter a valid rating."))
+                return res.status(400).send(failure("Please enter a valid rating."));
             }
 
             if (!reviewID) {
-                return res.status(400).send(failure("Please enter a valid review id."))
+                return res.status(400).send(failure("Please enter a valid review id."));
             }
 
-            const existingReview = await reviewModel.findOne({ _id: new mongoose.Types.ObjectId(reviewID) })
+            const existingReview = await reviewModel.findOne({ _id: new mongoose.Types.ObjectId(reviewID) });
 
             if (!existingReview) {
-                return res.status(400).send(failure("Review not found."))
+                return res.status(400).send(failure("Review not found."));
             }
 
-            const student = await authModel.findOne({ _id: new mongoose.Types.ObjectId(req.user._id) })
+            const student = await authModel.findOne({ _id: new mongoose.Types.ObjectId(req.user._id) });
 
             if (student._id.toString() !== existingReview.userID.toString()) {
-                return res.status(400).send(failure("You are not authorized to edit this review."))
+                return res.status(400).send(failure("You are not authorized to edit this review."));
             }
 
             // Update the review with the new rating and text
@@ -112,47 +153,129 @@ class reviewClass {
             existingReview.text = text || null;
             await existingReview.save();
 
-            // Prepare the response object with the edited review data
+            // Update the course's review array and calculate the new average rating
+            const averageReview = await reviewModel.aggregate([
+                {
+                    $match: {
+                        courseID: new mongoose.Types.ObjectId(existingReview.courseID),
+                    },
+                },
+                {
+                    $group: {
+                        _id: null,
+                        averageRating: { $avg: "$rating" },
+                    },
+                },
+            ]);
+
+            // Update the course model with the new average rating
+            if (averageReview.length > 0) {
+                const newAverageRating = averageReview[0].averageRating;
+
+                await courseModel.updateOne(
+                    { _id: new mongoose.Types.ObjectId(existingReview.courseID) },
+                    { $set: { rating: newAverageRating } }
+                );
+
+                const editedReview = {
+                    rating: existingReview.rating,
+                    text: existingReview.text,
+                };
+
+                return res.status(200).send(success("Review edited successfully.", editedReview, { newAverageRating }));
+            }
+
+            // If there are no reviews, set the course rating to 0
+            await courseModel.updateOne(
+                { _id: new mongoose.Types.ObjectId(existingReview.courseID) },
+                { $set: { rating: 0 } }
+            );
+
             const editedReview = {
                 rating: existingReview.rating,
                 text: existingReview.text,
             };
 
-            return res.status(200).send(success("Review edited successfully.", editedReview));
+            return res.status(200).send(success("Review edited successfully.", editedReview, { newAverageRating: 0 }));
 
         } catch (error) {
             console.error("Error", error);
-            return res.status(500).send(failure("internal server error."))
+            return res.status(500).send(failure("Internal server error."));
         }
     }
 
     // delete review and rating
     async deleteReview(req, res) {
         try {
-            const { reviewID } = req.params
+            const { reviewID } = req.params;
 
             if (!reviewID) {
-                return res.status(400).send(failure("Please enter a valid review id."))
+                return res.status(400).send(failure("Please enter a valid review id."));
             }
 
-            const existingReview = await reviewModel.findOne({ _id: new mongoose.Types.ObjectId(reviewID) })
+            const existingReview = await reviewModel.findOne({ _id: new mongoose.Types.ObjectId(reviewID) });
 
             if (!existingReview) {
-                return res.status(400).send(failure("Review not found."))
+                return res.status(400).send(failure("Review not found."));
             }
 
-            const student = await authModel.findOne({ _id: new mongoose.Types.ObjectId(req.user._id) })
+            const student = await authModel.findOne({ _id: new mongoose.Types.ObjectId(req.user._id) });
 
             if (student._id.toString() !== existingReview.userID.toString()) {
-                return res.status(400).send(failure("You are not authorized to delete this review."))
+                return res.status(400).send(failure("You are not authorized to delete this review."));
             }
 
-            await reviewModel.deleteOne({ _id: new mongoose.Types.ObjectId(reviewID) })
+            await reviewModel.deleteOne({ _id: new mongoose.Types.ObjectId(reviewID) });
 
-            return res.status(200).send(success("Review deleted successfully."))
+            // Update the course's review array
+            const existingCourse = await courseModel.findOne({ _id: new mongoose.Types.ObjectId(existingReview.courseID) });
+
+            if (!existingCourse) {
+                return res.status(400).send(failure("Course not found."));
+            }
+
+            existingCourse.reviews = existingCourse.reviews.filter(review => review.toString() !== reviewID);
+
+            await existingCourse.save();
+
+            // Update the course's review array and calculate the new average rating
+            const averageReview = await reviewModel.aggregate([
+                {
+                    $match: {
+                        courseID: new mongoose.Types.ObjectId(existingReview.courseID),
+                    },
+                },
+                {
+                    $group: {
+                        _id: null,
+                        averageRating: { $avg: "$rating" },
+                    },
+                },
+            ]);
+
+            // Update the course model with the new average rating
+            if (averageReview.length > 0) {
+                const newAverageRating = averageReview[0].averageRating;
+
+                await courseModel.updateOne(
+                    { _id: new mongoose.Types.ObjectId(existingReview.courseID) },
+                    { $set: { rating: newAverageRating } }
+                );
+
+                return res.status(200).send(success("Review deleted successfully.", { newAverageRating }));
+            }
+
+            // If there are no reviews, set the course rating to 0
+            await courseModel.updateOne(
+                { _id: new mongoose.Types.ObjectId(existingReview.courseID) },
+                { $set: { rating: 0 } }
+            );
+
+            return res.status(200).send(success("Review deleted successfully.", { newAverageRating: 0 }));
+
         } catch (error) {
             console.error("Error while deleting review:", error);
-            return res.status(500).send(failure("internal server error."))
+            return res.status(500).send(failure("Internal server error."));
         }
     }
 
@@ -190,6 +313,53 @@ class reviewClass {
             return res.status(500).send(failure("internal server error."))
         }
     }
+
+    // get aggregates review for a course
+    async getAggregatesReview(req, res) {
+        try {
+            const { courseID } = req.params;
+
+            if (!courseID) {
+                return res.status(400).send(failure("Please enter a valid course id."));
+            }
+
+            // Check if the course exists
+            const existingCourse = await courseModel.findOne({ _id: new mongoose.Types.ObjectId(courseID) });
+
+            if (!existingCourse) {
+                return res.status(400).send(failure("Course not found."));
+            }
+
+            // Use MongoDB aggregation to calculate the average review rating for the given course
+            const averageReview = await reviewModel.aggregate([
+                {
+                    $match: {
+                        courseID: new mongoose.Types.ObjectId(courseID)
+                    }
+                },
+                {
+                    $group: {
+                        _id: null,
+                        averageRating: { $avg: "$rating" }
+                    }
+                }
+            ]);
+
+            if (averageReview.length === 0) {
+                return res.status(404).send(failure("No reviews found for the specified course."));
+            }
+
+            const response = {
+                averageRating: averageReview[0].averageRating
+            };
+
+            return res.status(200).send(success("Average review calculated successfully.", response));
+        } catch (error) {
+            console.error("Error while calculating average review:", error);
+            return res.status(500).send(failure("Internal server error."));
+        }
+    }
+
 
     // get all the reviews for a course
     async getAllReviews(req, res) {
@@ -347,6 +517,43 @@ class reviewClass {
             console.error("Error", error);
             return res.status(500).send(failure("internal server error."))
         }
+    }
+
+    async updateCourseRating(courseID) {
+        // Calculate the new average rating for the course
+        const averageReview = await reviewModel.aggregate([
+            {
+                $match: {
+                    courseID: new mongoose.Types.ObjectId(courseID)
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    averageRating: { $avg: "$rating" }
+                }
+            }
+        ]);
+
+        // Update the course model with the new average rating
+        if (averageReview.length > 0) {
+            const newAverageRating = averageReview[0].averageRating;
+
+            await courseModel.updateOne(
+                { _id: new mongoose.Types.ObjectId(courseID) },
+                { $set: { rating: newAverageRating } }
+            );
+
+            return newAverageRating;
+        }
+
+        // If there are no reviews, set the course rating to 0
+        await courseModel.updateOne(
+            { _id: new mongoose.Types.ObjectId(courseID) },
+            { $set: { rating: 0 } }
+        );
+
+        return 0;
     }
 }
 

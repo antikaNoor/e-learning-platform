@@ -1,8 +1,8 @@
 // import React from 'react'
-import ResetPasswordBoxMolecule from '../molecules/ResetPasswordBoxMolecule'
-import WelcomeBoxMolecule from '../molecules/WelcomeBoxMolecule'
+import WelcomeBoxMolecule from "../molecules/WelcomeBoxMolecule";
+import ResetPasswordBoxMolecule from "../molecules/ResetPasswordBoxMolecule";
 
-const ResetPasswordOrganism = ({}) => {
+const ResetPasswordOrganism = ({ }) => {
     return (
         <div className="sm:flex justify-center items-center h-screen">
             <ResetPasswordBoxMolecule className="flex-1" />

@@ -11,5 +11,7 @@ routes.post("/login", AuthController.login)
 
 routes.post("/forgot-password", AuthController.sendForgotPasswordEmail)
 routes.post("/reset-password/:userId/:token", AuthController.resetPassword)
+routes.get("/validate-reset-request/:userId/:token", AuthController.validatePasswordResetRequest);
+
 
 module.exports = routes 

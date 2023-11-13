@@ -12,6 +12,7 @@ routes.delete("/delete-review/:reviewID", isUserLoggedIn, isUserStudent, ReviewC
 routes.delete("/delete-review-text/:reviewID", isUserLoggedIn, isUserStudent, ReviewController.deleteReviewText)
 routes.patch("/edit-review/:reviewID", isUserLoggedIn, isUserStudent, ReviewController.editReview)
 routes.get("/get-all-reviews/:courseID", ReviewController.getAllReviews)
+routes.get("/get-agg-review/:courseID", ReviewController.getAggregatesReview)
 routes.get("/get-your-review/:courseID", isUserLoggedIn, isUserStudent, ReviewController.getYourReview)
 routes.patch("/like-review/:reviewID", isUserLoggedIn, ReviewController.likeReview)
 routes.patch("/dislike-review/:reviewID", isUserLoggedIn, ReviewController.dislikeReview)

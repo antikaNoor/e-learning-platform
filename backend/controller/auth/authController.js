@@ -102,7 +102,7 @@ class AuthController {
             await authUser.save();
 
             // Create an email verification link
-            const emailVerificationURL = path.join(process.env.BACKEND_AUTH_URL, "verify-email", authUser._id.toString(), token);
+            const emailVerificationURL = path.join(process.env.FRONTEND_URL, "verify-email", authUser._id.toString(), token);
 
             // Compose the email content using EJS
             const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/emailVerification.ejs'), {
@@ -152,7 +152,7 @@ class AuthController {
 
             await user.save();
 
-            const emailVerificationURL = path.join(process.env.BACKEND_AUTH_URL, "verify-email", user._id.toString(), newToken);
+            const emailVerificationURL = path.join(process.env.FRONTEND_URL, "verify-email", user._id.toString(), newToken);
 
             const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/emailVerification.ejs'), {
                 name: user.username,
@@ -295,7 +295,7 @@ class AuthController {
 
             await auth.save()
 
-            const resetPasswordURL = path.join(process.env.FRONTEND_AUTH_URL, "reset-password", auth._id.toString(), resetToken);
+            const resetPasswordURL = path.join(process.env.FRONTEND_URL, "reset-password", auth._id.toString(), resetToken);
 
             const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/forgotPassword.ejs'), {
                 name: auth.username,
