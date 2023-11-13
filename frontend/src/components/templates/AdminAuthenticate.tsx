@@ -1,9 +1,29 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useSelector } from "react-redux";
+// import { BrowserRouter, Routes, Route } from "react-router-dom"
+// import axios from "axios";
+// import jwt_decode from "jwt-decode";
 
-const PrivateRoute = () => {
-    const auth = useSelector((state: { auth: { username: string; email: string; _id: string; token: string } }) => state.auth);
-    return auth.username && auth.email && auth._id && auth.token ? <Outlet /> : <Navigate to={"/login"} />
+const AdminAuthenticate = () => {
+    console.log("checking auth")
+    const checkString = localStorage.getItem("user")!;
+    const check = JSON.parse(checkString)
+
+    if (!check || !check.token) {
+        return <Navigate to="/login" />;
+    }
+
+    // const decodedToken = jwt_decode(check.token);
+    // console.log(decodedToken.status)
+
+    // if (decodedToken && decodedToken.status === true) {
+    return (
+        <div>
+            <Outlet />
+        </div>
+    );
+    // } else {
+    return <Navigate to="/login" />;
+    // }
 };
 
-export default PrivateRoute;
+export default AdminAuthenticate;

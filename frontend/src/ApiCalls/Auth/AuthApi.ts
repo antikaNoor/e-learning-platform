@@ -2,8 +2,6 @@
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
-import { useDispatch } from 'react-redux';
-import { saveLogin, removeLogin } from "../../redux/slices/AuthSlice";
 import {
     LOGIN_URL,
     SIGNUP_URL,
@@ -38,7 +36,6 @@ type FormDataResetPassword = {
 
 
 export const SignupApi = async (formData: FormData) => {
-    const dispatch = useDispatch();
     try {
         const response = await axios.post(SIGNUP_URL, formData);
         const data = response.data;
@@ -47,7 +44,6 @@ export const SignupApi = async (formData: FormData) => {
             toast.error(data.message);
         } else if (data.success === true) {
             toast.success(data.message);
-            dispatch(saveLogin(data));
             return data;
         }
     } catch (error) {
@@ -56,7 +52,6 @@ export const SignupApi = async (formData: FormData) => {
 };
 
 export const LoginApi = async (formData: FormDataLogin) => {
-    const dispatch = useDispatch();
     try {
         const response = await axios.post(LOGIN_URL, formData);
         const data = response.data;
@@ -66,7 +61,6 @@ export const LoginApi = async (formData: FormDataLogin) => {
             toast.error(data.message);
         } else if (data.success === true) {
             toast.success(data.message);
-            dispatch(saveLogin(data));
             return data;
         }
     } catch (error) {
@@ -126,10 +120,10 @@ export const ValidateResetPasswordApi = async () => {
     }
 };
 
-export const logout = () => {
-    const dispatch = useDispatch();
-    // Dispatch the logout action to clear user data
-    dispatch(removeLogin());
-    // Redirect to the login page
+// export const logout = () => {
+//     const dispatch = useDispatch();
+//     // Dispatch the logout action to clear user data
+//     dispatch(removeLogin());
+//     // Redirect to the login page
 
-};
+// };

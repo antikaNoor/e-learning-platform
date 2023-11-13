@@ -3,8 +3,12 @@ import { useForm, Controller } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 import Button from '../atoms/Button';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
-import useAuth from '../../hooks/useAuthHooks';
-import { logout } from '../../ApiCalls/Auth/AuthApi';
+// import useAuth from '../../hooks/useAuthHooks';
+// import { logout } from '../../ApiCalls/Auth/AuthApi';
+import { LoginApi } from '../../ApiCalls/Auth/AuthApi';
+
+import { useDispatch } from 'react-redux';
+import { saveLogin, removeLogin } from "../../redux/slices/AuthSlice";
 
 type FormData = {
     email: string;
@@ -17,7 +21,9 @@ type BoxProps = {
 
 const LoginBoxMolecule = ({ className }: BoxProps) => {
 
-    const { login } = useAuth();
+    const dispatch = useDispatch();
+
+    // const { login } = useAuth();
 
     const [showPassword, setShowPassword] = useState(false);
 
@@ -39,7 +45,11 @@ const LoginBoxMolecule = ({ className }: BoxProps) => {
 
     const onSubmit = async (data: FormData) => {
         console.log(data);
-        await login(data)
+        const response = await LoginApi(data)
+        if (response) {
+            dispatch(saveLogin(response));
+            dispatch(removeLogin());
+        }
     };
 
     return (
@@ -109,9 +119,9 @@ const LoginBoxMolecule = ({ className }: BoxProps) => {
                     <Button type="submit" value="Log in" additionalStyles="w-full mt-4" />
                     <p className='text-grey-700'>Not Registered? <Link to="/">Sign Up</Link></p>
                 </div>
-                <div style={{ cursor: 'pointer' }} onClick={logout}>
+                {/* <div style={{ cursor: 'pointer' }} onClick={logout}>
                     Log out
-                </div>
+                </div> */}
             </form>
         </div>
     );
