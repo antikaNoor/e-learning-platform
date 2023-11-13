@@ -54,7 +54,8 @@ class courseApprovalController {
 
             const notification = {
                 type: "course_approval",
-                userID: existingCourse.teacherID,
+                to: admin._id,
+                from: existingCourse.teacherID,
                 courseID: existingCourse._id,
                 message: `${req.user.username} has published a new course, ${existingCourse.title}.`,
             }

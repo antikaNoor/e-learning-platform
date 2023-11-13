@@ -25,7 +25,7 @@ const authValidator = {
                 }
                 const name = req.body.username.toLowerCase()
                 if (value.toLowerCase().includes(name)) {
-                    throw new Error("Password cannot contain parts of your name.")
+                    throw new Error("Password should be different from username.")
                 }
                 const checkCapitalLetter = /[A-Z]+/
                 const checkNumber = /[0-9]+/
@@ -36,22 +36,92 @@ const authValidator = {
                 }
                 return true
             }),
+
+        body("role")
+            .isString()
+            .withMessage("Role must be a string.")
+            .custom((value) => {
+                const validRoles = ["teacher", "student"];
+
+                if (!validRoles.includes(value)) {
+                    throw new Error("Invalid role. Allowed values are 'teacher' or 'student'.");
+                }
+
+                return true;
+            }),
     ]
 }
 
-// const courseValidator = {
-//     addCourse: [
-//         body("title")
-//             .isString()
-//             .withMessage("Title must be a string.")
-//             .custom((value) => {
-//                 if (value === "") {
-//                     throw new Error("Name cannot be empty")
-//                 }
-//                 return true
-//             }),
-//     ]
-// }
+const categoryValidator = {
+    addCategory: [
+        body("categoryName")
+            .isString()
+            .withMessage("Category name must be a string.")
+            .custom((value) => {
+                if (value === "") {
+                    throw new Error("Name cannot be empty");
+                }
+                return true;
+            }),
+    ]
+}
+
+const topicValidator = {
+    addTopic: [
+        body("topicName")
+            .isString()
+            .withMessage("Topic name must be a string.")
+            .custom((value) => {
+                if (value === "") {
+                    throw new Error("Name cannot be empty");
+                }
+                return true;
+            }),
+
+        body("categoryID")
+            .isMongoId()
+            .withMessage("Category ID must be a valid MongoDB ID."),
+    ]
+}
+
+
+const courseValidator = {
+    addCourse: [
+        body("title")
+            .isString()
+            .withMessage("Title must be a string.")
+            .custom((value) => {
+                if (value === "") {
+                    throw new Error("Name cannot be empty");
+                }
+                return true;
+            }),
+
+        body("description")
+            .isString()
+            .withMessage("Description must be a string.")
+            .custom((value) => {
+                if (value === "") {
+                    throw new Error("Description cannot be empty");
+                }
+                return true;
+            }),
+
+        body("language")
+            .isString()
+            .withMessage("Language must be a string.")
+            .isIn(["English", "Bangla"])
+            .withMessage("Language must be either 'English' or 'Bangla'."),
+
+        body("requirement")
+            .isArray()
+            .withMessage("Requirement must be an array."),
+
+        body("topicID")
+            .isMongoId()
+            .withMessage("Topic ID must be a valid MongoDB ID."),
+    ]
+};
 
 const reviewValidator = {
     addReview: [
@@ -80,5 +150,8 @@ const reviewValidator = {
 
 module.exports = {
     authValidator,
+    courseValidator,
+    categoryValidator,
+    topicValidator,
     reviewValidator
 }

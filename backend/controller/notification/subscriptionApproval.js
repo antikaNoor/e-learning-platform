@@ -46,6 +46,12 @@ class SubscriptionApprovalController {
                     select: "email",
                 });
 
+            const admin = await authModel.findOne({ role: "admin" })
+
+            if (!admin) {
+                return res.status(400).send(failure("Admin not found"))
+            }
+
             // find the student in student model using the email
             if (!student) {
                 return res.status(400).send(failure("Student not found"))
@@ -70,7 +76,8 @@ class SubscriptionApprovalController {
 
             const notification = {
                 type: "subscription_request",
-                userID: student._id,
+                to: admin._id,
+                from: student._id,
                 courseID: existingCourse._id,
                 message: `${req.user.username} has requested to subscribe for a course, ${existingCourse.title}.`,
             }
@@ -155,8 +162,7 @@ class SubscriptionApprovalController {
                 // remove from cart if the course is in the student's cart
                 const existingCart = await cartModel.findOne({ studentID: new mongoose.Types.ObjectId(existingStudent._id) });
                 if (existingCart) {
-                    // existingCart.courseID = existingCart.courseID.filter(course => !course.equals(existingCourse._id));
-                    existingCart.courseID.pull(existingCourse._id)
+                    existingCart.courseID = existingCart.courseID.filter(course => !course.equals(existingCourse._id));
                     await existingCart.save();
                 }
 
@@ -177,6 +183,17 @@ class SubscriptionApprovalController {
                 if (!emailResult) {
                     return res.status(400).send(failure("Failed to send email."));
                 }
+
+                // send notification to the teacher that a student has subscribed to a course
+                const notification = {
+                    type: "course_subscribed",
+                    to: existingCourse.teacherID,
+                    from: student._id,
+                    courseID: existingCourse._id,
+                    message: `${req.user.username} has subscribed to your course, ${existingCourse.title}.`,
+                }
+
+                await notificationModel.create(notification)
 
                 return res.status(200).send(success(`Subscription request for ${existingCourse.title} has been approved successfully.`));
             } else if (action === 'reject') {

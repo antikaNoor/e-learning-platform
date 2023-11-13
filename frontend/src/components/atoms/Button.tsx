@@ -1,20 +1,21 @@
-import React from 'react';
+// import React from 'react';
 
-interface ButtonProps {
+type Props = {
   type: 'button' | 'submit' | 'reset';
   value: string;
-  onClick: () => void;
+  onClick?: () => void;
+  additionalStyles?: string;
 }
 
-const Button: React.FC<ButtonProps> = ({ type, value, onClick }) => {
+const Button = (props: Props) => {
   return (
-    <div className="button-container">
+    <div className="w-full">
       <button
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        type={type}
-        onClick={onClick}
+        className={`bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded ${props.additionalStyles}`}
+        type={props.type}
+        onClick={props.onClick}
       >
-        {value}
+        {props.value}
       </button>
     </div>
   );

@@ -4,11 +4,13 @@ const CourseController = require('../../controller/course/courseController')
 const { isUserLoggedIn,
     isUserAdmin,
     isUserStudent,
-    isUserTeacher } = require('../../middleware/auth')
+    isUserTeacher,
+    isAdminOrTeacher } = require('../../middleware/auth')
+    const { courseValidator } = require('../../middleware/validation')
+const courseController = require('../../controller/course/courseController')
 
-routes.post("/create-course", isUserLoggedIn, isUserTeacher, CourseController.createCourse)
+routes.post("/create-course", isUserLoggedIn, isAdminOrTeacher, courseValidator.addCourse, courseController.createValiadtion, CourseController.createCourse)
 routes.get("/get-courses", CourseController.getCourses)
-routes.post("/delete-course", isUserLoggedIn, isUserTeacher, CourseController.deleteCourse)
-routes.post("/publish-course", isUserLoggedIn, isUserTeacher, CourseController.publishCourse)
+routes.post("/delete-course", isUserLoggedIn, isAdminOrTeacher, CourseController.deleteCourse)
 
 module.exports = routes 

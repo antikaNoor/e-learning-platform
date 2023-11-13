@@ -295,7 +295,7 @@ class AuthController {
 
             await auth.save()
 
-            const resetPasswordURL = path.join(process.env.BACKEND_AUTH_URL, "reset-password", auth._id.toString(), resetToken);
+            const resetPasswordURL = path.join(process.env.FRONTEND_AUTH_URL, "reset-password", auth._id.toString(), resetToken);
 
             const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/forgotPassword.ejs'), {
                 name: auth.username,

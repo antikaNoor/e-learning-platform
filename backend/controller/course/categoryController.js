@@ -39,7 +39,7 @@ class CategoryController {
             if (existingCategory && existingCategory.isDeleted === true) {
                 existingCategory.isDeleted = false
                 await existingCategory.save()
-                return res.status(200).send(success("Category created successfully"))
+                return res.status(200).send(success("Category created successfully", existingCategory))
             }
 
             const category = new categoryModel({
@@ -47,7 +47,11 @@ class CategoryController {
             })
 
             await category.save()
-            return res.status(200).send(success("Category created successfully"))
+
+            const response = category.toObject()
+            delete response.__v
+
+            return res.status(200).send(success("Category created successfully", response))
 
         } catch (error) {
             console.log("error", error)
@@ -58,7 +62,7 @@ class CategoryController {
     // delete a category
     async deleteCategory(req, res) {
         try {
-            const { categoryID } = req.body
+            const { categoryID } = req.params
 
             const existingCategory = await categoryModel.findOne({ _id: new mongoose.Types.ObjectId(categoryID) })
             if (!existingCategory) {
@@ -73,6 +77,35 @@ class CategoryController {
             await existingCategory.save()
             return res.status(200).send(success("Category deleted successfully"))
 
+        } catch (error) {
+            console.log("error", error)
+            return res.status(500).send(failure("Internal server error"))
+        }
+    }
+
+    // edit a category
+    async editCategory(req, res) {
+        try {
+            const { categoryID } = req.params
+            const { categoryName } = req.body
+
+            if (!categoryName || !categoryID) {
+                return res.status(400).send(failure("Please enter category name and ID."))
+            }
+
+            const existingCategory = await categoryModel.findOne({ _id: new mongoose.Types.ObjectId(categoryID) })
+
+            if (!existingCategory || existingCategory.isDeleted === true) {
+                return res.status(400).send(failure("Category not found."))
+            }
+
+            existingCategory.categoryName = categoryName
+            existingCategory.save()
+
+            const response = existingCategory.toObject()
+            delete response.__v
+
+            return res.status(200).send(success("Category updated successfully", response))
         } catch (error) {
             console.log("error", error)
             return res.status(500).send(failure("Internal server error"))

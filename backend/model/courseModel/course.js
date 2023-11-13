@@ -40,18 +40,6 @@ const courseSchema = new mongoose.Schema({
         type: mongoose.Types.ObjectId,
         ref: "Topic"
     },
-    // reviewID: {
-    //     type: [mongoose.Types.ObjectId],
-    //     ref: "Review"
-    // },
-    lessonID: {
-        type: [mongoose.Types.ObjectId],
-        ref: "Lesson"
-    },
-    // enrolledStudents: {
-    //     type: [mongoose.Types.ObjectId],
-    //     ref: "User"
-    // },
 
 }, { timestamps: true })
 

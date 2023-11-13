@@ -24,9 +24,9 @@ class CourseController {
     async createCourse(req, res) {
         try {
 
-            const { title, description, teacherID, language, learingOutcome, requirement, topicID } = req.body
+            const { title, description, language, learingOutcome, requirement, topicID } = req.body
 
-            if (!title || !description || !teacherID || !language || !learingOutcome || !requirement || !topicID) {
+            if (!title || !description || !language || !learingOutcome || !requirement || !topicID) {
                 return res.status(400).send(failure("Please fill all the fields"))
             }
 
@@ -36,19 +36,11 @@ class CourseController {
                 return res.status(400).send(failure("Course title already exists. Please choose a different title."))
             }
 
-            const existingteacher = await authModel.findOne({ _id: new mongoose.Types.ObjectId(teacherID) })
+            const existingteacher = await authModel.findOne({ _id: new mongoose.Types.ObjectId(req.user._id) })
                 .select("role isVerified isBanned")
 
             if (!existingteacher) {
                 return res.status(400).send(failure("teacher not found"))
-            }
-
-            if (existingteacher.role !== "teacher") {
-                return res.status(400).send(failure("User is not an teacher"))
-            }
-
-            if (!existingteacher.isVerified || existingteacher.isBanned) {
-                return res.status(400).send(failure("teacher not verified or banned"))
             }
 
             const existingTopic = await topicModel.findOne({ _id: new mongoose.Types.ObjectId(topicID) })
@@ -59,14 +51,25 @@ class CourseController {
             const course = new courseModel({
                 title,
                 description,
-                teacherID,
+                teacherID: req.user._id,
                 language,
                 learingOutcome,
                 requirement,
                 topicID
             })
+
+            if(existingteacher.role === "admin") {
+                course.isApproved = true
+                course.isPublished = true
+            }
+
             await course.save()
-            return res.status(200).send(success("Course created successfully"))
+
+            const response = course.toObject()
+            delete response.__v
+            delete response.isDeleted
+
+            return res.status(200).send(success("Course created successfully", response))
         } catch (error) {
             console.log("error", error)
             return res.status(500).send(failure("Internal server error"))
@@ -102,27 +105,6 @@ class CourseController {
             return res.status(200).send(success("Course deleted successfully"))
 
         } catch (error) {
-            console.log("error", error)
-            return res.status(500).send(failure("Internal server error"))
-        }
-    }
-
-    // publish a course 
-    async publishCourse(req, res) {
-        try {
-            const { courseID } = req.body
-
-            const existingCourse = await courseModel.findOne({ _id: new mongoose.Types.ObjectId(courseID) })
-            if (!existingCourse) {
-                return res.status(400).send(failure("This course does not exist. Please enter a valid course."))
-            }
-
-            // now admin can review the course for approval
-            existingCourse.isPublished = true
-            await existingCourse.save()
-
-            return res.status(200).send(success("Course published successfully"))
-        } catch(error) {
             console.log("error", error)
             return res.status(500).send(failure("Internal server error"))
         }

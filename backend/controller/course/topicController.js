@@ -45,7 +45,7 @@ class TopicController {
       if (existingTopic && existingTopic.isDeleted === true) {
         existingTopic.isDeleted = false;
         await existingTopic.save();
-        return res.status(200).send(success("Topic created successfully"));
+        return res.status(200).send(success("Topic created successfully", existingTopic));
       }
 
       const topic = new topicModel({
@@ -54,7 +54,11 @@ class TopicController {
       });
 
       await topic.save();
-      return res.status(200).send(success("Topic created successfully"));
+
+      const response = topic.toObject();
+      delete response.__v;
+
+      return res.status(200).send(success("Topic created successfully", response));
     } catch (error) {
       console.log("Error", error);
       return res.status(500).send(failure("Internal server error"));
@@ -63,7 +67,7 @@ class TopicController {
 
   async deleteTopic(req, res) {
     try {
-      const { topicID } = req.body;
+      const { topicID } = req.params;
 
       const existingTopic = await topicModel.findOne({
         _id: new mongoose.Types.ObjectId(topicID),
@@ -89,6 +93,37 @@ class TopicController {
       return res.status(200).send(success("Topic deleted successfully"));
 
     } catch (error) {
+      console.log("Error", error);
+      return res.status(500).send(failure("Internal server error"));
+    }
+  }
+
+  // edit a topic
+  async editTopic(req, res) {
+    try {
+      const { topicID } = req.params;
+      const { topicName } = req.body;
+
+      if(!topicName || !topicID) {
+        return res.status(400).send(failure("Please enter topic name and ID."));
+      }
+
+      const existingTopic = await topicModel.findOne({
+        _id: new mongoose.Types.ObjectId(topicID),
+      });
+
+      if(!existingTopic || existingTopic.isDeleted === true) {
+        return res.status(400).send(failure("Topic not found."));
+      }
+
+      existingTopic.topicName = topicName;
+      await existingTopic.save();
+
+      const response = existingTopic.toObject();
+      delete response.__v;
+
+      return res.status(200).send(success("Topic updated successfully", response));
+    } catch(error) {
       console.log("Error", error);
       return res.status(500).send(failure("Internal server error"));
     }

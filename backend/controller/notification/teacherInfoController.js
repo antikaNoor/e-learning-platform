@@ -40,6 +40,12 @@ class TeacherController {
                 return res.status(400).send(failure("Teacher not found."));
             }
 
+            const admin = await authModel.findOne({ role: "admin" })
+
+            if (!admin) {
+                return res.status(400).send(failure("Admin not found"))
+            }
+
             // if the fields are already filled up, ask the teacher to edit it.
             if (existingTeacher.educationalBackground.length > 0 || existingTeacher.teachingExperience.length > 0) {
                 return res.status(400).send(failure("Teacher information already filled up and admin has been notified."));
@@ -67,7 +73,8 @@ class TeacherController {
             // send notification to admin
             const notification = {
                 type: "teacher_approval",
-                userID: req.user._id,
+                to: admin._id,
+                from: req.user._id,
                 message: `${req.user.username} has requested to be a teacher.`,
             }
 
