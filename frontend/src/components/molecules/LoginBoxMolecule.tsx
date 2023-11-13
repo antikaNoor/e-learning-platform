@@ -8,7 +8,8 @@ import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { LoginApi } from '../../ApiCalls/Auth/AuthApi';
 
 import { useDispatch } from 'react-redux';
-import { saveLogin, removeLogin } from "../../redux/slices/AuthSlice";
+import { saveLogin } from "../../redux/slices/UserSlice";
+import { useSelector } from 'react-redux';
 
 type FormData = {
     email: string;
@@ -20,6 +21,9 @@ type BoxProps = {
 };
 
 const LoginBoxMolecule = ({ className }: BoxProps) => {
+
+    const token = useSelector((state: { user: { token: string } }) => state.user.token)
+
 
     const dispatch = useDispatch();
 
@@ -48,7 +52,8 @@ const LoginBoxMolecule = ({ className }: BoxProps) => {
         const response = await LoginApi(data)
         if (response) {
             dispatch(saveLogin(response));
-            dispatch(removeLogin());
+            console.log(token)
+            // dispatch(removeLogin());
         }
     };
 

@@ -61,7 +61,7 @@ export const LoginApi = async (formData: FormDataLogin) => {
             toast.error(data.message);
         } else if (data.success === true) {
             toast.success(data.message);
-            return data;
+            return data.data;
         }
     } catch (error) {
         console.error(error);

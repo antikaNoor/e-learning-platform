@@ -22,7 +22,7 @@ const AdminAuthenticate = () => {
         </div>
     );
     // } else {
-    return <Navigate to="/login" />;
+    // return <Navigate to="/login" />;
     // }
 };
 
