@@ -4,6 +4,7 @@ const studentModel = require("../../model/authModel/student")
 const notificationModel = require("../../model/notificationModel/notification")
 const cartModel = require("../../model/subscriptionModel/cart")
 const wishListModel = require("../../model/subscriptionModel/wishList")
+const progressModel = require("../../model/courseModel/progress")
 const { success, failure } = require("../../utils/successError")
 const express = require('express')
 const mongoose = require("mongoose")
@@ -105,7 +106,8 @@ class SubscriptionApprovalController {
     // accept or reject a subscription
     async acceptOrRejectSubscription(req, res) {
         try {
-            const { notificationID, action } = req.body;
+            const { notificationID } = req.params
+            const { action } = req.body;
 
             if (!notificationID || !action) {
                 return res.status(400).send(failure("Please provide all the fields."));
@@ -116,7 +118,7 @@ class SubscriptionApprovalController {
             const existingNotification = await notificationModel
                 .findOne({ _id: new mongoose.Types.ObjectId(notificationID) })
                 .populate({
-                    path: "userID",
+                    path: "from",
                     select: "username email",
                 });
 
@@ -134,7 +136,8 @@ class SubscriptionApprovalController {
                 return res.status(400).send(failure("This course has not been approved by admin."));
             }
 
-            const existingStudent = await studentModel.findOne({ email: existingNotification.userID.email });
+            const student = await authModel.findOne({ _id: existingNotification.from._id })
+            const existingStudent = await studentModel.findOne({ email: existingNotification.from.email });
 
             if (!existingStudent) {
                 return res.status(400).send(failure("Student not found"))
@@ -144,6 +147,10 @@ class SubscriptionApprovalController {
                 return res.status(400).send(failure("You are already enrolled in this course."))
             }
 
+            if (existingNotification.status === "read") {
+                return res.status(400).send(failure("This notification has already been read."))
+            }
+
             existingNotification.status = "read";
             await existingNotification.save()
 
@@ -151,6 +158,15 @@ class SubscriptionApprovalController {
                 // add the course to the enrolledCourses of the student
                 existingStudent.enrolledCourses.push(existingCourse._id);
                 await existingStudent.save();
+
+                // create the progress model for the student for the course
+                const progress = new progressModel({
+                    studentID: student._id,
+                    courseID: existingCourse._id,
+                    percentage: 0,
+                });
+
+                await progress.save();
 
                 // remove from wish-list if the course is in the student's wish-list
                 const existingWish = await wishListModel.findOne({ studentID: new mongoose.Types.ObjectId(existingStudent._id) });
@@ -171,14 +187,14 @@ class SubscriptionApprovalController {
 
                 // Compose the email
                 const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/SubscriptionApprovalEmail.ejs'), {
-                    name: existingNotification.userID.username,
+                    name: existingNotification.from.username,
                     courseName: existingCourse.title,
                     isSubscriptionApproved: isSubscriptionApproved,
                     SubscriptionApprovalEmailURL: SubscriptionApprovalEmailURL,
                 });
 
                 // Send the email
-                const emailResult = await sendMail(existingNotification.userID.email, "Subscription Approval", htmlBody);
+                const emailResult = await sendMail(existingNotification.from.email, "Subscription Approval", htmlBody);
 
                 if (!emailResult) {
                     return res.status(400).send(failure("Failed to send email."));
@@ -188,9 +204,9 @@ class SubscriptionApprovalController {
                 const notification = {
                     type: "course_subscribed",
                     to: existingCourse.teacherID,
-                    from: student._id,
+                    from: existingStudent._id,
                     courseID: existingCourse._id,
-                    message: `${req.user.username} has subscribed to your course, ${existingCourse.title}.`,
+                    message: `${existingStudent.username} has subscribed to your course, ${existingCourse.title}.`,
                 }
 
                 await notificationModel.create(notification)
@@ -202,14 +218,14 @@ class SubscriptionApprovalController {
 
                 // Compose the email
                 const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/SubscriptionApprovalEmail.ejs'), {
-                    name: existingNotification.userID.username,
+                    name: existingNotification.from.username,
                     courseName: existingCourse.title,
                     isSubscriptionApproved: isSubscriptionApproved,
                     SubscriptionApprovalEmailURL: SubscriptionApprovalEmailURL,
                 });
 
                 // Send the email
-                const emailResult = await sendMail(existingNotification.userID.email, "Subscription Rejection", htmlBody);
+                const emailResult = await sendMail(existingNotification.from.email, "Subscription Rejection", htmlBody);
 
                 if (!emailResult) {
                     return res.status(400).send(failure("Failed to send email."));

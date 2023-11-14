@@ -11,11 +11,15 @@ const progressSchema = new mongoose.Schema({
         ref: "Course",
         required: true
     },
-    progess: {
+    completedLessons: {
+        type: [mongoose.Types.ObjectId],
+        ref: "Lesson",
+    },
+    percentage: {
         type: Number,
         default: 0
     },
-    
+
 }, { timestamps: true })
 
 const Progress = mongoose.model("Progress", progressSchema);

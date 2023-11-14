@@ -1,10 +1,13 @@
 const courseModel = require("../../model/courseModel/course")
 const lessonModel = require("../../model/courseModel/lesson")
+const teacherModel = require("../../model/authModel/teacher")
+const studentModel = require("../../model/authModel/student")
+const progressModel = require("../../model/courseModel/progress")
 const { success, failure } = require("../../utils/successError")
 const express = require('express')
 const mongoose = require("mongoose")
 const { validationResult } = require('express-validator')
-const { uploadFile, deleteFile, deleteFolder } = require("../../config/files")
+const { uploadFile, deleteFile, deleteFiles, deleteFolder } = require("../../config/files")
 // const fileTypes = require("../constants/fileTypes")
 const fs = require('fs')
 const path = require('path')
@@ -27,16 +30,11 @@ class LessonController {
         try {
             // const video = req.file
             const { courseID } = req.params
-            const { title, description, isAccessibleToUnenrolled } = req.body
-            console.log(title, description, isAccessibleToUnenrolled)
+            const { serialNo, title, description, isAccessibleToUnenrolled } = req.body
+            console.log(serialNo, courseID, title, description, isAccessibleToUnenrolled)
 
-            if (!title || !description || !isAccessibleToUnenrolled) {
+            if (!courseID || !serialNo || !title || !description || !isAccessibleToUnenrolled) {
                 return res.status(400).send(failure("Please fill all the fields"))
-            }
-
-            // Check if files are uploaded
-            if (!req.files || req.files.length === 0) {
-                return res.status(400).send(failure("Please upload at least one video and one note."));
             }
 
             const existingCourse = await courseModel.findOne({ _id: new mongoose.Types.ObjectId(courseID) });
@@ -45,39 +43,17 @@ class LessonController {
                 return res.status(400).send(failure("The specified course does not exist. Please enter a valid course."));
             }
 
-            const existingTitle = await lessonModel.findOne({ title })
+            const existingTitle = await lessonModel.findOne({ serialNo, title, courseID })
             if (existingTitle && existingTitle.isDeleted === false) {
                 return res.status(400).send(failure("Lesson title already exists. Please choose a different title."))
             }
 
-            const videos = req.files.map(video => ({ filePath: video.buffer.toString('base64') }));
-            const notes = req.files.map(note => ({ filePath: note.buffer.toString('base64') }));
-
-            const videoUrls = await Promise.all(req.files.map(async (video) => {
-                try {
-                    return await uploadFile(video, 'videos'); // Assuming 'videos' is the folder for videos
-                } catch (uploadError) {
-                    console.error("Error uploading video:", uploadError.message);
-                    throw uploadError;
-                }
-            }));
-
-            const noteUrls = await Promise.all(req.files.map(async (note) => {
-                try {
-                    return await uploadFile(note, 'notes'); // Assuming 'notes' is the folder for notes
-                } catch (uploadError) {
-                    console.error("Error uploading note:", uploadError.message);
-                    throw uploadError;
-                }
-            }));
-
             const lesson = await lessonModel.create({
+                serialNo,
                 title,
                 description,
                 isAccessibleToUnenrolled,
                 courseID,
-                videos: videoUrls.map(filePath => ({ filePath })),
-                notes: noteUrls.map(filePath => ({ filePath })),
             });
 
             await lesson.save();
@@ -99,12 +75,214 @@ class LessonController {
         }
     }
 
+    // add videos to a lesson
+    async addVideos(req, res) {
+        try {
+            const { lessonID } = req.params
+            const videos = req.file
+
+            if (!lessonID || !videos) {
+                return res.status(400).send(failure("Please enter the lesson and video."))
+            }
+
+            const existingLesson = await lessonModel.findOne({ _id: new mongoose.Types.ObjectId(lessonID), isDeleted: false })
+
+            if (!existingLesson) {
+                return res.status(400).send(failure("The specified lesson does not exist. Please enter a valid lesson."))
+            }
+
+            const teacher = await teacherModel.findOne({ email: req.user.email })
+
+            if (!teacher) {
+                return res.status(400).send(failure("User not found"))
+            }
+
+            // check if teacher teacher this course
+            // const authorizedCourses = teacher.coursesTaught.map(courseId => courseId.toString());
+
+            // if (!authorizedCourses.includes(existingLesson.courseID.toString())) {
+            //     return res.status(400).send(failure("You are not authorized to add videos to this lesson."));
+            // }
+
+            // push the video inside the videos array
+            const uploadRes = await uploadFile(videos, "videos")
+
+            if (!uploadRes) {
+                return res.status(400).send(failure("Error uploading video."))
+            }
+
+            existingLesson.videos.push(uploadRes)
+            await existingLesson.save()
+
+            const responseLesson = existingLesson.toObject()
+            delete responseLesson.isAccessibleToUnenrolled
+
+            return res.status(200).send(success("Video added successfully.", responseLesson))
+
+        } catch (error) {
+            console.log("error", error)
+            return res.status(500).send(failure("Internal server error"))
+        }
+    }
+
+    // add notes to a lesson
+    async addNotes(req, res) {
+        try {
+            const { lessonID } = req.params
+            const notes = req.file
+
+            if (!lessonID || !notes) {
+                return res.status(400).send(failure("Please enter the lesson and a note."))
+            }
+
+            const existingLesson = await lessonModel.findOne({ _id: new mongoose.Types.ObjectId(lessonID), isDeleted: false })
+
+            if (!existingLesson) {
+                return res.status(400).send(failure("The specified lesson does not exist. Please enter a valid lesson."))
+            }
+
+            const teacher = await teacherModel.findOne({ email: req.user.email })
+
+            if (!teacher) {
+                return res.status(400).send(failure("User not found"))
+            }
+
+            // check if teacher teacher this course
+            // const authorizedCourses = teacher.coursesTaught.map(courseId => courseId.toString());
+
+            // if (!authorizedCourses.includes(existingLesson.courseID.toString())) {
+            //     return res.status(400).send(failure("You are not authorized to add videos to this lesson."));
+            // }
+
+            // push the video inside the videos array
+            const uploadRes = await uploadFile(notes, "notes")
+
+            if (!uploadRes) {
+                return res.status(400).send(failure("Error uploading video."))
+            }
+
+            existingLesson.notes.push(uploadRes)
+            await existingLesson.save()
+
+            const responseLesson = existingLesson.toObject()
+            delete responseLesson.isAccessibleToUnenrolled
+
+            return res.status(200).send(success("Video added successfully.", responseLesson))
+
+        } catch (error) {
+            console.log("error", error)
+            return res.status(500).send(failure("Internal server error"))
+        }
+    }
+
+    // complete a lesson
+    async completeLesson(req, res) {
+        try {
+            const { lessonID } = req.params
+
+            if (!lessonID) {
+                return res.status(400).send(failure("Please enter the lesson."))
+            }
+
+            const existingLesson = await lessonModel.findOne({ _id: new mongoose.Types.ObjectId(lessonID) })
+
+            if (!existingLesson) {
+                return res.status(400).send(failure("The specified lesson does not exist. Please enter a valid lesson."))
+            }
+
+            const existingStudent = await studentModel.findOne({ email: req.user.email })
+
+            if (!existingStudent) {
+                return res.status(400).send(failure("User not found"))
+            }
+
+            const course = await courseModel.findOne({ _id: new mongoose.Types.ObjectId(existingLesson.courseID) })
+
+            if (!course) {
+                return res.status(400).send(failure("Course not found"))
+            }
+
+            // check if student is enrolled in this course
+            const authorizedCourses = existingStudent.enrolledCourses.map(courseId => courseId.toString());
+
+            if (!authorizedCourses.includes(existingLesson.courseID.toString())) {
+                return res.status(400).send(failure("You are not authorized to complete this lesson."))
+            }
+
+            // existingStudent.completedLessons.push(existingLesson._id)
+            // await existingStudent.save()
+
+            const existingProgress = await progressModel.findOne({ studentID: new mongoose.Types.ObjectId(req.user._id) })
+
+            if (!existingProgress) {
+                return res.status(400).send(failure("Progress not found"))
+            }
+
+            // if lesson is found in the completedLessons array, return
+            if (existingProgress.completedLessons.includes(existingLesson._id)) {
+                return res.status(400).send(failure("Lesson already completed"))
+            }
+
+            // get the array length of completed lessonID in student model
+            existingProgress.completedLessons.push(existingLesson._id)
+            const completedLessons = existingProgress.completedLessons.length
+            await existingProgress.save()
+
+            // get the length of lessonID in course model
+            const totalLessons = course.lessonID.length
+
+            //compute progress (2 for quiz and assignment)
+            const progress = (completedLessons / (totalLessons)) * 100
+
+            existingProgress.percentage = progress
+            await existingProgress.save()
+
+            return res.status(200).send(success("Lesson completed successfully."))
+        } catch (error) {
+            console.log("error", error)
+            return res.status(500).send(failure("Internal server error"))
+        }
+    }
+
+    // delete a video
+    // async deleteVideo(req, res) {
+    //     try {
+    //         const { lessonID } = req.params
+    //         const { videoURL } = req.body
+
+    //         if (!lessonID || !videoURL) {
+
+    //             return res.status(400).send(failure("Please enter the video url and lesson ID."))
+    //         }
+
+    //         const existingLesson = await lessonModel.findOne({ _id: new mongoose.Types.ObjectId(lessonID) })
+    //         if (!existingLesson) {
+    //             return res.status(400).send(failure("The specified lesson does not exist. Please enter a valid lesson."))
+    //         }
+
+    //         // search the url inside the videos array
+    //         // const existingVideo = existingLesson.videos.filter(video => )
+
+    //         // if (!existingVideo) {
+    //         //     return res.status(400).send(failure("The specified video does not exist. Please enter a valid video."))
+    //         // }
+
+    //         // console.log(existingVideo)
+
+    //         // delete associated video from bucket
+    //     } catch (error) {
+    //         console.log("error", error)
+    //         return res.status(500).send(failure("Internal server error"))
+    //     }
+
+    // }
+
     // delete a lesson
     async deleteLesson(req, res) {
         try {
-            const { lessonID, courseID } = req.body
+            const { lessonID } = req.params
 
-            if (!lessonID || !courseID) {
+            if (!lessonID) {
                 return res.status(400).send(failure("Please enter the lesson and course ID."))
             }
 
@@ -113,7 +291,7 @@ class LessonController {
                 return res.status(400).send(failure("The specified lesson does not exist. Please enter a valid lesson."))
             }
 
-            const existingCourse = await courseModel.findOne({ _id: new mongoose.Types.ObjectId(courseID) })
+            const existingCourse = await courseModel.findOne({ _id: new mongoose.Types.ObjectId(existingLesson.courseID) })
             if (!existingCourse || existingCourse.isDeleted === true) {
                 return res.status(400).send(failure("The specified course does not exist. Please enter a valid course."))
             }
@@ -125,11 +303,14 @@ class LessonController {
             existingCourse.lessonID = existingCourse.lessonID.filter(id => id.toString() !== lessonID);
             await existingCourse.save();
 
-            // delete associated video from bucket
-            await deleteFile(existingLesson.videoFilePath)
+            // delete associated videos and notes from bucket
+            await deleteFiles(existingLesson.videos);
+            await deleteFiles(existingLesson.notes);
 
             existingLesson.isDeleted = true;
-            existingLesson.videoFilePath = null;
+            existingLesson.videos = [];
+            existingLesson.notes = [];
+
             await existingLesson.save();
 
             return res.status(200).send(success("Lesson deleted successfully."))

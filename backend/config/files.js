@@ -11,7 +11,7 @@ const { S3_REGION, S3_BUCKET, S3_BASE_URL } = process.env;
 const uploadFile = async function (file, folderName) {
     const s3Client = new S3Client({ region: S3_REGION });
     const key = folderName
-        ? `${folderName}/${Date.now()}-${file.originalname.replace(' ', '_')}`
+        ? `${folderName}/${Date.now()}-${file.originalname.replace(/ /g, '_')}`
         : `${Date.now()}-${file.originalname}`;
     const s3Params = {
         Bucket: S3_BUCKET,
@@ -40,6 +40,30 @@ const deleteFile = async function (fileUrl) {
         throw error;
     }
 };
+
+// delete array of files 
+const deleteFiles = async function (fileUrls) {
+    try {
+        const s3Client = new S3Client({ region: S3_REGION });
+
+        // Loop through each file URL in the array and delete the corresponding file
+        for (const fileUrl of fileUrls) {
+            const key = fileUrl.split("/").slice(-2).join("/");
+            const s3Params = {
+                Bucket: S3_BUCKET,
+                Key: key,
+            };
+
+            console.log(`File URL to delete: ${key}`);
+            await s3Client.send(new DeleteObjectCommand(s3Params));
+            console.log(`File deleted successfully: ${fileUrl}`);
+        }
+
+    } catch (error) {
+        console.error(`Error deleting files: ${error.message}`);
+        throw error;
+    }
+}
 
 const deleteFolder = async function (folderName) {
     try {
@@ -134,4 +158,4 @@ const deleteFolder = async function (folderName) {
 //     }
 // }
 
-module.exports = { uploadFile, deleteFile, deleteFolder };
+module.exports = { uploadFile, deleteFile, deleteFiles, deleteFolder };

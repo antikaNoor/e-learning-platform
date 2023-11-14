@@ -14,7 +14,7 @@ routes.post("/course-approval", isUserLoggedIn, isUserAdmin, CourseApprovalContr
 
 // subscription approval
 routes.post("/request-for-subscription", isUserLoggedIn, isUserStudent, SubscriptionApprovalController.requestForSubscription)
-routes.post("/subscription-approval", isUserLoggedIn, isUserAdmin, SubscriptionApprovalController.acceptOrRejectSubscription)
+routes.post("/subscription-approval/:notificationID", isUserLoggedIn, isUserAdmin, SubscriptionApprovalController.acceptOrRejectSubscription)
 
 // teacher approval
 routes.post("/teacher-request", isUserLoggedIn, TeacherApprovalController.addTeacherInfo)

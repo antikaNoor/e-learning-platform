@@ -55,7 +55,7 @@ class AssignmentController {
             const authorizedCourses = teacher.coursesTaught.map(courseId => courseId.toString());
 
             if (!authorizedCourses.includes(courseID.toString())) {
-                return res.status(400).send(failure("You are not authorized to post an answer to this forum."));
+                return res.status(400).send(failure("You are not authorized to create assignments for this course."));
             }
 
             // if there is a assignment against the course, throw error

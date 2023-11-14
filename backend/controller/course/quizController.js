@@ -4,6 +4,7 @@ const teacherModel = require("../../model/authModel/teacher")
 const courseModel = require("../../model/courseModel/course")
 const quizModel = require("../../model/courseModel/quiz")
 const evaluationModel = require("../../model/courseModel/evaluation")
+const progressModel = require("../../model/courseModel/progress")
 
 const { success, failure } = require("../../utils/successError")
 const express = require('express')
@@ -29,7 +30,8 @@ class QuizController {
     // add quiz
     async createQuiz(req, res) {
         try {
-            const { courseID, questions, duration } = req.body
+            const { courseID } = req.params
+            const { questions, duration } = req.body
 
             if (!courseID || !questions || !duration) {
                 return res.status(400).send(failure("Please fill all the fields"))
@@ -51,7 +53,7 @@ class QuizController {
             const authorizedCourses = teacher.coursesTaught.map(courseId => courseId.toString());
 
             if (!authorizedCourses.includes(courseID.toString())) {
-                return res.status(400).send(failure("You are not authorized to post an answer to this forum."));
+                return res.status(400).send(failure("You are not authorized to create quiz for this course."));
             }
 
             // if there is a quiz against the course, throw error
@@ -121,8 +123,12 @@ class QuizController {
             // Check if the user is a student and enrolled in the course
             if (user.role === "student") {
                 const student = await studentModel.findOne({ email: user.email });
-                if (!student || !student.enrolledCourses.find(course => course._id.toString() === courseID.toString())) {
+                if (!student || !student.enrolledCourses?.find(course => course._id.toString() === courseID.toString())) {
                     return res.status(400).send(failure("You are not enrolled in this course."));
+                }
+                const progress = await progressModel.findOne({ studentID: req.user._id });
+                if (!progress || progress.percentage < 100) {
+                    return res.status(400).send(failure("You have not completed the lessons."));
                 }
             }
 
