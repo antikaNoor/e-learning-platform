@@ -1,6 +1,10 @@
 const mongoose = require("mongoose")
 
 const lessonSchema = new mongoose.Schema({
+    serialNo: {
+        type: Number,
+        default: 0
+    },
     title: {
         type: String,
         maxLength: 100,
@@ -8,27 +12,41 @@ const lessonSchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        required: [true, "Decsription should be provided"]
     },
-    videoFilePath: {
-        type: String,
-    },
+    videos: [
+        {
+            filePath: {
+                type: String,
+                required: true,
+            },
+        },
+    ],
+
+    // Array of note files
+    notes: [
+        {
+            filePath: {
+                type: String,
+                required: true,
+            },
+        },
+    ],
     // Unenrolled students cannot watch all the lessons. They may access just the intro video.
     isAccessibleToUnenrolled: {
         type: Boolean,
         default: false
     },
     // To keep track of the exact moment the video was paused by an enrolled student.
-    progressofStudent: [{
-        StudentID: {
-            type: mongoose.Types.ObjectId,
-            ref: "Student"
-        },
-        videoLastPlayedDuration: {
-            type: Number, // Store the video duration where the student left off
-            default: 0 // Default value is 0 seconds
-        }
-    }],
+    // progressofStudent: [{
+    //     StudentID: {
+    //         type: mongoose.Types.ObjectId,
+    //         ref: "Student"
+    //     },
+    //     videoLastPlayedDuration: {
+    //         type: Number, // Store the video duration where the student left off
+    //         default: 0 // Default value is 0 seconds
+    //     }
+    // }],
     isDeleted: {
         type: Boolean,
         default: false

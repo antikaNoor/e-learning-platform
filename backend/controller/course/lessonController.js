@@ -25,11 +25,18 @@ class LessonController {
     // create a lesson
     async createLesson(req, res) {
         try {
-            const file = req.file
-            const { title, description, isAccessibleToUnenrolled, courseID, folderName } = req.body
+            // const video = req.file
+            const { courseID } = req.params
+            const { title, description, isAccessibleToUnenrolled } = req.body
+            console.log(title, description, isAccessibleToUnenrolled)
 
-            if (!title || !description || !isAccessibleToUnenrolled || !courseID || !file || !folderName) {
+            if (!title || !description || !isAccessibleToUnenrolled) {
                 return res.status(400).send(failure("Please fill all the fields"))
+            }
+
+            // Check if files are uploaded
+            if (!req.files || req.files.length === 0) {
+                return res.status(400).send(failure("Please upload at least one video and one note."));
             }
 
             const existingCourse = await courseModel.findOne({ _id: new mongoose.Types.ObjectId(courseID) });
@@ -43,14 +50,34 @@ class LessonController {
                 return res.status(400).send(failure("Lesson title already exists. Please choose a different title."))
             }
 
-            const uploadRes = await uploadFile(file, folderName)
+            const videos = req.files.map(video => ({ filePath: video.buffer.toString('base64') }));
+            const notes = req.files.map(note => ({ filePath: note.buffer.toString('base64') }));
+
+            const videoUrls = await Promise.all(req.files.map(async (video) => {
+                try {
+                    return await uploadFile(video, 'videos'); // Assuming 'videos' is the folder for videos
+                } catch (uploadError) {
+                    console.error("Error uploading video:", uploadError.message);
+                    throw uploadError;
+                }
+            }));
+
+            const noteUrls = await Promise.all(req.files.map(async (note) => {
+                try {
+                    return await uploadFile(note, 'notes'); // Assuming 'notes' is the folder for notes
+                } catch (uploadError) {
+                    console.error("Error uploading note:", uploadError.message);
+                    throw uploadError;
+                }
+            }));
 
             const lesson = await lessonModel.create({
                 title,
                 description,
                 isAccessibleToUnenrolled,
                 courseID,
-                videoFilePath: uploadRes,
+                videos: videoUrls.map(filePath => ({ filePath })),
+                notes: noteUrls.map(filePath => ({ filePath })),
             });
 
             await lesson.save();

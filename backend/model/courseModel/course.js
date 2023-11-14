@@ -24,6 +24,10 @@ const courseSchema = new mongoose.Schema({
     requirement: {
         type: [String]
     },
+    thumbnail: {
+        type: String,
+        required: [true, "Thumbnail should be provided"]
+    },
     isApproved: {
         type: Boolean,
         default: false

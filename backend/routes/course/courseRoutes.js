@@ -1,6 +1,7 @@
 const express = require('express')
 const routes = express()
 const CourseController = require('../../controller/course/courseController')
+const upload = require("multer")()
 const { isUserLoggedIn,
     isUserAdmin,
     isUserStudent,
@@ -9,8 +10,9 @@ const { isUserLoggedIn,
 const { courseValidator } = require('../../middleware/validation')
 const courseController = require('../../controller/course/courseController')
 
-routes.post("/create-course", isUserLoggedIn, isUserTeacher, courseValidator.addCourse, courseController.createValiadtion, CourseController.createCourse)
+routes.post("/create-course", isUserLoggedIn, isUserTeacher, upload.single('thumbnail'), CourseController.createCourse)
 routes.get("/get-courses", CourseController.getCourses)
 routes.post("/delete-course", isUserLoggedIn, isUserTeacher, CourseController.deleteCourse)
+routes.delete("/delete-file", CourseController.handleDeleteFile)
 
 module.exports = routes 

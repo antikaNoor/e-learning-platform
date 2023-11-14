@@ -107,7 +107,7 @@ const deleteFolder = async function (folderName) {
 //         const existingURL = await imageModel.findOne({ image: fileUrl })
 
 //         if (!existingURL) {
-//             return res.status(404).send(failure("File not found."));
+//             return res.status(400).send(failure("File not found."));
 //         }
 
 //         await imageModel.deleteOne({ image: fileUrl })

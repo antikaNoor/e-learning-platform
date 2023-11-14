@@ -2,6 +2,7 @@ const courseModel = require("../../model/courseModel/course")
 const authModel = require("../../model/authModel/auth")
 const topicModel = require("../../model/courseModel/topic")
 const { success, failure } = require("../../utils/successError")
+const { uploadFile, deleteFile, deleteFolder } = require("../../config/files")
 const express = require('express')
 const mongoose = require("mongoose")
 const { validationResult } = require('express-validator')
@@ -21,10 +22,33 @@ class CourseController {
         }
     }
 
+    async handleDeleteFile(req, res) {
+        try {
+            const fileUrl = req.body.fileUrl
+    
+            const existingURL = await courseModel.findOne({ thumbnail: fileUrl })
+    
+            if (!existingURL) {
+                return res.status(400).send(failure("File not found."));
+            }
+    
+            // await imageModel.deleteOne({ image: fileUrl })
+    
+            await deleteFile(fileUrl)
+    
+            return res.status(200).send(success("File deleted."));
+        } catch (error) {
+            console.error("Error while handling delete file:", error);
+            return res.status(500).send(failure("Internal server error."));
+        }
+    }
+
     async createCourse(req, res) {
         try {
-
+            const thumbnail = req.file
             const { title, description, language, learingOutcome, requirement, topicID } = req.body
+
+            console.log(title, description, language, learingOutcome, requirement, topicID)
 
             if (!title || !description || !language || !learingOutcome || !requirement || !topicID) {
                 return res.status(400).send(failure("Please fill all the fields"))
@@ -48,6 +72,8 @@ class CourseController {
                 return res.status(400).send(failure("Topic not found"))
             }
 
+            const uploadRes = await uploadFile(thumbnail, "thumbnail_folder")
+
             const course = new courseModel({
                 title,
                 description,
@@ -55,13 +81,9 @@ class CourseController {
                 language,
                 learingOutcome,
                 requirement,
-                topicID
+                topicID,
+                thumbnail: uploadRes,
             })
-
-            if (existingteacher.role === "admin") {
-                course.isApproved = true
-                course.isPublished = true
-            }
 
             await course.save()
 

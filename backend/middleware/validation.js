@@ -84,10 +84,11 @@ const topicValidator = {
     ]
 }
 
-
 const courseValidator = {
     addCourse: [
         body("title")
+            .exists()
+            .withMessage("Title must be provided.")
             .isString()
             .withMessage("Title must be a string.")
             .custom((value) => {
@@ -98,6 +99,8 @@ const courseValidator = {
             }),
 
         body("description")
+            .exists()
+            .withMessage("Description must be provided.")
             .isString()
             .withMessage("Description must be a string.")
             .custom((value) => {
@@ -108,16 +111,22 @@ const courseValidator = {
             }),
 
         body("language")
+            .exists()
+            .withMessage("Language must be provided.")
             .isString()
             .withMessage("Language must be a string.")
             .isIn(["English", "Bangla"])
             .withMessage("Language must be either 'English' or 'Bangla'."),
 
         body("requirement")
+            .exists()
+            .withMessage("Requirement must be provided.")
             .isArray()
             .withMessage("Requirement must be an array."),
 
         body("topicID")
+            .exists()
+            .withMessage("Topic ID must be provided.")
             .isMongoId()
             .withMessage("Topic ID must be a valid MongoDB ID."),
     ]
