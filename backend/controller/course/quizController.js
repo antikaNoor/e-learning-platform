@@ -202,7 +202,7 @@ class QuizController {
                 return res.status(400).send(failure("Quiz not found"));
             }
 
-            const evaluation = await evaluationModel.findOne({ quizID: existingQuiz.quizID, studentID: req.user._id });
+            const evaluation = await evaluationModel.findOne({ courseID: existingQuiz.courseID, studentID: req.user._id });
 
             if (!evaluation) {
                 return res.status(400).send(failure("Start the countdown first."));

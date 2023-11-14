@@ -13,12 +13,8 @@ const assignmentSchema = new mongoose.Schema({
     question: {
         type: String,
     },
-    document: {
-        type: String
-    },
-    duration: {
-        type: Number,
-        required: true
+    documents: {
+        type: [String]
     },
     totalMarks: {
         type: Number,
