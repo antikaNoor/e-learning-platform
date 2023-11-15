@@ -1,61 +1,65 @@
-import { debounce } from 'lodash';
+// useCourseHook.tsx
 import { useState, useEffect } from 'react';
-import { GetCoursesApi } from '../ApiCalls/CourseApi';
-// import { toast } from 'react-toastify';
+import { debounce } from 'lodash';
+import { getCourses } from '../ApiCalls/CourseApi';
 
-const useCourse = () => {
-    const [courses, setCourses] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [selectedSortOption, setSelectedSortOption] = useState('');
-    const [selectedOrderOption, setSelectedOrderOption] = useState('');
+interface UseCourseHookProps {
+  defaultPage: number;
+  defaultLimit: number;
+}
 
-    const handleSearchQuery = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchQuery(e.target.value);
-    };
+const useCourseHook = ({ defaultPage, defaultLimit }: UseCourseHookProps) => {
+  const [courses, setCourses] = useState([]);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [page, setPage] = useState(defaultPage);
+  const [limit, setLimit] = useState(defaultLimit);
+  const [sortParam, setSortParam] = useState('');
+  const [sortOrder, setSortOrder] = useState('');
+  const [search, setSearch] = useState('');
 
-    const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedSortOption(e.target.value);
-    };
+  const fetchCourses = async () => {
+    try {
+      const data = await getCourses(page, limit, sortParam, sortOrder, search);
+      setCourses(data.courses);
+      setTotalRecords(data.totalRecords);
+    } catch (error) {
+      console.error('Error fetching courses:', error);
+    }
+  };
 
-    const handleOrderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedOrderOption(e.target.value);
-    };
+  // Debounce the fetch function to wait for 3 seconds after the last keystroke
+  const debouncedFetch = debounce(fetchCourses, 3000);
 
-    const GetCourse = async () => {
-        try {
-            const result = await GetCoursesApi(currentPage, selectedSortOption, selectedOrderOption, searchQuery);
-            setCourses(result.data.courses);
-            setCurrentPage(result.data.currentPage);
-            setTotalPages(result.data.totalPages);
-        } catch (error) {
-            console.error('Error fetching courses:', error);
-            // toast.error('Error fetching courses');
-        }
-    };
+  useEffect(() => {
+    fetchCourses();
+  }, [page, limit, sortParam, sortOrder, search]);
 
-    useEffect(() => {
-        const debouncedFetch = debounce(GetCourse, 2000);
-        debouncedFetch();
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
 
-        return () => {
-            // Cleanup logic if needed
-        };
-    }, [currentPage, searchQuery, selectedSortOption, selectedOrderOption]);
+  const handleSortChange = (param: string, order: string) => {
+    setSortParam(param);
+    setSortOrder(order);
+  };
 
-    return {
-        GetCourse,
-        courses,
-        currentPage,
-        totalPages,
-        searchQuery,
-        handleSearchQuery,
-        selectedSortOption,
-        selectedOrderOption,
-        handleSortChange,
-        handleOrderChange,
-    };
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    debouncedFetch();
+  };
+
+  return {
+    courses,
+    totalRecords,
+    page,
+    limit,
+    sortParam,
+    sortOrder,
+    search,
+    handlePageChange,
+    handleSortChange,
+    handleSearchChange,
+  };
 };
 
-export default useCourse;
+export default useCourseHook;

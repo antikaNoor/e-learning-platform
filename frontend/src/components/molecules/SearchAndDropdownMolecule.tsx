@@ -1,36 +1,29 @@
+// SearchAndFilter.tsx
 import React from 'react';
 import SearchBar from '../atoms/SearchBar';
 import Dropdown from '../atoms/Dropdown';
-import useCourse from '../../hooks/useCourseHooks';
 
-type Props = {
-    onSearch: (e: React.ChangeEvent<HTMLInputElement>) => void;
-};
+interface SearchAndFilterProps {
+  searchValue: string;
+  onSearchChange: (value: string) => void;
+  filterOptions: string[];
+  selectedFilter: string;
+  onFilterChange: (option: string) => void;
+}
 
-const SearchAndDropdownMolecule = ({ onSearch }: Props) => {
-    const {
-        selectedSortOption,
-        handleSortChange,
-        selectedOrderOption,
-        handleOrderChange,
-    } = useCourse();
-
-    const sortOptions = [
-        { value: 'rating', label: 'Rating' },
-    ];
-
-    const orderOptions = [
-        { value: 'asc', label: 'Ascending' },
-        { value: 'desc', label: 'Descending' },
-    ];
-
-    return (
-        <div>
-            <SearchBar onSearch={onSearch} />
-            <Dropdown label="Sort By" options={sortOptions} selectedOption={selectedSortOption} onChange={handleSortChange} />
-            <Dropdown label="Order By" options={orderOptions} selectedOption={selectedOrderOption} onChange={handleOrderChange} />
-        </div>
-    );
+const SearchAndDropdownMolecule: React.FC<SearchAndFilterProps> = ({
+  searchValue,
+  onSearchChange,
+  filterOptions,
+  selectedFilter,
+  onFilterChange,
+}) => {
+  return (
+    <div className="flex items-center space-x-4">
+      <SearchBar value={searchValue} onChange={onSearchChange} />
+      <Dropdown options={filterOptions} selectedOption={selectedFilter} onChange={onFilterChange} />
+    </div>
+  );
 };
 
 export default SearchAndDropdownMolecule;

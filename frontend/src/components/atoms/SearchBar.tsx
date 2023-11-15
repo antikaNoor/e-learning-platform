@@ -1,18 +1,23 @@
-import React from 'react';
+import { BsSearch } from "react-icons/bs";
 
 type Props = {
-    onSearch: (e: React.ChangeEvent<HTMLInputElement>) => void;
-};
+  type?: string
+  placeholder?: string
+  value?: string
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
+}
+const SearchBar = ({ type, placeholder, value, onChange }: Props) => {
 
-const SearchBar: React.FC<Props> = ({ onSearch }) => {
-    return (
-        <input
-            type="text"
-            placeholder="Search"
-            onChange={onSearch}
-            className="border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-        />
-    );
-};
+  return (
+    <div>
+      <input
+        type={type}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange} />
+      <BsSearch />
+    </div>
+  )
+}
 
-export default SearchBar;
+export default SearchBar

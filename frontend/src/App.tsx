@@ -30,6 +30,7 @@ function App({ onSearch }: Props) {
       <ToastContainer />
       <BrowserRouter>
         <Routes>
+          <Route path="/" element={<HomePage />} />
           <Route path="/signup" element={<SignUpOrganism />} />
           <Route path="verify-email/:userId/:token" element={<VerifyEmailPage />} />
           <Route path="login" element={<LoginOrganism />} />
