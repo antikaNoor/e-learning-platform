@@ -58,7 +58,7 @@ const ForgotPasswordBoxMolecule = ({ className }: BoxProps) => {
                 </div>
 
                 <div className='text-center flex flex-col justify-center'>
-                    <Button type="submit" value="Submit" additionalStyles="w-full mt-4" />
+                    <Button type="submit" value="Submit" additionalStyles="bg-gray-500 hover:bg-gray-700 text-white font-bold w-full mt-4" />
                 </div>
             </form>
         </div>

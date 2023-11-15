@@ -9,6 +9,9 @@ const FORGOT_PASSWORD_URL = `${BASE_URL}/auth/forgot-password`;
 const RESET_PASSWORD_URL = `${BASE_URL}/auth/reset-password/:userId/:token`;
 const VALIDATE_RESET_REQUEST_URL = `${BASE_URL}/auth/validate-reset-request/:userId/:token`;
 
+// course
+const ALL_COURSES_URL = `${BASE_URL}/course/get-courses`;
+
 export {
     BASE_URL,
     LOGIN_URL,
@@ -17,5 +20,7 @@ export {
     RESEND_VERIFICATION_EMAIL_URL,
     FORGOT_PASSWORD_URL,
     RESET_PASSWORD_URL,
-    VALIDATE_RESET_REQUEST_URL
+    VALIDATE_RESET_REQUEST_URL,
+
+    ALL_COURSES_URL
 }

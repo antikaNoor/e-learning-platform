@@ -25,17 +25,17 @@ class CourseController {
     async handleDeleteFile(req, res) {
         try {
             const fileUrl = req.body.fileUrl
-    
+
             const existingURL = await courseModel.findOne({ thumbnail: fileUrl })
-    
+
             if (!existingURL) {
                 return res.status(400).send(failure("File not found."));
             }
-    
+
             // await imageModel.deleteOne({ image: fileUrl })
-    
+
             await deleteFile(fileUrl)
-    
+
             return res.status(200).send(success("File deleted."));
         } catch (error) {
             console.error("Error while handling delete file:", error);
@@ -146,14 +146,14 @@ class CourseController {
 
             if (result.length > 0) {
                 const paginationResult = {
-                    books: result,
+                    courses: result,
                     totalInCurrentPage: result.length,
                     currentPage: parseInt(page),
                     totalRecords: totalRecords
                 }
                 return res.status(200).send(success("All courses", paginationResult))
             }
-            return res.status(400).send(failure("No book was found"));
+            return res.status(400).send(failure("No course was found"));
 
         } catch (error) {
             console.log("error", error)

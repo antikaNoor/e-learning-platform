@@ -102,7 +102,7 @@ class AuthController {
             await authUser.save();
 
             // Create an email verification link
-            const emailVerificationURL = path.join(process.env.BACKEND_AUTH_URL, "verify-email", authUser._id.toString(), token);
+            const emailVerificationURL = path.join(process.env.FRONTEND_URL, "verify-email", authUser._id.toString(), token);
 
             // Compose the email content using EJS
             const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/emailVerification.ejs'), {
@@ -220,6 +220,11 @@ class AuthController {
 
             if (!auth) {
                 return res.status(400).send(failure("User not registered."))
+            }
+
+            // if user not verified, throw error
+            if (!auth.isVerified) {
+                return res.status(400).send(failure("Please verify your email first."))
             }
 
             const currentTime = new Date()

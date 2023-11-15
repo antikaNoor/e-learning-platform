@@ -3,7 +3,7 @@ import { useForm, Controller } from 'react-hook-form';
 import Button from '../atoms/Button';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 // import useAuth from '../../hooks/useAuthHooks';
-import { ResetPasswordApi, ValidateResetPasswordApi } from '../../ApiCalls/Auth/AuthApi';
+import { ResetPasswordApi, ValidateResetPasswordApi } from '../../ApiCalls/AuthApi';
 
 type FormData = {
     newPassword: string;
@@ -44,8 +44,8 @@ const ResetPasswordBoxMolecule = ({ className }: BoxProps) => {
 
     const onSubmit = async (data: FormData) => {
         console.log(data);
-        await ValidateResetPasswordApi();
-        await ResetPasswordApi(data);
+        // await ValidateResetPasswordApi();
+        // await ResetPasswordApi(data);
     };
 
     return (
@@ -131,7 +131,7 @@ const ResetPasswordBoxMolecule = ({ className }: BoxProps) => {
                 </div>
 
                 <div className="text-center flex flex-col justify-center">
-                    <Button type="submit" value="Reset Password" additionalStyles="w-full mt-4" />
+                    <Button type="submit" value="Reset Password" additionalStyles="bg-gray-500 hover:bg-gray-700 text-white font-bold w-full mt-4" />
                 </div>
             </form>
         </div>

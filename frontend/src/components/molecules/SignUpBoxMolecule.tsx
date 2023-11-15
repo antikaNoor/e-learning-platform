@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Button from '../atoms/Button';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import useAuth from '../../hooks/useAuthHooks';
+// import { SignupApi } from '../../ApiCalls/Auth/AuthApi';
 
 type FormData = {
     username: string;
@@ -19,6 +20,7 @@ type SignUpBoxProps = {
 
 const SignUpBoxMolecule = ({ className }: SignUpBoxProps) => {
     const { signup } = useAuth();
+    const navigate = useNavigate();
     const {
         handleSubmit,
         control,
@@ -49,6 +51,7 @@ const SignUpBoxMolecule = ({ className }: SignUpBoxProps) => {
     const onSubmit = async (data: FormData) => {
         console.log(data);
         await signup(data);
+        navigate('/login');
     };
 
     return (
@@ -201,7 +204,7 @@ const SignUpBoxMolecule = ({ className }: SignUpBoxProps) => {
                 </div>
 
                 <div className="text-center flex flex-col justify-center">
-                    <Button type="submit" value="Sign Up" additionalStyles="w-full mt-4" />
+                    <Button type="submit" value="Sign Up" additionalStyles="bg-gray-500 hover:bg-gray-700 text-white font-bold w-full mt-4" />
                     <p className='text-grey-700'>Already have an account? <Link to="/login">Login</Link></p>
                 </div>
             </form>

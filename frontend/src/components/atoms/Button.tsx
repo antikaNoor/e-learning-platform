@@ -5,13 +5,15 @@ type Props = {
   value: string;
   onClick?: () => void;
   additionalStyles?: string;
+  children?: React.ReactNode;
 }
 
 const Button = (props: Props) => {
   return (
     <div className="w-full">
+      {/* bg-gray-500 hover:bg-gray-700 text-white font-bold  */}
       <button
-        className={`bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded ${props.additionalStyles}`}
+        className={`py-2 px-4 rounded ${props.additionalStyles}`}
         type={props.type}
         onClick={props.onClick}
       >

@@ -1,13 +1,14 @@
-import SignUpOrganism from "../organisms/SignUpOrganism"
 import NavBarOrganism from "../organisms/NavBarOrganism"
 
-const SignUpPage = () => {
+type Props = {}
+
+const HomePage = (props: Props) => {
     return (
         <div>
             <NavBarOrganism />
-            <SignUpOrganism />
+            Home
         </div>
     )
 }
 
-export default SignUpPage
+export default HomePage

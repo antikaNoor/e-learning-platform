@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Button from '../atoms/Button';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 // import useAuth from '../../hooks/useAuthHooks';
-// import { logout } from '../../ApiCalls/Auth/AuthApi';
-import { LoginApi } from '../../ApiCalls/Auth/AuthApi';
+// import { login } from '../../hooks/useAuthHooks';
+import { LoginApi } from '../../ApiCalls/AuthApi';
 
 import { useDispatch } from 'react-redux';
 import { saveLogin } from "../../redux/slices/UserSlice";
-import { useSelector } from 'react-redux';
+// import { useSelector } from 'react-redux';
 
 type FormData = {
     email: string;
@@ -22,12 +22,10 @@ type BoxProps = {
 
 const LoginBoxMolecule = ({ className }: BoxProps) => {
 
-    const token = useSelector((state: { user: { token: string } }) => state.user.token)
-
-
+    // const token = useSelector((state: { user: { token: string } }) => state.user.token)
+    // console.log(token)
     const dispatch = useDispatch();
-
-    // const { login } = useAuth();
+    const navigate = useNavigate();
 
     const [showPassword, setShowPassword] = useState(false);
 
@@ -52,8 +50,7 @@ const LoginBoxMolecule = ({ className }: BoxProps) => {
         const response = await LoginApi(data)
         if (response) {
             dispatch(saveLogin(response));
-            console.log(token)
-            // dispatch(removeLogin());
+            navigate('/dummy');
         }
     };
 
@@ -121,12 +118,18 @@ const LoginBoxMolecule = ({ className }: BoxProps) => {
                 <div className="text-left text-blue-700"><Link to="/forgot-password">Forgot Password?</Link></div>
 
                 <div className='text-center flex flex-col justify-center'>
-                    <Button type="submit" value="Log in" additionalStyles="w-full mt-4" />
-                    <p className='text-grey-700'>Not Registered? <Link to="/">Sign Up</Link></p>
+                    <Button type="submit" value="Log in" additionalStyles="bg-gray-500 hover:bg-gray-700 text-white font-bold w-full mt-4" />
+                    <p className='text-grey-700'>Not Registered? <Link to="/" className='text-blue-700'>Sign Up</Link></p>
                 </div>
-                {/* <div style={{ cursor: 'pointer' }} onClick={logout}>
-                    Log out
-                </div> */}
+
+                <hr />
+
+                <div
+                    className='text-center text-blue-700 cursor-pointer'
+                    onClick={() => navigate("/resend-verification-email")} // Use the navigate function from 'react-router-dom'
+                >
+                    Resend Verification Email?
+                </div>
             </form>
         </div>
     );
