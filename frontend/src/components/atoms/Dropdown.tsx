@@ -1,10 +1,10 @@
 
 type Props = {
-  title?: string
-  labels?: string[]
-  options?: { value: string; label: string }[]
-  selectedOption?: string
-  onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void
+    title?: string
+    labels?: string[]
+    options?: { value: string; label: string }[]
+    selectedOption?: string
+    onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void
 }
 
 function Dropdown({ title, labels = [], options, selectedOption, onChange }: Props) {

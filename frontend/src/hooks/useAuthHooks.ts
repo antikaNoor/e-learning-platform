@@ -1,6 +1,6 @@
 // useAuthHook.ts
 import { useCallback } from 'react';
-import { SignupApi, VerifyEmailApi, ResendVerificationEmailApi, LoginApi, ForgotPasswordApi, ResetPasswordApi, ValidateResetPasswordApi } from '../ApiCalls/AuthApi';
+import { SignupApi, VerifyEmailApi, ResendVerificationEmailApi, LoginApi, ForgotPasswordApi, ResetPasswordApi, ValidateResetPasswordApi, teacherInfoApi } from '../ApiCalls/AuthApi';
 import { toast } from 'react-toastify';
 
 // Define the shape of the user object
@@ -24,6 +24,19 @@ type FormDataForgotPassword = {
 type FormDataResetPassword = {
   newPassword: string;
   confirmPassword: string;
+}
+
+type FormDataTeacherInfo = {
+  educationalBackground: {
+    university: string;
+    major: string;
+    cgpa: number;
+  }[];
+  teachingExperience: {
+    institution: string;
+    duration: string;
+    description: string;
+  }[];
 }
 
 // Define the authentication hook
@@ -112,7 +125,20 @@ const useAuth = () => {
     []
   );
 
-  return { signup, verifyEmail, ResendVerificationEmail, login, forgotPassword, resetPassword, validateResetPassword };
+  const teacherInfo = useCallback(
+    async (formData: FormDataTeacherInfo, token: string) => {
+      try {
+        await teacherInfoApi(formData, token);
+        // Optionally, update the user state or perform other actions
+      } catch (error: any) {
+        toast.error(error.message || 'An unknown error occurred during signup');
+      }
+    },
+    []
+  );
+
+
+  return { signup, verifyEmail, ResendVerificationEmail, login, forgotPassword, resetPassword, validateResetPassword, teacherInfo };
 };
 
 export default useAuth;

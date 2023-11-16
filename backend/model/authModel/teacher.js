@@ -23,7 +23,7 @@ const teacherSchema = new mongoose.Schema({
         ref: "Course"
     },
     educationalBackground: [{
-        univesity: {
+        university: {
             type: String,
             default: null
         },

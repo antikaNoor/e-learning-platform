@@ -9,6 +9,9 @@ const FORGOT_PASSWORD_URL = `${BASE_URL}/auth/forgot-password`;
 const RESET_PASSWORD_URL = `${BASE_URL}/auth/reset-password/:userId/:token`;
 const VALIDATE_RESET_REQUEST_URL = `${BASE_URL}/auth/validate-reset-request/:userId/:token`;
 
+//teacher
+const TEACHER_INFO = `/notification/teacher-request`;
+
 // course
 const ALL_COURSES_URL = `${BASE_URL}/course/get-courses`;
 
@@ -21,6 +24,8 @@ export {
     FORGOT_PASSWORD_URL,
     RESET_PASSWORD_URL,
     VALIDATE_RESET_REQUEST_URL,
+
+    TEACHER_INFO,
 
     ALL_COURSES_URL
 }

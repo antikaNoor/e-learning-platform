@@ -7,6 +7,7 @@ const teacherModel = require("../model/authModel/teacher")
 const isUserLoggedIn = async (req, res, next) => {
     try {
         const { authorization } = req.headers
+        console.log("authorization", authorization)
 
         if (!authorization) {
             return res.status(400).send(failure("Authorization failed!"))
@@ -14,6 +15,7 @@ const isUserLoggedIn = async (req, res, next) => {
         const token = req.headers.authorization.split(" ")[1]
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
+        console.log("decoded", decoded)
 
         if (!decoded) {
             return res.status(400).send(failure("Authorization failed!"))

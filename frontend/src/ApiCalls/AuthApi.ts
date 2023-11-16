@@ -1,5 +1,7 @@
 import axios from 'axios';
+import axiosInstanceToken from '../utils/axiosInstance';
 import { toast } from 'react-toastify';
+
 import {
     LOGIN_URL,
     SIGNUP_URL,
@@ -7,7 +9,8 @@ import {
     RESEND_VERIFICATION_EMAIL_URL,
     FORGOT_PASSWORD_URL,
     RESET_PASSWORD_URL,
-    VALIDATE_RESET_REQUEST_URL
+    VALIDATE_RESET_REQUEST_URL,
+    TEACHER_INFO,
 } from "../utils/constants";
 
 type FormData = {
@@ -31,6 +34,19 @@ type FormDataResetPassword = {
     newPassword: string;
     confirmPassword: string;
 }
+
+type FormDataTeacherInfo = {
+    educationalBackground: {
+        university: string;
+        major: string;
+        cgpa: number;
+    }[];
+    teachingExperience: {
+        institution: string;
+        duration: string;
+        description: string;
+    }[];
+};
 
 export const SignupApi = async (formData: FormData) => {
     try {
@@ -223,4 +239,23 @@ export const ValidateResetPasswordApi = async (userId: string, token: string) =>
             toast.error(error.message || 'An unknown error occurred during reset password validation');
         }
     }
+};
+
+export const teacherInfoApi = async (formData: FormDataTeacherInfo, token: string) => {
+    await axiosInstanceToken
+        .post(TEACHER_INFO, formData, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then((response) => {
+            toast.success(response.data.message);
+            return response.data.data
+        })
+        .catch((error) => {
+            // Handle other errors (network error, timeout, etc.) here.
+            toast.error(error.response.data.message);
+            console.error("Other Error:", error);
+        })
 };

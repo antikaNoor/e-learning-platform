@@ -1,5 +1,6 @@
 const teacherModel = require("../../model/authModel/teacher");
 const notificationModel = require("../../model/notificationModel/notification");
+const authModel = require("../../model/authModel/auth");
 const { success, failure } = require("../../utils/successError");
 const express = require("express");
 const mongoose = require("mongoose");

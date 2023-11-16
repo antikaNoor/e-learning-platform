@@ -17,13 +17,16 @@ import NotFoundPage from "./components/templates/NotFoundPage";
 import HomePage from "./components/templates/HomePage";
 import AboutPage from "./components/templates/AboutPage";
 import ContactPage from "./components/templates/ContactPage";
-import AllCoursesPage from "./components/templates/AllCoursesPage";
+// import AllCoursesPage from "./components/templates/AllCoursesPage";
+import TeacherInfoMolecule from "./components/molecules/TeacherInfoMolecule";
+import LoginAuthenticate from "./components/templates/LoginAuthenticate";
+import CreateCourseMolecule from "./components/molecules/CreateCourseMolecule";
 
 type Props = {
   onSearch: () => void;
 }
 
-function App({ onSearch }: Props) {
+function App() {
   // const auth = useSelector((state: { auth: { username: string; email: string; _id: string; token: string } }) => state.auth);
   return (
     <>
@@ -37,7 +40,7 @@ function App({ onSearch }: Props) {
           <Route path="forgot-password" element={<ForgotPasswordOrganism />} />
           <Route path="reset-password/:userId/:token" element={<ResetPasswordOrganism />} />
           <Route path="*" element={<NotFoundPage />} />
-          <Route path="/courses" element={<AllCoursesPage onSearch={onSearch} />} />
+          {/* <Route path="/courses" element={<AllCoursesPage onSearch={onSearch} />} /> */}
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
           {/* <Route path="validate-reset-password/:userId/:token" element={<ResetPasswordOrganism />} /> */}
@@ -45,6 +48,11 @@ function App({ onSearch }: Props) {
           {/* <Route element={<AdminAuthenticate />} > */}
           <Route path="/dummy" element={<DummyPage />} />
           <Route path="/home" element={<HomePage />} />
+          {/* <Route path="/teachers" element={<TeacherInfoMolecule />} /> */}
+          <Route element={<LoginAuthenticate />}>
+            <Route path="login/teacher" element={<TeacherInfoMolecule />} />
+            <Route path="login/create-course" element={<CreateCourseMolecule />} />
+          </Route>
           {/* </Route> */}
           {/* <Route path="*" element={<NotFoundPage />} /> */}
         </Routes>

@@ -1,19 +1,17 @@
-import NavBarOrganism from '../organisms/NavBarOrganism'
-import GetCoursesOrganism from '../organisms/GetCoursesOrganism'
-import SearchOrganism from '../organisms/SearchOrganism'
+// import NavBarOrganism from '../organisms/NavBarOrganism'
+// import GetCoursesOrganism from '../organisms/GetCoursesOrganism'
 
-type Props = {
-    onSearch: () => void;
-}
+// type Props = {
+//     onSearch: () => void;
+// }
 
-const AllCoursesPage = (props: Props) => {
-    return (
-        <div>
-            <NavBarOrganism />
-            <SearchOrganism onSearch={props.onSearch} />
-            <GetCoursesOrganism />
-        </div>
-    )
-}
+// const AllCoursesPage = (props: Props) => {
+//     return (
+//         <div>
+//             <NavBarOrganism />
+//             <GetCoursesOrganism />
+//         </div>
+//     )
+// }
 
-export default AllCoursesPage
+// export default AllCoursesPage
