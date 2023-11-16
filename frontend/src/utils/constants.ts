@@ -13,6 +13,8 @@ const VALIDATE_RESET_REQUEST_URL = `${BASE_URL}/auth/validate-reset-request/:use
 const TEACHER_INFO = `/notification/teacher-request`;
 
 // course
+const ADD_CATEOGRY = `/course/add-category`;
+const ADD_COURSE = `/course/create-course`;
 const ALL_COURSES_URL = `${BASE_URL}/course/get-courses`;
 
 export {
@@ -27,5 +29,7 @@ export {
 
     TEACHER_INFO,
 
+    ADD_CATEOGRY,
+    ADD_COURSE,
     ALL_COURSES_URL
 }

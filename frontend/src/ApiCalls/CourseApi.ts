@@ -1,6 +1,13 @@
 // import axios from 'axios';
 // import { toast } from 'react-toastify';
+// import { ADD_CATEOGRY} from '../utils/constants';
+import axiosInstance from '../utils/axiosInstance';
+import { ADD_COURSE } from '../utils/constants';
 // import { ALL_COURSES_URL } from "../utils/constants";
+
+// type Category = {
+//     categoryName: string;
+// }
 
 // type Course = {
 //   page: number;
@@ -11,6 +18,42 @@
 //   // setFetchedData: React.Dispatch<React.SetStateAction<any>>;
 //   // setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
 // }
+
+export const GetTopicApi = async () => {
+    // Fetch data from API
+    return axiosInstance
+        .get("/topic/get-all-topics")
+        .then((response) => {
+            // console.log(fetchedReview)
+            return response.data
+        })
+        .catch((error) => {
+            // Handle other errors (network error, timeout, etc.) here.
+            console.error("Other Error:", error);
+            throw error;
+        })
+}
+
+// add course api
+export const AddCourseApi = async (data: any, token: string) => {
+    // Fetch data from API
+    return axiosInstance
+        .post(ADD_COURSE, data, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then((response) => {
+            console.log(response.data)
+            return response.data
+        })
+        .catch((error) => {
+            // Handle other errors (network error, timeout, etc.) here.
+            console.error("Other Error:", error);
+            throw error;
+        })
+}
 
 // export const GetCoursesApi = async ({ page, selectedSortOption, selectedOrderOption, searchQuery }: Course) => {
 //   // Fetch data from API

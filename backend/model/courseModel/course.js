@@ -24,10 +24,10 @@ const courseSchema = new mongoose.Schema({
     requirement: {
         type: [String]
     },
-    // thumbnail: {
-    //     type: String,
-    //     required: [true, "Thumbnail should be provided"]
-    // },
+    thumbnail: {
+        type: String,
+        required: [true, "Thumbnail should be provided"]
+    },
     isApproved: {
         type: Boolean,
         default: false
@@ -40,8 +40,8 @@ const courseSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    topicID: {
-        type: mongoose.Types.ObjectId,
+    topicName: {
+        type: String,
         ref: "Topic"
     },
     lessonID: {

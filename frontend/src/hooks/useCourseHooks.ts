@@ -1,3 +1,38 @@
+import { AddCourseApi, GetTopicApi } from "../ApiCalls/CourseApi";
+import { useCallback } from 'react';
+import { toast } from 'react-toastify';
+
+const useCourse = () => {
+    const getTopic = async () => {
+        try {
+            const data = await GetTopicApi(); // Await the promise
+            return data;
+        } catch (error) {
+            console.error('Error fetching topics:', error);
+            // Handle the error or re-throw it if necessary
+        }
+    };
+
+    const addCourse = useCallback(
+        async (data: any, token: string) => {
+            try {
+                await AddCourseApi(data, token);
+                // Optionally, update the user state or perform other actions
+            } catch (error: any) {
+                console.log(error)
+            }
+        },
+        []
+    );
+
+    return {
+        getTopic,
+        addCourse
+    };
+};
+
+export default useCourse
+
 // // useCourseHook.tsx
 // import { useState, useEffect } from 'react';
 // import { debounce } from 'lodash';

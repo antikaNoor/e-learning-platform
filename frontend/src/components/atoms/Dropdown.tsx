@@ -1,25 +1,23 @@
+type DropdownProps = {
+    title?: string;
+    options?: { value: string; label: string }[];
+    selectedOption?: string;
+    onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+};
 
-type Props = {
-    title?: string
-    labels?: string[]
-    options?: { value: string; label: string }[]
-    selectedOption?: string
-    onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void
-}
-
-function Dropdown({ title, labels = [], options, selectedOption, onChange }: Props) {
+const Dropdown: React.FC<DropdownProps> = ({ title, options, selectedOption, onChange }) => {
     return (
-        <div className='dropdown-container'>
-            <label className='dropdown-label'>{title}</label>
-            <select value={selectedOption} onChange={onChange} className='dropdown-select'>
-                {options?.map((option, index) => (
-                    <option key={option.value} value={option.value} className='dropdown-option'>
-                        {labels[index]}
+        <div>
+            <label>{title}</label>
+            <select value={selectedOption} onChange={onChange}>
+                {options?.map((option) => (
+                    <option key={option.value} value={option.value}>
+                        {option.label}
                     </option>
                 ))}
             </select>
         </div>
-    )
-}
+    );
+};
 
-export default Dropdown
+export default Dropdown;

@@ -46,12 +46,12 @@ class CourseController {
     async createCourse(req, res) {
         try {
             const thumbnail = req.file
-            const { title, description, language, learingOutcome, requirement, topicID } = req.body
+            const { title, description, language, learingOutcome, requirement, topicName } = req.body
 
-            console.log(title, description, language, learingOutcome, requirement, topicID)
+            console.log(title, description, language, learingOutcome, requirement, topicName)
 
-            if (!title || !description || !language || !learingOutcome || !requirement || !topicID) {
-                return res.status(400).send(failure("Please fill all the fields"))
+            if (!title || !description || !language || !requirement || !topicName) {
+                return res.status(400).send(failure("Please fill all the fields", { title, description, language, learingOutcome, requirement, topicName }))
             }
 
             const existingTitle = await courseModel.findOne({ title })
@@ -67,7 +67,7 @@ class CourseController {
                 return res.status(400).send(failure("teacher not found"))
             }
 
-            const existingTopic = await topicModel.findOne({ _id: new mongoose.Types.ObjectId(topicID) })
+            const existingTopic = await topicModel.findOne({ topicName })
             if (!existingTopic || existingTopic.isDeleted === true) {
                 return res.status(400).send(failure("Topic not found"))
             }
@@ -81,7 +81,7 @@ class CourseController {
                 language,
                 learingOutcome,
                 requirement,
-                topicID,
+                topicName,
                 thumbnail: uploadRes,
             })
 
