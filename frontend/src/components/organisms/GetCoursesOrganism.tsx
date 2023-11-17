@@ -1,14 +1,27 @@
-// import GetCoursesMolecule from '../molecules/GetCoursesMolecule'
+// GetCoursesOrganism component
 
-// type Props = {}
+import FilterCourseMolecule from '../molecules/FilterCourseMolecule';
+import GetCoursesMolecule from '../molecules/GetCoursesMolecule';
+import SearchAndDropdownMolecule from '../molecules/SearchAndDropdownMolecule';
 
-// const GetCoursesOrganism = (props: Props) => {
-//     return (
-//         <div>
-//             <h2 className='text-3xl font-bold py-10 px-0 text-center'>Courses</h2>
-//             <GetCoursesMolecule />
-//         </div>
-//     )
-// }
+const optionsData = [
+    { heading: 'Rating', options: ["5 stars", "4 stars", "3 stars", "2 stars", "1 star"] },
+    { heading: 'Difficulty', options: ["Beginner", "Intermediate", "Advanced"] },
+    // Add more objects as needed
+];
 
-// export default GetCoursesOrganism
+const GetCoursesOrganism = () => {
+    return (
+
+        <div>
+            <SearchAndDropdownMolecule />
+            <div className="my-8 px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row">
+                <FilterCourseMolecule data={optionsData} />
+                {/* Other components or content */}
+                <GetCoursesMolecule />
+            </div>
+        </div>
+    );
+};
+
+export default GetCoursesOrganism;

@@ -1,4 +1,4 @@
-import { AddCourseApi, GetTopicApi } from "../ApiCalls/CourseApi";
+import { GetCoursesApi, AddCourseApi, GetTopicApi } from "../ApiCalls/CourseApi";
 import { useCallback } from 'react';
 import { toast } from 'react-toastify';
 
@@ -25,7 +25,18 @@ const useCourse = () => {
         []
     );
 
+    const getAllCourses = async () => {
+        try {
+            const data = await GetCoursesApi();
+            return data
+            // console.log("data from hook", data)
+        } catch (error) {
+            console.error('Error fetching courses:', error);
+        }
+    };
+
     return {
+        getAllCourses,
         getTopic,
         addCourse
     };

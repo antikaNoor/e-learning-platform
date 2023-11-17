@@ -17,14 +17,17 @@ import NotFoundPage from "./components/templates/NotFoundPage";
 import HomePage from "./components/templates/HomePage";
 import AboutPage from "./components/templates/AboutPage";
 import ContactPage from "./components/templates/ContactPage";
-// import AllCoursesPage from "./components/templates/AllCoursesPage";
+import AllCoursesPage from "./components/templates/AllCoursesPage";
 import TeacherInfoMolecule from "./components/molecules/TeacherInfoMolecule";
 import LoginAuthenticate from "./components/templates/LoginAuthenticate";
 import CreateCourseMolecule from "./components/molecules/CreateCourseMolecule";
+import TeacherProfilePage from "./components/templates/TeacherProfilePage";
+import TeacherAuthenticate from "./components/templates/TeacherAuthenticate";
+import StudentAuthenticate from "./components/templates/StudentAuthenticate";
+import StudentProfilePage from "./components/templates/StudentProfilePage";
+import SingleCoursePage from "./components/templates/SingleCoursePage";
 
-type Props = {
-  onSearch: () => void;
-}
+type Props = {}
 
 function App() {
   // const auth = useSelector((state: { auth: { username: string; email: string; _id: string; token: string } }) => state.auth);
@@ -40,21 +43,22 @@ function App() {
           <Route path="forgot-password" element={<ForgotPasswordOrganism />} />
           <Route path="reset-password/:userId/:token" element={<ResetPasswordOrganism />} />
           <Route path="*" element={<NotFoundPage />} />
-          {/* <Route path="/courses" element={<AllCoursesPage onSearch={onSearch} />} /> */}
+          <Route path="/courses" element={<AllCoursesPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          {/* <Route path="validate-reset-password/:userId/:token" element={<ResetPasswordOrganism />} /> */}
-          {/* <Route path="/login" element={!(auth.username && auth.email && auth._id && auth.token) ? <LoginOrganism /> : <Navigate to={"/dummy"} />} /> */}
-          {/* <Route element={<AdminAuthenticate />} > */}
           <Route path="/dummy" element={<DummyPage />} />
           <Route path="/home" element={<HomePage />} />
-          {/* <Route path="/teachers" element={<TeacherInfoMolecule />} /> */}
+          <Route path="/single-course/:courseId" element={<SingleCoursePage />} />
           <Route element={<LoginAuthenticate />}>
             <Route path="login/teacher" element={<TeacherInfoMolecule />} />
-            <Route path="login/create-course" element={<CreateCourseMolecule />} />
+            <Route element={<TeacherAuthenticate />}>
+              <Route path="login/teacher/create-course" element={<CreateCourseMolecule />} />
+              <Route path="login/teacher/teacher-profile" element={<TeacherProfilePage />} />
+            </Route>
+            <Route element={<StudentAuthenticate />}>
+              <Route path="login/student/student-profile" element={<StudentProfilePage />} />
+            </Route>
           </Route>
-          {/* </Route> */}
-          {/* <Route path="*" element={<NotFoundPage />} /> */}
         </Routes>
       </BrowserRouter>
     </>

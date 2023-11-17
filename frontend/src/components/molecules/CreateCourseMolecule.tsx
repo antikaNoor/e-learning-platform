@@ -40,8 +40,8 @@ const CreateCourseMolecule = () => {
 
     const [topicOptions, setTopicOptions] = useState<{ value: string; label: string }[]>([]);
     const [loading, setLoading] = useState(true);
-    const [thumbnail, setThumbnail] = useState<File[]>([]);
-    const path = thumbnail[0]?.name;
+    const [thumbnail, setThumbnail] = useState<any>([]);
+    // const path_ = thumbnail[0]?.path;
 
     useEffect(() => {
         const fetchTopics = async () => {
@@ -65,10 +65,9 @@ const CreateCourseMolecule = () => {
         fetchTopics();
     }, []);
 
-    const onDrop = useCallback((acceptedFiles: File[]) => {
+    const onDrop = useCallback((acceptedFiles: any) => {
         // Do something with the files
         setThumbnail(acceptedFiles);
-        console.log(acceptedFiles);
     }, [])
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
@@ -84,10 +83,9 @@ const CreateCourseMolecule = () => {
         formData.append('learningOutcome', data.learningOutcome);
         formData.append('requirement', JSON.stringify(data.requirement));
         formData.append('topicName', data.topicName);
-        formData.append('thumbnail', path);
+        formData.append('thumbnail', thumbnail);
         // Handle form submission logic here
         console.log({ ...data, thumbnail: thumbnail });
-        console.log(path)
         // call add course from hook
         await addCourse(formData, checkString);
     };

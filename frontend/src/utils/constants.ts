@@ -12,10 +12,13 @@ const VALIDATE_RESET_REQUEST_URL = `${BASE_URL}/auth/validate-reset-request/:use
 //teacher
 const TEACHER_INFO = `/notification/teacher-request`;
 
+// Category
+const GET_ALL_CATEGORIES = `/category/get-all-categories`;
+
 // course
 const ADD_CATEOGRY = `/course/add-category`;
 const ADD_COURSE = `/course/create-course`;
-const ALL_COURSES_URL = `${BASE_URL}/course/get-courses`;
+const GET_ALL_COURSES = `${BASE_URL}/course/get-courses`;
 
 export {
     BASE_URL,
@@ -29,7 +32,9 @@ export {
 
     TEACHER_INFO,
 
+    GET_ALL_CATEGORIES,
+
     ADD_CATEOGRY,
     ADD_COURSE,
-    ALL_COURSES_URL
+    GET_ALL_COURSES
 }

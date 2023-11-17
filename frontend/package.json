@@ -34,7 +34,6 @@
     "twin.macro": "^3.4.0"
   },
   "devDependencies": {
-    "@types/jsonwebtoken": "^9.0.5",
     "@types/lodash": "^4.14.201",
     "@types/node": "^20.9.0",
     "@types/react": "^18.2.15",

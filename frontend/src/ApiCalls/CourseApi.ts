@@ -2,7 +2,7 @@
 // import { toast } from 'react-toastify';
 // import { ADD_CATEOGRY} from '../utils/constants';
 import axiosInstance from '../utils/axiosInstance';
-import { ADD_COURSE } from '../utils/constants';
+import { ADD_COURSE, GET_ALL_COURSES } from '../utils/constants';
 // import { ALL_COURSES_URL } from "../utils/constants";
 
 // type Category = {
@@ -29,6 +29,20 @@ export const GetTopicApi = async () => {
         })
         .catch((error) => {
             // Handle other errors (network error, timeout, etc.) here.
+            console.error("Other Error:", error);
+            throw error;
+        })
+}
+
+export const GetCoursesApi = async () => {
+    // Fetch data from API
+    return axiosInstance
+        .get(GET_ALL_COURSES)
+        .then((response) => {
+            console.log(response.data.data.courses)
+            return response.data.data.courses;
+        })
+        .catch((error) => {
             console.error("Other Error:", error);
             throw error;
         })

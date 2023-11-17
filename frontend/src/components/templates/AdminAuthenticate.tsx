@@ -1,29 +1,39 @@
 import { Navigate, Outlet } from "react-router-dom";
-// import { BrowserRouter, Routes, Route } from "react-router-dom"
-// import axios from "axios";
-// import jwt_decode from "jwt-decode";
+import { useSelector } from "react-redux";
+import { jwtDecode } from "jwt-decode"
+import { toast } from "react-toastify";
 
-const AdminAuthenticate = () => {
+type MyToken = {
+    _id: string;
+    username: string;
+    email: string;
+    role: string; // Replace with actual roles
+    isVerified: boolean;
+    isBanned: boolean;
+    teacherID?: string; // This is optional, as it may not exist for all users
+    iat: number;
+    exp: number;
+}
+
+const TeacherAuthenticate = () => {
+
     console.log("checking auth")
-    const checkString = localStorage.getItem("user")!;
-    const check = JSON.parse(checkString)
 
-    if (!check || !check.token) {
+    const state = useSelector((state: any) => state.user);
+
+    const checkString = state.token;
+    const decodedToken = jwtDecode<MyToken>(checkString);
+
+    if (decodedToken.role !== "admin") {
+        toast.error("You are not authorized to access this page");
         return <Navigate to="/login" />;
     }
 
-    // const decodedToken = jwt_decode(check.token);
-    // console.log(decodedToken.status)
-
-    // if (decodedToken && decodedToken.status === true) {
     return (
         <div>
             <Outlet />
         </div>
     );
-    // } else {
-    // return <Navigate to="/login" />;
-    // }
 };
 
-export default AdminAuthenticate;
+export default TeacherAuthenticate;

@@ -101,65 +101,81 @@ class CourseController {
     // get all courses
     async getCourses(req, res) {
         try {
-            let { page, limit, sortParam, sortOrder, search } = req.query
+            let { page, limit, sortParam, sortOrder, search } = req.query;
 
-            let result = 0
+            let result = 0;
             // Total number of records in the whole collection
-            const totalRecords = await courseModel.countDocuments({})
+            const totalRecords = await courseModel.countDocuments({
+                isPublished: true,
+                isApproved: true,
+                isDeleted: false,
+            });
 
             if (!page || !limit) {
-                page = 1
-                limit = 6
+                page = 1;
+                limit = 6;
             }
 
             if (page < 1 || limit < 0) {
-                return res.status(400).send(failure("Page must be at least 1 and limit must be at least 0"))
+                return res
+                    .status(400)
+                    .send(failure("Page must be at least 1 and limit must be at least 0"));
             }
 
             // sorting
             if (
                 (sortParam && !sortOrder) ||
                 (!sortParam && sortOrder) ||
-                (sortParam && sortParam !== "rating" && sortParam !== "createdAt") ||
+                (sortParam &&
+                    sortParam !== "rating" &&
+                    sortParam !== "createdAt") ||
                 (sortOrder && sortOrder !== "asc" && sortOrder !== "desc")
             ) {
                 return res.status(400).send(failure("Invalid sort parameters provided."));
             }
 
             // search
+            const filter = {
+                isPublished: true,
+                isApproved: true,
+                isDeleted: false,
+            };
+
             if (search) {
-                filter["$or"] = [
-                    { title: { $regex: search, $options: "i" } },
-                ];
+                filter["$or"] = [{ title: { $regex: search, $options: "i" } }];
             }
 
-            result = await courseModel.find()
-                .sort(sortParam ? {
-                    [sortParam]: sortOrder === "asc" ? 1 : -1,
-                } : {
-                    _id: 1
-                })
+            result = await courseModel
+                .find(filter)
+                .sort(
+                    sortParam
+                        ? {
+                            [sortParam]: sortOrder === "asc" ? 1 : -1,
+                        }
+                        : {
+                            _id: 1,
+                        }
+                )
                 .skip((page - 1) * limit)
                 .limit(limit)
-                .select('-__v -updatedAt')
-
+                .select("-__v -updatedAt");
 
             if (result.length > 0) {
                 const paginationResult = {
                     courses: result,
                     totalInCurrentPage: result.length,
                     currentPage: parseInt(page),
-                    totalRecords: totalRecords
-                }
-                return res.status(200).send(success("All courses", paginationResult))
+                    totalRecords: totalRecords,
+                };
+                return res.status(200).send(success("All courses", paginationResult));
             }
             return res.status(400).send(failure("No course was found"));
-
         } catch (error) {
-            console.log("error", error)
-            return res.status(500).send(failure("Internal server error"))
+            console.error("Error:", error);
+            return res.status(500).send(failure("Internal server error"));
         }
     }
+
 
     // delete a course
     async deleteCourse(req, res) {

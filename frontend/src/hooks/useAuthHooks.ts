@@ -2,7 +2,6 @@
 import { useCallback } from 'react';
 import { SignupApi, VerifyEmailApi, ResendVerificationEmailApi, LoginApi, ForgotPasswordApi, ResetPasswordApi, ValidateResetPasswordApi, teacherInfoApi } from '../ApiCalls/AuthApi';
 import { toast } from 'react-toastify';
-
 // Define the shape of the user object
 type FormData = {
   username: string;
