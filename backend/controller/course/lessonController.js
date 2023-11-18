@@ -30,10 +30,10 @@ class LessonController {
         try {
             // const video = req.file
             const { courseID } = req.params
-            const { serialNo, title, description, isAccessibleToUnenrolled } = req.body
-            console.log(serialNo, courseID, title, description, isAccessibleToUnenrolled)
+            const { serialNo, title, description } = req.body
+            console.log(serialNo, courseID, title, description)
 
-            if (!courseID || !serialNo || !title || !description || !isAccessibleToUnenrolled) {
+            if (!courseID || !serialNo || !title || !description) {
                 return res.status(400).send(failure("Please fill all the fields"))
             }
 
@@ -52,7 +52,6 @@ class LessonController {
                 serialNo,
                 title,
                 description,
-                isAccessibleToUnenrolled,
                 courseID,
             });
 
@@ -60,7 +59,6 @@ class LessonController {
 
             const responseLesson = lesson.toObject();
 
-            delete responseLesson.isAccessibleToUnenrolled;
             delete responseLesson.isDeleted;
 
             if (existingCourse) {
@@ -79,9 +77,10 @@ class LessonController {
     async addVideos(req, res) {
         try {
             const { lessonID } = req.params
-            const videos = req.file
+            const videoLink = req.file
+            const { videoTitle } = req.body
 
-            if (!lessonID || !videos) {
+            if (!lessonID || !videoLink || !videoTitle) {
                 return res.status(400).send(failure("Please enter the lesson and video."))
             }
 
@@ -105,17 +104,20 @@ class LessonController {
             // }
 
             // push the video inside the videos array
-            const uploadRes = await uploadFile(videos, "videos")
+            const uploadRes = await uploadFile(videoLink, "videos")
 
             if (!uploadRes) {
                 return res.status(400).send(failure("Error uploading video."))
             }
 
-            existingLesson.videos.push(uploadRes)
+            // push the title and link to videos
+            existingLesson.videos.push({
+                videoTitle: videoTitle,
+                videoLink: uploadRes
+            })
             await existingLesson.save()
 
             const responseLesson = existingLesson.toObject()
-            delete responseLesson.isAccessibleToUnenrolled
 
             return res.status(200).send(success("Video added successfully.", responseLesson))
 
@@ -129,9 +131,10 @@ class LessonController {
     async addNotes(req, res) {
         try {
             const { lessonID } = req.params
-            const notes = req.file
+            const noteLink = req.file
+            const { noteTitle } = req.body
 
-            if (!lessonID || !notes) {
+            if (!lessonID || !noteLink || !noteTitle) {
                 return res.status(400).send(failure("Please enter the lesson and a note."))
             }
 
@@ -155,19 +158,22 @@ class LessonController {
             // }
 
             // push the video inside the videos array
-            const uploadRes = await uploadFile(notes, "notes")
+            const uploadRes = await uploadFile(noteLink, "notes")
 
             if (!uploadRes) {
-                return res.status(400).send(failure("Error uploading video."))
+                return res.status(400).send(failure("Error uploading note."))
             }
 
-            existingLesson.notes.push(uploadRes)
+            // push the title and link to notes
+            existingLesson.notes.push({
+                noteTitle: noteTitle,
+                noteLink: uploadRes
+            })
             await existingLesson.save()
 
             const responseLesson = existingLesson.toObject()
-            delete responseLesson.isAccessibleToUnenrolled
 
-            return res.status(200).send(success("Video added successfully.", responseLesson))
+            return res.status(200).send(success("Note added successfully.", responseLesson))
 
         } catch (error) {
             console.log("error", error)

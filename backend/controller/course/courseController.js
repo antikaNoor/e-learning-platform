@@ -45,13 +45,14 @@ class CourseController {
 
     async createCourse(req, res) {
         try {
-            const thumbnail = req.file
+            const thumbnail = req.files
             const { title, description, language, learingOutcome, requirement, topicName } = req.body
 
             console.log(title, description, language, learingOutcome, requirement, topicName)
+            console.log(req.files)
 
             if (!title || !description || !language || !requirement || !topicName) {
-                return res.status(400).send(failure("Please fill all the fields", { title, description, language, learingOutcome, requirement, topicName }))
+                return res.status(400).send(failure("Please fill all the fields"))
             }
 
             const existingTitle = await courseModel.findOne({ title })
@@ -158,23 +159,61 @@ class CourseController {
                 )
                 .skip((page - 1) * limit)
                 .limit(limit)
-                .select("-__v -updatedAt");
+                .populate({
+                    path: "teacherID",
+                    select: "_id username email",
+                })
+                .populate({
+                    path: "reviews",
+                    populate: {
+                        path: "userID",
+                        select: "_id username email",
+                    },
+                })
+                .select("-__v");
 
+            // Check if courses are found
             if (result.length > 0) {
-                const paginationResult = {
-                    courses: result,
-                    totalInCurrentPage: result.length,
-                    currentPage: parseInt(page),
-                    totalRecords: totalRecords,
-                };
-                return res.status(200).send(success("All courses", paginationResult));
+                // Extract course IDs
+                const courseIds = result.map((course) => course._id);
+
+                // Populate lessons for each course
+                const coursesWithLessons = await courseModel.find({ _id: { $in: courseIds } })
+                    .populate({
+                        path: "lessonID",
+                    })
+                    .exec();
+
+                // Create a map for quick lookup
+                const courseMap = new Map(coursesWithLessons.map((course) => [course._id.toString(), course]));
+
+                // Map the populated lessons and reviews to the original result
+                result = result.map((course) => {
+                    const courseIdString = course._id.toString();
+                    return {
+                        ...course.toObject(),
+                        lessons: courseMap.has(courseIdString) ? courseMap.get(courseIdString).lessonID : [],
+                        reviewsPopulated: course.reviews,
+                    };
+                });
+
+                if (result.length > 0) {
+                    const paginationResult = {
+                        courses: result,
+                        totalInCurrentPage: result.length,
+                        currentPage: parseInt(page),
+                        totalRecords: totalRecords,
+                    };
+                    return res.status(200).send(success("All courses", paginationResult));
+                }
+                return res.status(400).send(failure("No course was found"));
             }
-            return res.status(400).send(failure("No course was found"));
         } catch (error) {
             console.error("Error:", error);
             return res.status(500).send(failure("Internal server error"));
         }
     }
+
 
 
     // delete a course

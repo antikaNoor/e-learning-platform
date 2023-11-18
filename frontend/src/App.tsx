@@ -25,7 +25,7 @@ import TeacherProfilePage from "./components/templates/TeacherProfilePage";
 import TeacherAuthenticate from "./components/templates/TeacherAuthenticate";
 import StudentAuthenticate from "./components/templates/StudentAuthenticate";
 import StudentProfilePage from "./components/templates/StudentProfilePage";
-import SingleCoursePage from "./components/templates/SingleCoursePage";
+import SingleCourseOverviewPage from "./components/templates/SingleCourseOverviewPage";
 
 type Props = {}
 
@@ -48,7 +48,7 @@ function App() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/dummy" element={<DummyPage />} />
           <Route path="/home" element={<HomePage />} />
-          <Route path="/single-course/:courseId" element={<SingleCoursePage />} />
+          <Route path="/single-course/:courseId" element={<SingleCourseOverviewPage />} />
           <Route element={<LoginAuthenticate />}>
             <Route path="login/teacher" element={<TeacherInfoMolecule />} />
             <Route element={<TeacherAuthenticate />}>

@@ -8,6 +8,37 @@ const {
 } = require("@aws-sdk/client-s3");
 const { S3_REGION, S3_BUCKET, S3_BASE_URL } = process.env;
 
+// const upload = multer({
+//     limits: {
+//         fileSize: 1000000 / 2
+//     },
+
+//     storage: multer.diskStorage({
+//         destination: function (req, file, callback) {
+//             callback(null, path.join(__dirname, "../server"))
+//         },
+//         filename: function (req, file, callback) {
+//             callback(null, Date.now() + path.extname(file.originalname))
+//         }
+//     }),
+
+//     fileFilter: function (req, file, callback) {
+//         if (file) {
+//             const extention = path.extname(file.originalname)
+//             req.file_extention = extention
+
+//             if (fileTypes.includes(extention)) {
+//                 callback(null, true)
+//             } else {
+//                 callback(null, false)
+//             }
+//         }
+//         else {
+//             callback("No files found", false)
+//         }
+//     }
+// })
+
 const uploadFile = async function (file, folderName) {
     const s3Client = new S3Client({ region: S3_REGION });
     const key = folderName

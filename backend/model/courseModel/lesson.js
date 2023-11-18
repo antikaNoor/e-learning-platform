@@ -13,19 +13,28 @@ const lessonSchema = new mongoose.Schema({
     description: {
         type: String,
     },
-    videos: {
-        type: [String],
-    },
+    videos: [{
+        videoTitle: {
+            type: String,
+            required: true
+        },
+        videoLink: {
+            type: String,
+            required: true
+        },
+    }],
 
     // Array of note files
-    notes: {
-        type: [String],
-    },
-    // Unenrolled students cannot watch all the lessons. They may access just the intro video.
-    isAccessibleToUnenrolled: {
-        type: Boolean,
-        default: false
-    },
+    notes: [{
+        noteTitle: {
+            type: String,
+            required: true
+        },
+        noteLink: {
+            type: String,
+            required: true
+        },
+    }],
     isDeleted: {
         type: Boolean,
         default: false

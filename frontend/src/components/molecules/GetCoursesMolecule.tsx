@@ -23,7 +23,9 @@ type Course = {
     rating?: number;
     reviews?: string[];
     createdAt?: string;
+    updatedAt?: string;
     lessonID?: string[];
+    thumbnail?: string;
 };
 
 type MyToken = {
@@ -46,9 +48,8 @@ const CourseList = () => {
 
     const checkString = state.token;
 
-    // const decodedToken = jwtDecode<MyToken>(checkString);
-
     const [courses, setCourses] = useState<Course[]>([]);
+    const [singleCourse, setSingleCourse] = useState<Course>();
     const { truncateText } = helper()
 
     useEffect(() => {
@@ -70,19 +71,22 @@ const CourseList = () => {
                     <div className="container mx-auto my-8 px-10">
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             {courses?.map((course: Course) => (
-                                <div key={course?._id} className="bg-white rounded-lg overflow-hidden shadow-md"
-                                    onClick={() => {
-                                        console.log("kuddus")
-                                        navigate(`/single-course/${course?._id}`)
-                                    }}>
-                                    <img
-                                        src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80"
-                                        alt={course?.title}
-                                        className="w-full h-54 object-cover transition-transform transform hover:scale-105 duration-300"
-                                    />
+                                <div key={course?._id} className="bg-white rounded-lg overflow-hidden shadow-md">
+                                    {course.thumbnail && (
+                                        <img
+                                            src={course.thumbnail}
+                                            alt={course?.title}
+                                            className="w-full h-54 object-cover transition-transform transform hover:scale-105 duration-300"
+                                        />
+                                    )}
                                     <div className="p-4">
                                         <div className='flex justify-between items-center'>
-                                            <h3 className="text-xl font-bold mb-2">{course?.title}</h3>
+                                            <h3 className="text-xl font-bold mb-2"
+                                                onClick={() => {
+                                                    console.log("kuddus")
+                                                    setSingleCourse(course)
+                                                    navigate(`/single-course/${course?._id}`, { state: { singleCourse: course } });
+                                                }}>{course?.title}</h3>
                                             <div className='flex gap-3'>
                                                 <FaCartShopping className="text-2xl cursor-pointer w-5 h-5" />
                                                 <FaHeart className="text-2xl cursor-pointer w-5 h-5" />
@@ -125,14 +129,20 @@ const CourseList = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {courses?.map((course: Course) => (
                         <div key={course?._id} className="bg-white rounded-lg overflow-hidden shadow-md">
-                            <img
-                                src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80"
-                                alt={course?.title}
-                                className="w-full h-54 object-cover transition-transform transform hover:scale-105 duration-300"
-                            />
+                            {course.thumbnail && (
+                                        <img
+                                            src={course.thumbnail}
+                                            alt={course?.title}
+                                            className="w-full h-54 object-cover transition-transform transform hover:scale-105 duration-300"
+                                        />
+                                    )}
                             <div className="p-4">
                                 <div className='flex justify-between items-center'>
-                                    <h3 className="text-xl font-bold mb-2">{course?.title}</h3>
+                                    <h3 className="text-xl font-bold mb-2"
+                                        onClick={() => {
+                                            console.log("kuddus")
+                                            navigate(`/single-course/${course?._id}`, { state: { singleCourse: course } });
+                                        }}>{course?.title}</h3>
 
                                 </div>
 

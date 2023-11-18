@@ -1,3 +1,4 @@
+import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useState, useEffect, useCallback } from 'react';
 import ReactQuill from 'react-quill';
@@ -70,9 +71,9 @@ const CreateCourseMolecule = () => {
         setThumbnail(acceptedFiles);
     }, [])
 
+    console.log("thumbnail", thumbnail)
+
     const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
-
-
 
     const onSubmit = async (data: FormData) => {
         const formData = new FormData();
@@ -86,6 +87,7 @@ const CreateCourseMolecule = () => {
         formData.append('thumbnail', thumbnail);
         // Handle form submission logic here
         console.log({ ...data, thumbnail: thumbnail });
+        console.log(data.title)
         // call add course from hook
         await addCourse(formData, checkString);
     };
@@ -176,12 +178,12 @@ const CreateCourseMolecule = () => {
                             },
                         }}
                         render={({ field }) => (
-                            <ReactQuill
-                                {...field}
-                                theme="snow"
-                                placeholder="Enter Learning outcome"
-                                className={`w-full border ${errors.learningOutcome ? 'border-red-500' : ''}`}
-                            />
+                                <ReactQuill
+                                    {...field}
+                                    theme="snow"
+                                    placeholder="Enter Learning outcome"
+                                    className={`w-full border ${errors.learningOutcome ? 'border-red-500' : ''}`}
+                                />
                         )}
                     />
                     {errors.learningOutcome && <h5 className="text-red-500">{String(errors.learningOutcome.message)}</h5>}

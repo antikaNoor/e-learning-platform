@@ -55,11 +55,12 @@ export const AddCourseApi = async (data: any, token: string) => {
         .post(ADD_COURSE, data, {
             headers: {
                 'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
+                'Content-Type': 'multipart/form-data',
             },
         })
         .then((response) => {
             console.log(response.data)
+            console.log(response.headers['Content-Type'])
             return response.data
         })
         .catch((error) => {
