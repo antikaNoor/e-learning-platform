@@ -69,7 +69,7 @@ const CourseList = () => {
             return (
                 <div>
                     <div className="container mx-auto my-8 px-10">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {courses?.map((course: Course) => (
                                 <div key={course?._id} className="bg-white rounded-lg overflow-hidden shadow-md">
                                     {course.thumbnail && (
@@ -126,16 +126,16 @@ const CourseList = () => {
     return (
         <div>
             <div className="container mx-auto my-8 px-10">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {courses?.map((course: Course) => (
                         <div key={course?._id} className="bg-white rounded-lg overflow-hidden shadow-md">
                             {course.thumbnail && (
-                                        <img
-                                            src={course.thumbnail}
-                                            alt={course?.title}
-                                            className="w-full h-54 object-cover transition-transform transform hover:scale-105 duration-300"
-                                        />
-                                    )}
+                                <img
+                                    src={course.thumbnail}
+                                    alt={course?.title}
+                                    className="w-full h-54 object-cover transition-transform transform hover:scale-105 duration-300"
+                                />
+                            )}
                             <div className="p-4">
                                 <div className='flex justify-between items-center'>
                                     <h3 className="text-xl font-bold mb-2"

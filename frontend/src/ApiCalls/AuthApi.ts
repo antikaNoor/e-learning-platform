@@ -1,5 +1,5 @@
 import axios from 'axios';
-import axiosInstanceToken from '../utils/axiosInstance';
+import { axiosInstance, axiosInstanceToken } from '../utils/axiosInstance';
 import { toast } from 'react-toastify';
 
 import {

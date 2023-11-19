@@ -15,7 +15,7 @@ type MyToken = {
     exp: number;
 }
 
-const TeacherAuthenticate = () => {
+const AdminAuthenticate = () => {
 
     console.log("checking auth")
 
@@ -36,4 +36,4 @@ const TeacherAuthenticate = () => {
     );
 };
 
-export default TeacherAuthenticate;
+export default AdminAuthenticate;

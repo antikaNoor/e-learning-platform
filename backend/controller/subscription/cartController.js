@@ -29,6 +29,7 @@ class CartController {
     async addToCart(req, res) {
         try {
             const { courseID } = req.body
+            console.log("courseID", req.body)
 
             if (!courseID) {
                 return res.status(400).send(failure("Provide a valid course ID"))
@@ -69,7 +70,7 @@ class CartController {
                         await existingWish.save();
                     }
                 }
-                return res.status(200).send(success("Course added to cart successfully."))
+                return res.status(200).send(success("Course added to cart successfully.", cart))
             }
 
             // check if the course is already added to the cart
@@ -97,6 +98,8 @@ class CartController {
             if (enrolledCourse) {
                 return res.status(400).send(failure("You are already enrolled in this course."))
             }
+
+
 
             // if there is already a cart against the student, just push into the array
             existingCart.courseID.push(existingCourse._id)
@@ -195,7 +198,7 @@ class CartController {
         }
     }
 
-    // get your wishlist
+    // get your cart
     async getYourCart(req, res) {
         try {
 
@@ -203,6 +206,7 @@ class CartController {
                 studentID: new mongoose.Types.ObjectId(req.user._id)
             })
                 .select("-__v -createdAt -updatedAt")
+                .populate('courseID', '-__v -createdAt -updatedAt -isApproved -isDeleted -isPublished');
 
             if (!existingCart) {
                 return res.status(400).send(failure("Cart not found."))

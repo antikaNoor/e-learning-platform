@@ -26,16 +26,7 @@ const studentSchema = new mongoose.Schema({
     completedCourses: {
         type: [mongoose.Types.ObjectId],
         ref: "Course"
-    },
-    wishList: {
-        type: [mongoose.Types.ObjectId],
-        ref: "WishList"
-    },
-    Cart: {
-        type: [mongoose.Types.ObjectId],
-        ref: "Cart"
-    },
-
+    }
 }, { timestamps: true })
 
 const Student = mongoose.model("Student", studentSchema);

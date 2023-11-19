@@ -30,10 +30,10 @@ class LessonController {
         try {
             // const video = req.file
             const { courseID } = req.params
-            const { serialNo, title, description } = req.body
-            console.log(serialNo, courseID, title, description)
+            const { title, description } = req.body
+            console.log(courseID, title, description)
 
-            if (!courseID || !serialNo || !title || !description) {
+            if (!courseID || !title || !description) {
                 return res.status(400).send(failure("Please fill all the fields"))
             }
 
@@ -43,13 +43,12 @@ class LessonController {
                 return res.status(400).send(failure("The specified course does not exist. Please enter a valid course."));
             }
 
-            const existingTitle = await lessonModel.findOne({ serialNo, title, courseID })
+            const existingTitle = await lessonModel.findOne({ title, courseID })
             if (existingTitle && existingTitle.isDeleted === false) {
                 return res.status(400).send(failure("Lesson title already exists. Please choose a different title."))
             }
 
             const lesson = await lessonModel.create({
-                serialNo,
                 title,
                 description,
                 courseID,

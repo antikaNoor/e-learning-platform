@@ -8,8 +8,6 @@ import LoginOrganism from "./components/templates/LoginPage";
 import SignUpOrganism from "./components/templates/SignUpPage";
 import ForgotPasswordOrganism from "./components/organisms/ForgotPasswordOrganism";
 import ResetPasswordOrganism from "./components/organisms/ResetPasswordOrganism";
-// import PrivateRoute from "./components/templates/AdminAuthenticate";
-// import AdminAuthenticate from "./components/templates/AdminAuthenticate";
 import 'react-toastify/dist/ReactToastify.css';
 import DummyPage from "./components/templates/DummyPage";
 import VerifyEmailPage from "./components/templates/VerifyEmailPage";
@@ -22,6 +20,7 @@ import TeacherInfoMolecule from "./components/molecules/TeacherInfoMolecule";
 import LoginAuthenticate from "./components/templates/LoginAuthenticate";
 import CreateCourseMolecule from "./components/molecules/CreateCourseMolecule";
 import TeacherProfilePage from "./components/templates/TeacherProfilePage";
+import AdminAuthenticate from "./components/templates/AdminAuthenticate";
 import TeacherAuthenticate from "./components/templates/TeacherAuthenticate";
 import StudentAuthenticate from "./components/templates/StudentAuthenticate";
 import StudentProfilePage from "./components/templates/StudentProfilePage";
@@ -57,6 +56,9 @@ function App() {
             </Route>
             <Route element={<StudentAuthenticate />}>
               <Route path="login/student/student-profile" element={<StudentProfilePage />} />
+            </Route>
+            <Route element={<AdminAuthenticate />}>
+              <Route path="login/admin/admin-profile" element={<StudentProfilePage />} />
             </Route>
           </Route>
         </Routes>

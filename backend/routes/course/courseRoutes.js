@@ -10,8 +10,9 @@ const { isUserLoggedIn,
 const { courseValidator } = require('../../middleware/validation')
 const courseController = require('../../controller/course/courseController')
 
-routes.post("/create-course", isUserLoggedIn, isUserTeacher, upload.single('thumbnail'), CourseController.createCourse)
+routes.post("/create-course", isUserLoggedIn, isUserTeacher, upload.single('file'), CourseController.createCourse)
 routes.get("/get-courses", CourseController.getCourses)
+routes.get("/get-teachers-courses", isUserLoggedIn, isUserTeacher, CourseController.getTeachersCourses)
 routes.post("/delete-course", isUserLoggedIn, isUserTeacher, CourseController.deleteCourse)
 routes.delete("/delete-file", CourseController.handleDeleteFile)
 

@@ -18,7 +18,7 @@ const courseSchema = new mongoose.Schema({
         type: String,
         enum: ["English", "Bangla"],
     },
-    learingOutcome: {
+    learningOutcome: {
         type: String
     },
     requirement: {

@@ -1,4 +1,4 @@
-import axiosInstance from '../utils/axiosInstance';
+import { axiosInstance, axiosInstanceToken } from '../utils/axiosInstance';
 import { GET_ALL_CATEGORIES } from '../utils/constants';
 
 export const GetAllCategoriesApi = async () => {

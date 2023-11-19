@@ -4,7 +4,8 @@ const CartController = require('../../controller/subscription/cartController')
 const { isUserLoggedIn,
     isUserAdmin,
     isUserStudent,
-    isUserTeacher } = require('../../middleware/auth')
+    isUserTeacher,
+    CartAuthenticationMiddleware } = require('../../middleware/auth')
 
 routes.post("/add-to-cart", isUserLoggedIn, isUserStudent, CartController.addToCart)
 routes.delete("/remove-from-cart/:cartID/:courseID", isUserLoggedIn, isUserStudent, CartController.removeFromCart)

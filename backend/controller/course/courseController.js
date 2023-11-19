@@ -44,55 +44,60 @@ class CourseController {
     }
 
     async createCourse(req, res) {
+        console.log(req.file)
         try {
-            const thumbnail = req.files
-            const { title, description, language, learingOutcome, requirement, topicName } = req.body
+            if (req.file) {
 
-            console.log(title, description, language, learingOutcome, requirement, topicName)
-            console.log(req.files)
+                const thumbnail = req.file
+                const { title, description, language, learningOutcome, requirement, topicName } = req.body
 
-            if (!title || !description || !language || !requirement || !topicName) {
-                return res.status(400).send(failure("Please fill all the fields"))
+                console.log(title, description, language, learningOutcome, requirement, topicName)
+                console.log(req.file)
+
+                if (!title || !description || !language || !requirement || !topicName) {
+                    return res.status(400).send(failure("Please fill all the fields"))
+                }
+
+                const existingTitle = await courseModel.findOne({ title })
+
+                if (existingTitle) {
+                    return res.status(400).send(failure("Course title already exists. Please choose a different title."))
+                }
+
+                const existingteacher = await authModel.findOne({ _id: new mongoose.Types.ObjectId(req.user._id) })
+                    .select("role isVerified isBanned")
+
+                if (!existingteacher) {
+                    return res.status(400).send(failure("teacher not found"))
+                }
+
+                const existingTopic = await topicModel.findOne({ topicName })
+                if (!existingTopic || existingTopic.isDeleted === true) {
+                    return res.status(400).send(failure("Topic not found"))
+                }
+
+                const uploadRes = await uploadFile(thumbnail, "thumbnail_folder")
+
+                const course = new courseModel({
+                    title,
+                    description,
+                    teacherID: req.user._id,
+                    language,
+                    learningOutcome,
+                    requirement,
+                    topicName,
+                    thumbnail: uploadRes,
+                })
+
+                await course.save()
+
+                const response = course.toObject()
+                delete response.__v
+                delete response.isDeleted
+
+                return res.status(200).send(success("Course created successfully", response))
             }
-
-            const existingTitle = await courseModel.findOne({ title })
-
-            if (existingTitle) {
-                return res.status(400).send(failure("Course title already exists. Please choose a different title."))
-            }
-
-            const existingteacher = await authModel.findOne({ _id: new mongoose.Types.ObjectId(req.user._id) })
-                .select("role isVerified isBanned")
-
-            if (!existingteacher) {
-                return res.status(400).send(failure("teacher not found"))
-            }
-
-            const existingTopic = await topicModel.findOne({ topicName })
-            if (!existingTopic || existingTopic.isDeleted === true) {
-                return res.status(400).send(failure("Topic not found"))
-            }
-
-            const uploadRes = await uploadFile(thumbnail, "thumbnail_folder")
-
-            const course = new courseModel({
-                title,
-                description,
-                teacherID: req.user._id,
-                language,
-                learingOutcome,
-                requirement,
-                topicName,
-                thumbnail: uploadRes,
-            })
-
-            await course.save()
-
-            const response = course.toObject()
-            delete response.__v
-            delete response.isDeleted
-
-            return res.status(200).send(success("Course created successfully", response))
+            return res.status(400).send(failure("Please upload thumbnail"))
         } catch (error) {
             console.log("error", error)
             return res.status(500).send(failure("Internal server error"))
@@ -214,7 +219,31 @@ class CourseController {
         }
     }
 
+    // get all the courses of a teacher
+    async getTeachersCourses(req, res) {
+        try {
+            const teacherID = req.user._id
+            console.log("teacherID", teacherID)
 
+            if (!teacherID) {
+                return res.status(400).send(failure("User not found"))
+            }
+
+            const existingTeacher = await authModel.findOne({ _id: new mongoose.Types.ObjectId(teacherID) })
+
+            if (!existingTeacher) {
+                return res.status(400).send(failure("User not found"))
+            }
+
+            const courses = await courseModel.find({ teacherID: new mongoose.Types.ObjectId(teacherID) })
+
+            return res.status(200).send(success("All courses", courses))
+
+        } catch (error) {
+            console.log("error", error)
+            return res.status(500).send(failure("Internal server error"))
+        }
+    }
 
     // delete a course
     async deleteCourse(req, res) {

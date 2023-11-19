@@ -1,8 +1,9 @@
 // import axios from 'axios';
 // import { toast } from 'react-toastify';
 // import { ADD_CATEOGRY} from '../utils/constants';
-import axiosInstance from '../utils/axiosInstance';
-import { ADD_COURSE, GET_ALL_COURSES } from '../utils/constants';
+import { toast } from 'react-toastify';
+import { axiosInstance, axiosInstanceToken } from '../utils/axiosInstance';
+import { ADD_COURSE, GET_ALL_COURSES, GET_TEACHERS_COURSES } from '../utils/constants';
 // import { ALL_COURSES_URL } from "../utils/constants";
 
 // type Category = {
@@ -48,6 +49,26 @@ export const GetCoursesApi = async () => {
         })
 }
 
+export const GetTeachersCoursesApi = async (token: string) => {
+    // Fetch data from API
+    return axiosInstance
+        .get(GET_TEACHERS_COURSES, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+
+        })
+        .then((response) => {
+            console.log(response.data)
+            console.log("token", token)
+            return response.data;
+        })
+        .catch((error) => {
+            console.error("Other Error:", error);
+            throw error;
+        })
+}
+
 // add course api
 export const AddCourseApi = async (data: any, token: string) => {
     // Fetch data from API
@@ -60,11 +81,12 @@ export const AddCourseApi = async (data: any, token: string) => {
         })
         .then((response) => {
             console.log(response.data)
-            console.log(response.headers['Content-Type'])
+            toast.success(response.data.message)
             return response.data
         })
         .catch((error) => {
             // Handle other errors (network error, timeout, etc.) here.
+            toast.error(error.response.data.message)
             console.error("Other Error:", error);
             throw error;
         })

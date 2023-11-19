@@ -3,7 +3,7 @@ import SideBarOrganism from '../organisms/SideBarOrganism'
 
 type Props = {}
 
-const TeacherProfilePage = (props: Props) => {
+const AdminProfilePage = (props: Props) => {
     return (
         <div>
             <NavBarOrganism />
@@ -12,4 +12,4 @@ const TeacherProfilePage = (props: Props) => {
     )
 }
 
-export default TeacherProfilePage
+export default AdminProfilePage

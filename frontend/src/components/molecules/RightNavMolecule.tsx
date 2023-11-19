@@ -24,7 +24,8 @@ const LoginSignUpNavMolecule = () => {
     }
     return (
         <div className='flex gap-5'>
-            <AiFillHome className='font-bold text-xl cursor-pointer' />
+            <AiFillHome className='font-bold text-xl cursor-pointer'
+                onClick={() => navigate('/')} />
             <IoMdNotifications className='font-bold text-xl cursor-pointer' />
         </div>
     )

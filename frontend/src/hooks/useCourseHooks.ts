@@ -1,6 +1,5 @@
-import { GetCoursesApi, AddCourseApi, GetTopicApi } from "../ApiCalls/CourseApi";
+import { GetCoursesApi, AddCourseApi, GetTopicApi, GetTeachersCoursesApi } from "../ApiCalls/CourseApi";
 import { useCallback } from 'react';
-import { toast } from 'react-toastify';
 
 const useCourse = () => {
     const getTopic = async () => {
@@ -35,10 +34,24 @@ const useCourse = () => {
         }
     };
 
+    const getTeachersCourse = useCallback(
+        async (token: string) => {
+            try {
+                const response = await GetTeachersCoursesApi(token);
+                return response
+                // Optionally, update the user state or perform other actions
+            } catch (error: any) {
+                console.log(error)
+            }
+        },
+        []
+    );
+
     return {
         getAllCourses,
         getTopic,
-        addCourse
+        addCourse,
+        getTeachersCourse
     };
 };
 

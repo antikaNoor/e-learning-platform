@@ -1,12 +1,12 @@
-import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useState, useEffect, useCallback } from 'react';
-import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import useCourse from '../../hooks/useCourseHooks';
 import Dropdown from '../atoms/Dropdown';
 import { useDropzone } from 'react-dropzone';
 import { useSelector } from 'react-redux';
+import Button from '../atoms/Button';
+import { useNavigate } from 'react-router-dom';
 
 type FormData = {
     title: string;
@@ -18,8 +18,32 @@ type FormData = {
     thumbnail: FileList;
 }
 
+type Course = {
+    _id?: string;
+    title?: string;
+    description?: string;
+    teacherID?: string;
+    language?: string;
+    learingOutcome?: string;
+    requirement?: string[];
+    isApproved?: boolean;
+    isPublished?: boolean;
+    isDeleted?: boolean;
+    topicID?: string;
+    rating?: number;
+    reviews?: string[];
+    createdAt?: string;
+    updatedAt?: string;
+    lessonID?: string[];
+    thumbnail?: string;
+};
+
 const CreateCourseMolecule = () => {
-    const { getTopic, addCourse } = useCourse();
+    const navigate = useNavigate();
+    const { getTopic, addCourse, getAllCourses, getTeachersCourse } = useCourse();
+
+    const [singleCourse, setSingleCourse] = useState<Course>();
+
     const state = useSelector((state: any) => state.user);
     const checkString = state.token;
     const {
@@ -71,6 +95,8 @@ const CreateCourseMolecule = () => {
         setThumbnail(acceptedFiles);
     }, [])
 
+
+
     console.log("thumbnail", thumbnail)
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
@@ -82,18 +108,35 @@ const CreateCourseMolecule = () => {
         formData.append('description', data.description);
         formData.append('language', data.language);
         formData.append('learningOutcome', data.learningOutcome);
-        formData.append('requirement', JSON.stringify(data.requirement));
+
+        const requirements = Array.isArray(data.requirement)
+            ? (data.requirement.join(',').split(',') as string[]).map((req) => req.trim())
+            : ((data.requirement || '') as string).split(',').map((req) => req.trim());
+
+        console.log(requirements);
+
+        // Join the array using a comma before appending it
+        requirements.forEach((requirement) => {
+            formData.append('requirement', requirement);
+        });
+
         formData.append('topicName', data.topicName);
-        formData.append('thumbnail', thumbnail);
-        // Handle form submission logic here
+        formData.append('file', thumbnail[0]);
         console.log({ ...data, thumbnail: thumbnail });
         console.log(data.title)
-        // call add course from hook
         await addCourse(formData, checkString);
+
+        const createdCourseResponse = await getTeachersCourse(checkString);
+        // get the last item of the array
+        const newCourseId = createdCourseResponse.data[createdCourseResponse.data.length - 1]._id;
+
+        // Add the ID after the link in navigate
+        navigate(`create-lesson/${newCourseId}`);
+
     };
 
     return (
-        <div className="container mx-auto mt-8">
+        <div className="mx-auto mt-8 max-w-md">
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div>
                     <label>Title</label>
@@ -152,7 +195,7 @@ const CreateCourseMolecule = () => {
                         control={control}
                         rules={{
                             required: 'Language is required',
-                            validate: (value) => ['english', 'bangla'].includes(value) || 'Language must be either English or Bangla',
+                            validate: (value) => ['English', 'Bangla'].includes(value) || 'Language must be either English or Bangla',
                         }}
                         render={({ field }) => (
                             <input
@@ -166,24 +209,23 @@ const CreateCourseMolecule = () => {
                 </div>
 
                 <div>
-                    <label>Learning outcome</label>
+                    <label>Learning Outcome</label>
                     <Controller
                         name="learningOutcome"
                         control={control}
                         rules={{
-                            required: 'Learning outcome is required',
+                            required: 'Learning outcome  is required',
                             maxLength: {
-                                value: 1000,
-                                message: 'Maximum length must be 1000',
+                                value: 500,
+                                message: 'Maximum length must be 3000',
                             },
                         }}
                         render={({ field }) => (
-                                <ReactQuill
-                                    {...field}
-                                    theme="snow"
-                                    placeholder="Enter Learning outcome"
-                                    className={`w-full border ${errors.learningOutcome ? 'border-red-500' : ''}`}
-                                />
+                            <input
+                                placeholder="Enter Learning outcome"
+                                {...field}
+                                className={`w-full px-4 py-2 border rounded ${errors.learningOutcome ? 'border-red-500' : ''}`}
+                            />
                         )}
                     />
                     {errors.learningOutcome && <h5 className="text-red-500">{String(errors.learningOutcome.message)}</h5>}
@@ -199,18 +241,16 @@ const CreateCourseMolecule = () => {
                             validate: (value) => value.length > 0 || 'At least one requirement is required',
                         }}
                         render={({ field }) => (
-                            <div>
-                                <input
-                                    placeholder="Enter requirement"
-                                    {...field}
-                                    className={`w-full px-4 py-2 border rounded ${errors.requirement ? 'border-red-500' : ''}`}
-                                />
-                                {errors.requirement && (
-                                    <h5 className="text-red-500">{String(errors.requirement.message)}</h5>
-                                )}
-                            </div>
+                            <textarea
+                                placeholder="Enter requirements (comma-separated)"
+                                {...field}
+                                className={`w-full px-4 py-2 border rounded ${errors.requirement ? 'border-red-500' : ''}`}
+                            />
                         )}
                     />
+                    {errors.requirement && (
+                        <h5 className="text-red-500">{String(errors.requirement.message)}</h5>
+                    )}
                 </div>
 
                 <div>
@@ -246,12 +286,12 @@ const CreateCourseMolecule = () => {
                 </div>
 
                 <div className="mb-4">
-                    <button
+                    <Button
                         type="submit"
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        value="Submit"
+                        additionalStyles="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                     >
-                        Submit
-                    </button>
+                    </Button>
                 </div>
             </form>
         </div>

@@ -19,6 +19,11 @@ const GET_ALL_CATEGORIES = `/category/get-all-categories`;
 const ADD_CATEOGRY = `/course/add-category`;
 const ADD_COURSE = `/course/create-course`;
 const GET_ALL_COURSES = `${BASE_URL}/course/get-courses`;
+const GET_TEACHERS_COURSES = `/course/get-teachers-courses`;
+
+// cart 
+const ADD_TO_CART = `${BASE_URL}/cart/add-to-cart`;
+const GET_YOUR_CART = `${BASE_URL}/cart/get-your-cart`;
 
 export {
     BASE_URL,
@@ -36,5 +41,9 @@ export {
 
     ADD_CATEOGRY,
     ADD_COURSE,
-    GET_ALL_COURSES
+    GET_ALL_COURSES,
+    GET_TEACHERS_COURSES,
+
+    ADD_TO_CART,
+    GET_YOUR_CART
 }

@@ -118,6 +118,35 @@ const isUserStudent = async (req, res, next) => {
     }
 }
 
+const CartAuthenticationMiddleware = async (req, res, next) => {
+    try {
+        const { authorization } = req.headers
+
+        if (!authorization) {
+            next()
+        }
+
+        console.log("authorization", req.headers.authorization)
+        const token = authorization.split(" ")[1]
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+
+        const user = await authModel.findOne({ _id: decoded._id })
+
+        req.user = user
+        next()
+
+    } catch (error) {
+        console.log("error found", error)
+        if (error instanceof jwt.JsonWebTokenError) {
+            return res.status(500).send(failure("Token is invalid", error))
+        }
+        if (error instanceof jwt.TokenExpiredError) {
+            return res.status(500).send(failure("Token is expired", error))
+        }
+        return res.status(500).send(failure("Internal server error"))
+    }
+}
+
 const isUserTeacher = async (req, res, next) => {
     try {
         const { authorization } = req.headers
@@ -211,5 +240,6 @@ module.exports = {
     isUserAdmin,
     isUserStudent,
     isUserTeacher,
-    isAdminOrTeacher
+    isAdminOrTeacher,
+    CartAuthenticationMiddleware
 }

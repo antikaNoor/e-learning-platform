@@ -1,15 +1,35 @@
 import { FaCartPlus, FaHeart } from "react-icons/fa";
 import { IoBagCheck } from "react-icons/io5";
 import { TiTick } from "react-icons/ti";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import useSubscription from "../../hooks/SubscriptionHooks";
+// import jwtDecode from "jwt-decode";
+import { useSelector } from "react-redux";
 
 const AddCourseToCartBoxMolecule = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     const singleCourse = location.state?.singleCourse;
-    console.log(singleCourse)
+    console.log("singleCourse", singleCourse._id);
+
+    const state = useSelector((state: any) => state.user);
+
+    const checkString = state.token;
+
+    const { addToCart } = useSubscription();
 
     const { thumbnail, lessonID, language } = singleCourse || {};
     console.log(language)
+
+    const handleAddToCart = async () => {
+        if (!checkString) {
+            navigate("/login");
+            return;
+        }
+
+        console.log("singleCourse?._id", singleCourse?._id);
+        await addToCart(singleCourse?._id, checkString);
+    };
 
     return (
         <div className="p-4 bg-white shadow-md rounded">
@@ -33,7 +53,9 @@ const AddCourseToCartBoxMolecule = () => {
                     <TiTick className="text-green-500 mr-2" />
                     Notes</p>
             </div>
-            <div className="mt-4 flex flex-col gap-3 items-center">
+            <div className="mt-4 flex flex-col gap-3 items-center"
+                onClick={handleAddToCart}
+            >
                 <button className="flex justify-center items-center rounded w-full md:w-[350px] h-12 md:h-[40px] bg-blue-500 text-white">
                     <FaCartPlus className="mr-2" />
                     Add to Cart

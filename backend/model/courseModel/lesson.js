@@ -1,10 +1,6 @@
 const mongoose = require("mongoose")
 
 const lessonSchema = new mongoose.Schema({
-    serialNo: {
-        type: Number,
-        default: 0
-    },
     title: {
         type: String,
         maxLength: 100,
