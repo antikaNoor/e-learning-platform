@@ -1,38 +1,106 @@
-import { AddToCartApi, GetYourCartApi } from "../ApiCalls/SubscriptionApi";
-import { useCallback } from 'react';
+import { AddToCartApi, RemoveFromCartApi, AddToWishlistApi, RemoveFromWishlistApi, SubscribeApi } from "../ApiCalls/SubscriptionApi";
+import { useCallback, useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+
+type Carts = {
+    _id?: string;
+    studentID?: string;
+    courseID?: {
+        title?: string;
+        thumbnail?: string;
+        topicName?: string;
+        description?: string;
+        _id?: string;
+        rating?: number;
+        language?: string;
+    };
+};
 
 const useSubscription = () => {
+
     const addToCart = useCallback(
         async (data: any, token: string) => {
-            console.log("token from hook", token, data)
+            console.log("token from hook", token, data);
             try {
                 await AddToCartApi(data, token);
-                console.log("response from hook")
+                console.log("response from hook");
+                // After adding to the cart, you might want to update the cart again
+                // You can call fetchCart here or any other logic to update the cart
             } catch (error: any) {
-                console.log(error)
+                console.log(error);
             }
         },
         []
     );
 
-    const getYourCart = useCallback(
-        async (token: string) => {
+    const addToWishlist = useCallback(
+        async (data: any, token: string) => {
+            console.log("token from hook", token, data);
             try {
-                const response = await GetYourCartApi(token);
-                console.log("response from hook", response)
-                return response
+                await AddToWishlistApi(data, token);
+                console.log("response from hook");
+                // After adding to the cart, you might want to update the cart again
+                // You can call fetchCart here or any other logic to update the cart
             } catch (error: any) {
-                console.log(error)
+                console.log(error);
             }
         },
         []
-    )
+    );
+
+    const subscribe = useCallback(
+        async (data: any, token: string) => {
+            console.log("token from hook", token, data);
+            try {
+                await SubscribeApi(data, token);
+                console.log("response from hook");
+                // After adding to the cart, you might want to update the cart again
+                // You can call fetchCart here or any other logic to update the cart
+            } catch (error: any) {
+                console.log(error);
+            }
+        },
+        []
+    );
+
+    const removeFromCart = useCallback(
+        async (courseID: string, cartID: string, token: string) => {
+            console.log("token from hook", token);
+            try {
+                await RemoveFromCartApi(cartID, courseID, token);
+                console.log("response from hook");
+                // After removing from the cart, you might want to update the cart again
+                // You can call fetchCart here or any other logic to update the cart
+            } catch (error: any) {
+                console.log(error);
+            }
+        },
+        []
+    );
+
+    const removeFromWishlist = useCallback(
+        async (courseID: string, cartID: string, token: string) => {
+            console.log("token from hook", token);
+            try {
+                await RemoveFromWishlistApi(cartID, courseID, token);
+                console.log("response from hook");
+                // After removing from the cart, you might want to update the cart again
+                // You can call fetchCart here or any other logic to update the cart
+            } catch (error: any) {
+                console.log(error);
+            }
+        },
+        []
+    );
+
 
     return {
         addToCart,
-        getYourCart
-    }
-}
+        removeFromCart,
+        addToWishlist,
+        removeFromWishlist,
+        subscribe
+    };
+};
 
-export default useSubscription
-
+export default useSubscription;

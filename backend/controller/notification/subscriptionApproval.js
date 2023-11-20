@@ -64,13 +64,12 @@ class SubscriptionApprovalController {
                 return res.status(400).send(failure("Student not found"))
             }
 
-            if (existingStudent.enrolledCourses.includes(existingCourse._id)) {
-                return res.status(400).send(failure("You are already enrolled in this course."))
+            if (existingStudent.enrolledCourses.some(course => course._id.equals(existingCourse._id))) {
+                return res.status(400).send(failure("You are already enrolled in this course."));
             }
 
             // if the student has already requested for subscription
             const existingRequest = await notificationModel.findOne({ userID: student._id, courseID: existingCourse._id });
-
             if (existingRequest) {
                 return res.status(400).send(failure("You have already requested for subscription."))
             }

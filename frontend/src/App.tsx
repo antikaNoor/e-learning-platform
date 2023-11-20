@@ -1,8 +1,6 @@
 // @ts-ignore
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
-// import { useSelector } from "react-redux";
 import { ToastContainer } from "react-toastify";
-// import SignUpOrganism from "./Components/organisms/SignUpOrganism";
 import './App.css'
 import LoginOrganism from "./components/templates/LoginPage";
 import SignUpOrganism from "./components/templates/SignUpPage";
@@ -25,6 +23,7 @@ import TeacherAuthenticate from "./components/templates/TeacherAuthenticate";
 import StudentAuthenticate from "./components/templates/StudentAuthenticate";
 import StudentProfilePage from "./components/templates/StudentProfilePage";
 import SingleCourseOverviewPage from "./components/templates/SingleCourseOverviewPage";
+import CreateLessonMolecule from "./components/molecules/CreateLessonMolecule";
 
 type Props = {}
 
@@ -32,7 +31,7 @@ function App() {
   // const auth = useSelector((state: { auth: { username: string; email: string; _id: string; token: string } }) => state.auth);
   return (
     <>
-      <ToastContainer />
+      <ToastContainer position="bottom-right" />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -53,6 +52,7 @@ function App() {
             <Route element={<TeacherAuthenticate />}>
               <Route path="login/teacher/create-course" element={<CreateCourseMolecule />} />
               <Route path="login/teacher/teacher-profile" element={<TeacherProfilePage />} />
+              <Route path="/login/teacher/teacher-profile/create-lesson/:courseId" element={<CreateLessonMolecule />} />
             </Route>
             <Route element={<StudentAuthenticate />}>
               <Route path="login/student/student-profile" element={<StudentProfilePage />} />

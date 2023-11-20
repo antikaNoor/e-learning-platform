@@ -14,5 +14,6 @@ routes.post("/add-video/:lessonID", isUserLoggedIn, isUserTeacher, upload.single
 routes.post("/add-note/:lessonID", isUserLoggedIn, isUserTeacher, upload.single('noteLink'), LessonController.addNotes)
 routes.delete("/delete-lesson/:lessonID", isUserLoggedIn, isUserTeacher, LessonController.deleteLesson)
 routes.get("/complete-lesson/:lessonID", isUserLoggedIn, isUserStudent, LessonController.completeLesson)
+routes.get("/get-teachers-lesson", isUserLoggedIn, isUserTeacher, LessonController.getTeacherLessons)
 
 module.exports = routes 

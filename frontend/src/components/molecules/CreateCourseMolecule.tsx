@@ -18,31 +18,10 @@ type FormData = {
     thumbnail: FileList;
 }
 
-type Course = {
-    _id?: string;
-    title?: string;
-    description?: string;
-    teacherID?: string;
-    language?: string;
-    learingOutcome?: string;
-    requirement?: string[];
-    isApproved?: boolean;
-    isPublished?: boolean;
-    isDeleted?: boolean;
-    topicID?: string;
-    rating?: number;
-    reviews?: string[];
-    createdAt?: string;
-    updatedAt?: string;
-    lessonID?: string[];
-    thumbnail?: string;
-};
-
 const CreateCourseMolecule = () => {
     const navigate = useNavigate();
     const { getTopic, addCourse, getAllCourses, getTeachersCourse } = useCourse();
 
-    const [singleCourse, setSingleCourse] = useState<Course>();
 
     const state = useSelector((state: any) => state.user);
     const checkString = state.token;
@@ -125,6 +104,7 @@ const CreateCourseMolecule = () => {
         console.log({ ...data, thumbnail: thumbnail });
         console.log(data.title)
         await addCourse(formData, checkString);
+
 
         const createdCourseResponse = await getTeachersCourse(checkString);
         // get the last item of the array

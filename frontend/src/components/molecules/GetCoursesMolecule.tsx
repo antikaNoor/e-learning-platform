@@ -8,6 +8,7 @@ import helper from '../../utils/helper';
 import { jwtDecode } from "jwt-decode"
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from 'react-router-dom';
+import { FaCheck } from 'react-icons/fa6';
 type Course = {
     _id?: string;
     title?: string;
@@ -95,7 +96,16 @@ const CourseList = () => {
 
                                         <p className="text-gray-600 mb-1">{truncateText(course?.description ?? "", 100)}</p>
                                         <p><strong>Language:</strong> {course?.language}</p>
-                                        <p><strong>Requirements:</strong> {course?.requirement?.join(', ')}</p>
+                                        <p><strong>Prerequisites</strong></p>
+                                        <ul className='list-disc pl-6'>
+                                            {course?.requirement?.map((requirement: string, index: number) => (
+                                                <li key={index} className='flex items-center text-gray-700'>
+                                                    <FaCheck className='mr-2 text-green-500' /> {/* Tick icon */}
+                                                    {requirement}
+                                                </li>
+                                            ))}
+                                            {!course?.requirement && <li className='text-gray-700'>None</li>}
+                                        </ul>
                                         <span className="text-gray-700">
                                             {course?.lessonID && `Lessons: ${course.lessonID.length}`}
                                         </span>
@@ -140,7 +150,6 @@ const CourseList = () => {
                                 <div className='flex justify-between items-center'>
                                     <h3 className="text-xl font-bold mb-2"
                                         onClick={() => {
-                                            console.log("kuddus")
                                             navigate(`/single-course/${course?._id}`, { state: { singleCourse: course } });
                                         }}>{course?.title}</h3>
 
@@ -148,7 +157,16 @@ const CourseList = () => {
 
                                 <p className="text-gray-600 mb-1">{truncateText(course?.description ?? "", 100)}</p>
                                 <p><strong>Language:</strong> {course?.language}</p>
-                                <p><strong>Requirements:</strong> {course?.requirement?.join(', ')}</p>
+                                <p><strong>Prerequisites</strong></p>
+                                <ul className='list-disc pl-6'>
+                                    {course?.requirement?.map((requirement: string, index: number) => (
+                                        <li key={index} className='flex items-center text-gray-700'>
+                                            <FaCheck className='mr-2 text-green-500' /> {/* Tick icon */}
+                                            {requirement}
+                                        </li>
+                                    ))}
+                                    {!course?.requirement && <li className='text-gray-700'>None</li>}
+                                </ul>
                                 <span className="text-gray-700">
                                     {course?.lessonID && `Lessons: ${course.lessonID.length}`}
                                 </span>

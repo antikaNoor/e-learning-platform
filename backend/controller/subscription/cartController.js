@@ -93,7 +93,7 @@ class CartController {
             }
 
             //check if student is enrolled in this course
-            const enrolledCourse = existingStudent.enrolledCourses.find(course => course._id.equals(existingCourse._id))
+            const enrolledCourse = existingStudent.enrolledCourses && existingStudent.enrolledCourses.find(course => course._id.equals(existingCourse._id));
 
             if (enrolledCourse) {
                 return res.status(400).send(failure("You are already enrolled in this course."))

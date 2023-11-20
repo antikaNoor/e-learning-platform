@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode"
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { removeLogin } from "../../redux/slices/UserSlice";
 import { BiPowerOff } from "react-icons/bi";
 import { LuLayoutDashboard } from "react-icons/lu";
@@ -9,7 +10,6 @@ import { IoAnalyticsOutline } from "react-icons/io5";
 import { RiTodoLine } from "react-icons/ri";
 import { FiBookOpen } from "react-icons/fi";
 import { LuPlusSquare } from "react-icons/lu";
-import { BsEnvelopeCheck } from "react-icons/bs";
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { HiOutlineHeart } from "react-icons/hi";
 import StudentDashboardMolecule from '../molecules/StudentDashboardMolecule';
@@ -22,6 +22,7 @@ import TeacherCoursesMolecule from '../molecules/TeacherCoursesMolecule';
 import AdminDashboardMolecule from '../molecules/AdminDashboardMolecule';
 import AdminAnalyticsMolecule from '../molecules/AdminAnalyticsMolecule';
 import AdminRequestsMolecule from '../molecules/AdminRequestsMolecule';
+import { Link } from 'react-router-dom';
 
 type MyToken = {
     _id: string;
@@ -40,6 +41,7 @@ type Props = {
 }
 
 const SideBarOrganism = (props: Props) => {
+    const navigate = useNavigate();
 
     const state = useSelector((state: any) => state.user);
 
@@ -61,8 +63,8 @@ const SideBarOrganism = (props: Props) => {
 
     if (decodedToken.role === "admin") {
         return (
-            <div className='flex items-center pt-10 px-10'>
-                <div className='flex flex-col gap-3 w-[13rem] py-4 rounded-lg h-[60vh] items-center justify-center shadow-md'>
+            <div className='flex pt-10 px-10 gap-20'>
+                <div className='flex flex-col gap-3 w-[13rem] p-7 rounded-lg h-[60vh] shadow-md'>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
                         onClick={() => handleTabClick(1)}>
                         <LuLayoutDashboard className='font-bold text-xl' />
@@ -87,7 +89,7 @@ const SideBarOrganism = (props: Props) => {
                     </div>
                 </div>
 
-                <div>
+                <div className='flex flex-col justify-center items-center w-full'>
                     {activeTab === 1 && <div>
                         <AdminDashboardMolecule />
                     </div>}
@@ -104,8 +106,8 @@ const SideBarOrganism = (props: Props) => {
 
     if (decodedToken.role === "teacher") {
         return (
-            <div className='flex items-center pt-10 px-10 gap-20'>
-                <div className='flex flex-col gap-3 w-[13rem] py-4 rounded-lg h-[60vh] items-center justify-center shadow-md'>
+            <div className='flex pt-10 px-10 gap-20'>
+                <div className='flex flex-col gap-3 w-[13rem] p-7 rounded-lg h-[60vh] shadow-md'>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
                         onClick={() => handleTabClick(1)}>
                         <LuLayoutDashboard className='font-bold text-xl' />
@@ -124,13 +126,19 @@ const SideBarOrganism = (props: Props) => {
                         Create Course
                     </div>
                     <hr className='w-40'></hr>
+                    <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
+                        onClick={() => handleTabClick(4)}>
+                        <LuPlusSquare className='font-bold text-xl' />
+                        Create Lesson
+                    </div>
+                    <hr className='w-40'></hr>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'>
                         <BiPowerOff className='font-bold text-xl' />
                         <div onClick={logout}>Log out</div>
                     </div>
                 </div>
 
-                <div>
+                <div className='flex flex-col justify-center items-center w-full'>
                     {activeTab === 1 && <div>
                         <TeacherDashboardMolecule />
                     </div>}
@@ -140,6 +148,7 @@ const SideBarOrganism = (props: Props) => {
                     {activeTab === 3 && <div>
                         <CreateCourseMolecule />
                     </div>}
+                    {activeTab === 4 && <>{navigate(`/login/teacher/teacher-profile/create-lesson/6559df0a57fce2e6fc969da0`)}</>}
                 </div>
             </div>
         )
@@ -147,8 +156,8 @@ const SideBarOrganism = (props: Props) => {
 
     if (decodedToken.role === "student") {
         return (
-            <div className='flex justify-between items-center pt-10 px-10'>
-                <div className='flex flex-col gap-3 w-[13rem] py-4 rounded-lg h-[60vh] items-center justify-center shadow-md'>
+            <div className='flex pt-10 px-10 gap-20'>
+                <div className='flex flex-col gap-3 w-[13rem] p-7 rounded-lg h-[60vh] shadow-md'>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
                         onClick={() => handleTabClick(1)}>
                         <LuLayoutDashboard className='font-bold text-xl' />
@@ -179,7 +188,7 @@ const SideBarOrganism = (props: Props) => {
                     </div>
                 </div>
 
-                <div>
+                <div className='flex flex-col justify-center items-center w-full'>
                     {activeTab === 1 && <div>
                         <StudentDashboardMolecule />
                     </div>}

@@ -1,15 +1,51 @@
-import NavBarOrganism from '../organisms/NavBarOrganism'
-import SideBarOrganism from '../organisms/SideBarOrganism'
+// import NavBarOrganism from '../organisms/NavBarOrganism'
+// import SideBarOrganism from '../organisms/SideBarOrganism'
 
-type Props = {}
+// type Props = {}
+
+// const StudentProfilePage = (props: Props) => {
+//     return (
+//         <div>
+//             <NavBarOrganism />
+//             <SideBarOrganism />
+//         </div>
+//     )
+// }
+
+// export default StudentProfilePage
+
+import React, { useEffect, useState } from 'react';
+import NavBarOrganism from '../organisms/NavBarOrganism';
+import GetCoursesOrganism from '../organisms/GetCoursesOrganism';
+import LoaderComponent from '../atoms/Loader';
+import SideBarOrganism from '../organisms/SideBarOrganism';
+
+type Props = {};
 
 const StudentProfilePage = (props: Props) => {
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulating a 2-second delay
+            setLoading(false);
+        };
+
+        fetchData();
+    }, []);
+
     return (
         <div>
             <NavBarOrganism />
-            <SideBarOrganism />
+            {loading ? (
+                <div className="flex items-center justify-center h-screen">
+                    <LoaderComponent />
+                </div>
+            ) : (
+                <SideBarOrganism />
+            )}
         </div>
-    )
-}
+    );
+};
 
-export default StudentProfilePage
+export default StudentProfilePage;

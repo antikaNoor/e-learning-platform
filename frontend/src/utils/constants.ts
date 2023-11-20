@@ -20,10 +20,20 @@ const ADD_CATEOGRY = `/course/add-category`;
 const ADD_COURSE = `/course/create-course`;
 const GET_ALL_COURSES = `${BASE_URL}/course/get-courses`;
 const GET_TEACHERS_COURSES = `/course/get-teachers-courses`;
+const ADD_VIDEO = `/lesson/add-video`;
+const ADD_LESSON = `/lesson/create-lesson/:courseID`;
+const GET_TEACHERS_LESSONS = `/lesson/get-teachers-lesson`;
 
 // cart 
 const ADD_TO_CART = `${BASE_URL}/cart/add-to-cart`;
 const GET_YOUR_CART = `${BASE_URL}/cart/get-your-cart`;
+const REMOVE_FROM_CART = `${BASE_URL}/cart/remove-from-cart/:cartID/:courseID`;
+
+//wishlist
+const ADD_TO_WISHLIST = `${BASE_URL}/wishlist/add-to-wishlist`;
+
+//subscribe
+const SUBSCRIBE = `${BASE_URL}/notification/request-for-subscription`;
 
 export {
     BASE_URL,
@@ -43,7 +53,15 @@ export {
     ADD_COURSE,
     GET_ALL_COURSES,
     GET_TEACHERS_COURSES,
+    ADD_LESSON,
+    GET_TEACHERS_LESSONS,
+    ADD_VIDEO,
 
     ADD_TO_CART,
-    GET_YOUR_CART
+    GET_YOUR_CART,
+    REMOVE_FROM_CART,
+
+    ADD_TO_WISHLIST,
+
+    SUBSCRIBE
 }

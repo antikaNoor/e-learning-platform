@@ -3,7 +3,7 @@
 // import { ADD_CATEOGRY} from '../utils/constants';
 import { toast } from 'react-toastify';
 import { axiosInstance, axiosInstanceToken } from '../utils/axiosInstance';
-import { ADD_COURSE, GET_ALL_COURSES, GET_TEACHERS_COURSES } from '../utils/constants';
+import { ADD_COURSE, GET_ALL_COURSES, GET_TEACHERS_COURSES, ADD_LESSON, ADD_VIDEO, GET_TEACHERS_LESSONS } from '../utils/constants';
 // import { ALL_COURSES_URL } from "../utils/constants";
 
 // type Category = {
@@ -69,11 +69,98 @@ export const GetTeachersCoursesApi = async (token: string) => {
         })
 }
 
+export const GetTeachersLessonsApi = async (token: string) => {
+    // Fetch data from API
+    return axiosInstance
+        .get(GET_TEACHERS_LESSONS, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+
+        })
+        .then((response) => {
+            console.log(response.data)
+            console.log("token", token)
+            return response.data;
+        })
+        .catch((error) => {
+            console.error("Other Error:", error);
+            throw error;
+        })
+}
+
 // add course api
 export const AddCourseApi = async (data: any, token: string) => {
     // Fetch data from API
     return axiosInstance
         .post(ADD_COURSE, data, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data',
+            },
+        })
+        .then((response) => {
+            console.log(response.data)
+            toast.success(response.data.message)
+            return response.data
+        })
+        .catch((error) => {
+            // Handle other errors (network error, timeout, etc.) here.
+            toast.error(error.response.data.message)
+            console.error("Other Error:", error);
+            throw error;
+        })
+}
+
+// add lesson api
+export const AddLessonApi = async (courseID: string, data: any, token: string) => {
+    // Fetch data from API
+    return axiosInstance
+        .post(`/lesson/create-lesson/${courseID}`, data, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then((response) => {
+            console.log(response.data)
+            toast.success(response.data.message)
+            return response.data
+        })
+        .catch((error) => {
+            // Handle other errors (network error, timeout, etc.) here.
+            toast.error(error.response.data.message)
+            console.error("Other Error:", error);
+            throw error;
+        })
+}
+
+export const AddVideoApi = async (lessonID: string, data: any, token: string) => {
+    // Fetch data from API
+    return axiosInstance
+        .post(`/lesson/add-video/${lessonID}`, data, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data',
+            },
+        })
+        .then((response) => {
+            console.log(response.data)
+            toast.success(response.data.message)
+            return response.data
+        })
+        .catch((error) => {
+            // Handle other errors (network error, timeout, etc.) here.
+            toast.error(error.response.data.message)
+            console.error("Other Error:", error);
+            throw error;
+        })
+}
+
+export const AddNoteApi = async (lessonID: string, data: any, token: string) => {
+    // Fetch data from API
+    return axiosInstance
+        .post(`/lesson/add-note/${lessonID}`, data, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'multipart/form-data',

@@ -86,6 +86,11 @@ const SidebarMolecule = () => {
                     </div>
                     <hr className='w-40'></hr>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'>
+                        <LuPlusSquare className='font-bold text-xl' />
+                        Create Lesson
+                    </div>
+                    <hr className='w-40'></hr>
+                    <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'>
                         <BiPowerOff className='font-bold text-xl' />
                         <div onClick={logout}>Log out</div>
                     </div>
@@ -97,7 +102,7 @@ const SidebarMolecule = () => {
     if (decodedToken.role === "student") {
         return (
             <div className='max-w-screen-sm'>
-                <div className='flex flex-col gap-4 w-[13rem] py-4 rounded-lg h-[65vh] items-center justify-center shadow-md'>
+                <div className='flex flex-col gap-4 w-[19rem] py-4 rounded-lg h-[65vh] items-center justify-center shadow-md'>
                     <hr className='w-40'></hr>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'>
                         <LuLayoutDashboard className='font-bold text-xl' />

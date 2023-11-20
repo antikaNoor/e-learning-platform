@@ -1,6 +1,7 @@
 const courseModel = require("../../model/courseModel/course")
 const lessonModel = require("../../model/courseModel/lesson")
 const teacherModel = require("../../model/authModel/teacher")
+const authModel = require("../../model/authModel/auth")
 const studentModel = require("../../model/authModel/student")
 const progressModel = require("../../model/courseModel/progress")
 const { success, failure } = require("../../utils/successError")
@@ -71,6 +72,37 @@ class LessonController {
             return res.status(500).send(failure("Internal server error"))
         }
     }
+
+    // get teacher's lessons
+    async getTeacherLessons(req, res) {
+        try {
+            const teacherID = req.user._id;
+            console.log("teacherID", teacherID);
+
+            if (!teacherID) {
+                return res.status(400).send({ success: false, message: "User not found" });
+            }
+
+            const existingTeacher = await authModel.findOne({ _id: new mongoose.Types.ObjectId(teacherID) });
+
+            if (!existingTeacher) {
+                return res.status(400).send({ success: false, message: "User not found" });
+            }
+
+            const courses = await courseModel
+                .find({ teacherID: new mongoose.Types.ObjectId(teacherID) })
+                .select("lessonID"); // Select only the lessonID field
+
+            const lessonIDs = courses.map(course => course.lessonID).flat(); // Flatten the array of lessonID
+
+            return res.status(200).send({ success: true, message: "All lessons", data: lessonIDs });
+
+        } catch (error) {
+            console.error("Error:", error);
+            return res.status(500).send({ success: false, message: "Internal server error" });
+        }
+    }
+
 
     // add videos to a lesson
     async addVideos(req, res) {

@@ -1,4 +1,4 @@
-import { GetCoursesApi, AddCourseApi, GetTopicApi, GetTeachersCoursesApi } from "../ApiCalls/CourseApi";
+import { GetCoursesApi, AddCourseApi, AddVideoApi, AddLessonApi, GetTopicApi, GetTeachersCoursesApi, GetTeachersLessonsApi, AddNoteApi } from "../ApiCalls/CourseApi";
 import { useCallback } from 'react';
 
 const useCourse = () => {
@@ -16,6 +16,42 @@ const useCourse = () => {
         async (data: any, token: string) => {
             try {
                 await AddCourseApi(data, token);
+                // Optionally, update the user state or perform other actions
+            } catch (error: any) {
+                console.log(error)
+            }
+        },
+        []
+    );
+
+    const addVideo = useCallback(
+        async (lessonID: string, data: any, token: string) => {
+            try {
+                await AddVideoApi(lessonID, data, token);
+                // Optionally, update the user state or perform other actions
+            } catch (error: any) {
+                console.log(error)
+            }
+        },
+        []
+    );
+
+    const addNote = useCallback(
+        async (lessonID: string, data: any, token: string) => {
+            try {
+                await AddNoteApi(lessonID, data, token);
+                // Optionally, update the user state or perform other actions
+            } catch (error: any) {
+                console.log(error)
+            }
+        },
+        []
+    );
+
+    const addLesson = useCallback(
+        async (courseID: string, data: any, token: string) => {
+            try {
+                await AddLessonApi(courseID, data, token);
                 // Optionally, update the user state or perform other actions
             } catch (error: any) {
                 console.log(error)
@@ -47,11 +83,29 @@ const useCourse = () => {
         []
     );
 
+    const getTeachersLesson = useCallback(
+        async (token: string) => {
+            try {
+                const response = await GetTeachersLessonsApi(token);
+                console.log("response from hook", response.data)
+                return response.data
+                // Optionally, update the user state or perform other actions
+            } catch (error: any) {
+                console.log(error)
+            }
+        },
+        []
+    );
+
     return {
         getAllCourses,
         getTopic,
         addCourse,
-        getTeachersCourse
+        getTeachersCourse,
+        getTeachersLesson,
+        addLesson,
+        addVideo,
+        addNote
     };
 };
 

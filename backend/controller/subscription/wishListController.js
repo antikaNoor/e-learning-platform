@@ -35,6 +35,7 @@ class wishListController {
             }
 
             const existingCourse = await courseModel.findOne({ _id: new mongoose.Types.ObjectId(courseID) })
+            const existingCart = await cartModel.findOne({ studentID: new mongoose.Types.ObjectId(req.user._id), courseID: new mongoose.Types.ObjectId(existingCourse._id) })
 
             if (!existingCourse || existingCourse.isApproved === false) {
                 return res.status(400).send(failure("Course not found."))
@@ -59,18 +60,18 @@ class wishListController {
                 return res.status(200).send(success("Course added to wish-list successfully."))
             }
 
+            //check if student has this course in cart
+
+            console.log("existingCart", existingCart)
+            if (existingCart) {
+                return res.status(400).send(failure("Course already added to cart."))
+            }
+
             // check if the course is already added to the wish-list
             const existingCourseInWish = existingWish.courseID.find(course => course.equals(existingCourse._id))
 
             if (existingCourseInWish) {
                 return res.status(400).send(failure("Course already added to wish-list."))
-            }
-
-            //check if student has this course in cart
-            const existingCart = await cartModel.findOne({ studentID: new mongoose.Types.ObjectId(req.user._id), courseID: new mongoose.Types.ObjectId(existingCourse._id) })
-
-            if (existingCart) {
-                return res.status(400).send(failure("Course already added to cart."))
             }
 
             //check if student is enrolled in this course
@@ -185,6 +186,7 @@ class wishListController {
                 studentID: new mongoose.Types.ObjectId(req.user._id)
             })
                 .select("-__v -createdAt -updatedAt")
+                .populate('courseID', '-__v -createdAt -updatedAt -isApproved -isDeleted -isPublished');
 
             if (!existingWish) {
                 return res.status(400).send(failure("Wish-list not found."))
