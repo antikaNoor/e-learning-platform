@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const notificationSchema = new mongoose.Schema({
     type: {
         type: String,
-        enum: ["teacher_approval", "subscription_approval", "course_approval", "subscription_request", "course_subscribed"],
+        enum: ["teacher_approval", "course_approval", "subscription_request", "course_subscribed"],
         required: true
     },
     message: {

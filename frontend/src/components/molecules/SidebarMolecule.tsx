@@ -11,6 +11,7 @@ import { LuPlusSquare } from "react-icons/lu";
 import { BsEnvelopeCheck } from "react-icons/bs";
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { HiOutlineHeart } from "react-icons/hi";
+import { LuCopyPlus } from "react-icons/lu";
 
 type MyToken = {
     _id: string;
@@ -86,7 +87,7 @@ const SidebarMolecule = () => {
                     </div>
                     <hr className='w-40'></hr>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'>
-                        <LuPlusSquare className='font-bold text-xl' />
+                        <BiPowerOff className='font-bold text-xl' />
                         Create Lesson
                     </div>
                     <hr className='w-40'></hr>

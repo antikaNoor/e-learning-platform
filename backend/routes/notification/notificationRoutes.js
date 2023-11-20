@@ -20,4 +20,7 @@ routes.post("/subscription-approval/:notificationID", isUserLoggedIn, isUserAdmi
 routes.post("/teacher-request", isUserLoggedIn, TeacherApprovalController.addTeacherInfo)
 routes.post("/teacher-approval", isUserLoggedIn, isUserAdmin, TeacherApprovalController.acceptOrRejectTeacher)
 
+// view
+routes.get("/show-all-subscription-request", isUserLoggedIn, isUserAdmin, SubscriptionApprovalController.showAllSubscriptionRequest)
+
 module.exports = routes 

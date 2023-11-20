@@ -21,8 +21,10 @@ import TeacherDashboardMolecule from '../molecules/TeacherDashboardMolecule';
 import TeacherCoursesMolecule from '../molecules/TeacherCoursesMolecule';
 import AdminDashboardMolecule from '../molecules/AdminDashboardMolecule';
 import AdminAnalyticsMolecule from '../molecules/AdminAnalyticsMolecule';
-import AdminRequestsMolecule from '../molecules/AdminRequestsMolecule';
-import { Link } from 'react-router-dom';
+import AdminTeacherRequestsMolecule from '../molecules/AdminTeacherRequestsMolecule';
+import AdminCourseApprovalRequestsMolecule from '../molecules/AdminCourseApprovalMolecule';
+import { LuCopyPlus } from "react-icons/lu";
+import AdminSubscriptionRequestsMolecule from '../molecules/AdminSubscriptionRequestsMolecule';
 
 type MyToken = {
     _id: string;
@@ -64,7 +66,7 @@ const SideBarOrganism = (props: Props) => {
     if (decodedToken.role === "admin") {
         return (
             <div className='flex pt-10 px-10 gap-20'>
-                <div className='flex flex-col gap-3 w-[13rem] p-7 rounded-lg h-[60vh] shadow-md'>
+                <div className='flex flex-col gap-3 w-[18rem] p-7 rounded-lg h-[60vh] shadow-md'>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
                         onClick={() => handleTabClick(1)}>
                         <LuLayoutDashboard className='font-bold text-xl' />
@@ -80,7 +82,19 @@ const SideBarOrganism = (props: Props) => {
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
                         onClick={() => handleTabClick(3)}>
                         <RiTodoLine className='font-bold text-xl' />
-                        Requests
+                        Student Requests
+                    </div>
+                    <hr className='w-40'></hr>
+                    <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
+                        onClick={() => handleTabClick(4)}>
+                        <RiTodoLine className='font-bold text-xl' />
+                        Teacher Requests
+                    </div>
+                    <hr className='w-40'></hr>
+                    <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
+                        onClick={() => handleTabClick(5)}>
+                        <RiTodoLine className='font-bold text-xl' />
+                        Course Requests
                     </div>
                     <hr className='w-40'></hr>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'>
@@ -89,7 +103,7 @@ const SideBarOrganism = (props: Props) => {
                     </div>
                 </div>
 
-                <div className='flex flex-col justify-center items-center w-full'>
+                <div className='flex flex-col w-full'>
                     {activeTab === 1 && <div>
                         <AdminDashboardMolecule />
                     </div>}
@@ -97,7 +111,13 @@ const SideBarOrganism = (props: Props) => {
                         <AdminAnalyticsMolecule />
                     </div>}
                     {activeTab === 3 && <div>
-                        <AdminRequestsMolecule />
+                        <AdminSubscriptionRequestsMolecule />
+                    </div>}
+                    {activeTab === 4 && <div>
+                        <AdminTeacherRequestsMolecule />
+                    </div>}
+                    {activeTab === 5 && <div>
+                        <AdminCourseApprovalRequestsMolecule />
                     </div>}
                 </div>
             </div>
@@ -128,7 +148,7 @@ const SideBarOrganism = (props: Props) => {
                     <hr className='w-40'></hr>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
                         onClick={() => handleTabClick(4)}>
-                        <LuPlusSquare className='font-bold text-xl' />
+                        <LuCopyPlus className='font-bold text-xl' />
                         Create Lesson
                     </div>
                     <hr className='w-40'></hr>

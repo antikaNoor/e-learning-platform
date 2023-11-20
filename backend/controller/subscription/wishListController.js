@@ -35,7 +35,6 @@ class wishListController {
             }
 
             const existingCourse = await courseModel.findOne({ _id: new mongoose.Types.ObjectId(courseID) })
-            const existingCart = await cartModel.findOne({ studentID: new mongoose.Types.ObjectId(req.user._id), courseID: new mongoose.Types.ObjectId(existingCourse._id) })
 
             if (!existingCourse || existingCourse.isApproved === false) {
                 return res.status(400).send(failure("Course not found."))
@@ -45,6 +44,14 @@ class wishListController {
 
             if (!existingStudent) {
                 return res.status(400).send(failure("Student not found."))
+            }
+
+            //check if student has this course in cart
+            const existingCart = await cartModel.findOne({ studentID: new mongoose.Types.ObjectId(req.user._id), courseID: new mongoose.Types.ObjectId(existingCourse._id) })
+
+            console.log("existingCart", existingCart)
+            if (existingCart) {
+                return res.status(400).send(failure("Course already added to cart."))
             }
 
             //check if the student has a wish-list
@@ -58,13 +65,6 @@ class wishListController {
                 })
                 await wishlist.save()
                 return res.status(200).send(success("Course added to wish-list successfully."))
-            }
-
-            //check if student has this course in cart
-
-            console.log("existingCart", existingCart)
-            if (existingCart) {
-                return res.status(400).send(failure("Course already added to cart."))
             }
 
             // check if the course is already added to the wish-list
