@@ -1,22 +1,27 @@
-import { useDispatch } from 'react-redux';
-import { removeLogin } from "../../redux/slices/UserSlice";
-import Button from '../atoms/Button';
+import React, { useState } from 'react';
 
-const DummyPage = () => {
+const DynamicInputField = () => {
+    const [inputFields, setInputFields] = useState([]);
 
-    const dispatch = useDispatch();
-    // log out
-    const logOut = () => {
-        dispatch(removeLogin());
-    }
+    const addInputField = () => {
+        setInputFields([...inputFields, { id: inputFields.length }]);
+    };
 
+    const removeInputField = (id) => {
+        setInputFields(inputFields.filter(field => field.id !== id));
+    };
 
     return (
         <div>
-            <div>DummyPage</div>
-            <Button type='button' value="Log out" additionalStyles="w-full mt-4" onClick={logOut}>Log Out</Button>
+            <div onClick={addInputField}>Add Input Field</div>
+            {inputFields.map((field) => (
+                <div key={field.id}>
+                    <input type="text" name={`input_${field.id}`} />
+                    <div onClick={() => removeInputField(field.id)}>Remove Input Field</div>
+                </div>
+            ))}
         </div>
-    )
-}
+    );
+};
 
-export default DummyPage
+export default DynamicInputField;

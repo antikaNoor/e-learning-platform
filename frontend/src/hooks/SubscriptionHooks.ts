@@ -1,4 +1,4 @@
-import { AddToCartApi, RemoveFromCartApi, AddToWishlistApi, RemoveFromWishlistApi, SubscribeApi } from "../ApiCalls/SubscriptionApi";
+import { AddToCartApi, RemoveFromCartApi, AddToWishlistApi, RemoveFromWishlistApi, SubscribeApi, RespondToSubscribeApi } from "../ApiCalls/SubscriptionApi";
 import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -78,6 +78,21 @@ const useSubscription = () => {
         []
     );
 
+    const respondToSubscribe = useCallback(
+        async (data: string, notificationID: string, token: string) => {
+            console.log("token from hook", token);
+            try {
+                await RespondToSubscribeApi(data, notificationID, token);
+                console.log("response from hook");
+                // After removing from the cart, you might want to update the cart again
+                // You can call fetchCart here or any other logic to update the cart
+            } catch (error: any) {
+                console.log(error);
+            }
+        },
+        []
+    )
+
     const removeFromWishlist = useCallback(
         async (courseID: string, cartID: string, token: string) => {
             console.log("token from hook", token);
@@ -99,7 +114,8 @@ const useSubscription = () => {
         removeFromCart,
         addToWishlist,
         removeFromWishlist,
-        subscribe
+        subscribe,
+        respondToSubscribe
     };
 };
 

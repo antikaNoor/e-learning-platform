@@ -5,27 +5,29 @@ import AddNotesToLessonsAtom from '../atoms/AddNotesToLessonsAtom'
 import { FiPlusCircle } from "react-icons/fi";
 import { FiMinusCircle } from "react-icons/fi";
 import { useState } from 'react';
+import { FaPlus } from 'react-icons/fa6';
+import { useLocation } from 'react-router-dom';
 
-type Props = {}
 
-const CreateLessonMolecule = (props: Props) => {
+const CreateLessonMolecule = () => {
 
-    const [newLessonID, setNewLessonID] = useState<string | undefined>(undefined);
+    const [lessonDivs, setLessonDivs] = useState<number[]>([1]);
 
-    const handleLessonCreated = (lessonID: string) => {
-        setNewLessonID(lessonID);
+    const addDivLesson = () => {
+        setLessonDivs([...lessonDivs, lessonDivs.length + 1]);
     };
 
+    const removeDivLesson = (index: number) => {
+        const updatedDivs = lessonDivs.filter((_, i) => i !== index);
+        setLessonDivs(updatedDivs);
+    };
     return (
         <div>
-            <CreateLessonAtom onLessonCreated={handleLessonCreated} />
-            {/* <div className='flex gap-2 items-center justify-center'>
-                <FiMinusCircle size={24} className='text-red-600' /> */}
-            <div className='flex flex-col justify-center items-center gap-2'></div>
-            <AddVideoToLessonAtom lessonID={newLessonID} />
-            {/* <FiPlusCircle size={24} className='text-green-600' />
-            </div> */}
-            <AddNotesToLessonsAtom lessonID={newLessonID} />
+            {/* this is the child now */}
+            <FaPlus onClick={addDivLesson} />
+            {lessonDivs.map((_, index) => (
+                <CreateLessonAtom key={index} onLessonRemove={() => removeDivLesson(index)} />
+            ))}
         </div>
     )
 }

@@ -9,6 +9,7 @@ import Button from '../atoms/Button';
 import { useNavigate } from 'react-router-dom';
 import { IoCloudUpload } from "react-icons/io5";
 import { toast } from 'react-toastify';
+import { FaMinus } from 'react-icons/fa6';
 
 type FormData = {
     _id?: string;
@@ -18,8 +19,9 @@ type FormData = {
 
 type LessonID = {
     lessonID?: string;
+    onRemove: () => void;
 }
-const AddNoteToLessonAtom = ({ lessonID }: LessonID) => {
+const AddNoteToLessonAtom = ({ lessonID, onRemove }: LessonID) => {
 
     const { addNote } = useCourse();
 
@@ -77,6 +79,7 @@ const AddNoteToLessonAtom = ({ lessonID }: LessonID) => {
 
     return (
         <div className='flex flex-col gap-2 items-center border w-[400px] rounded p-3 mx-auto'>
+            <FaMinus onClick={onRemove} />
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div>
                     <label>Title</label>

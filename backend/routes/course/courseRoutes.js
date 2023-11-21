@@ -16,4 +16,6 @@ routes.get("/get-teachers-courses", isUserLoggedIn, isUserTeacher, CourseControl
 routes.post("/delete-course", isUserLoggedIn, isUserTeacher, CourseController.deleteCourse)
 routes.delete("/delete-file", CourseController.handleDeleteFile)
 
+routes.get("/get-enrolled-courses", isUserLoggedIn, isUserStudent, CourseController.getEnrolledCourses)
+
 module.exports = routes 

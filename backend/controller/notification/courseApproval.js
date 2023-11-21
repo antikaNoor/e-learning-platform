@@ -72,15 +72,61 @@ class courseApprovalController {
     // show all notification (for admin)
     async showAllNotification(req, res) {
         try {
+            const user = await authModel.findOne({ _id: req.user._id })
+
+            if (!user) {
+                return res.status(400).send(failure("User not found"))
+            }
+
+            if (user.role !== "admin") {
+                return res
+                    .status(400)
+                    .send(failure("You are not authorized to perform this action"))
+            }
+
             const notifications = await notificationModel.find()
-            return res.status(200).send(success(notifications))
+                .populate({
+                    path: "from",
+                    select: "username email",
+                })
+                .sort({ createdAt: -1 });
+
+            return res.status(200).send(success("All notifications", notifications))
         } catch (error) {
             console.log("error", error)
             return res.status(500).send(failure("Internal server error"))
         }
     }
 
-    // accept or reject a course
+    // show teacher's notification (for teacher)
+    async showATeachersNotification(req, res) {
+        try {
+            const user = await authModel.findOne({ _id: req.user._id })
+
+            if (!user) {
+                return res.status(400).send(failure("User not found"))
+            }
+
+            if (user.role !== "teacher") {
+                return res
+                    .status(400)
+                    .send(failure("You are not authorized to perform this action"))
+            }
+
+            const notifications = await notificationModel.find({ type: "course_subscribed" })
+                .populate({
+                    path: "from",
+                    select: "username email",
+                })
+                .sort({ createdAt: -1 });
+
+            return res.status(200).send(success("All notifications", notifications))
+        } catch (error) {
+            console.log("error", error)
+            return res.status(500).send(failure("Internal server error"))
+        }
+    }
+
     // accept or reject a course
     async acceptOrRejectCourse(req, res) {
         try {
@@ -134,7 +180,7 @@ class courseApprovalController {
                 await existingTeacher.save();
 
                 // Create an email
-                const courseApprovalEmailURL = path.join(process.env.BACKEND_AUTH_URL, "course-approval");
+                const courseApprovalEmailURL = path.join(process.env.FRONTEND_URL, "course-approval");
 
                 // Compose the email
                 const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/courseApprovalEmail.ejs'), {
@@ -155,7 +201,7 @@ class courseApprovalController {
 
             } else if (action === 'reject') {
                 // Create an email
-                const courseApprovalEmailURL = path.join(process.env.BACKEND_AUTH_URL, "course-approval");
+                const courseApprovalEmailURL = path.join(process.env.FRONTEND_URL, "course-approval");
 
                 // Compose the email
                 const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/courseApprovalEmail.ejs'), {

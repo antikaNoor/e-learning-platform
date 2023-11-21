@@ -7,7 +7,7 @@ import SignUpOrganism from "./components/templates/SignUpPage";
 import ForgotPasswordOrganism from "./components/organisms/ForgotPasswordOrganism";
 import ResetPasswordOrganism from "./components/organisms/ResetPasswordOrganism";
 import 'react-toastify/dist/ReactToastify.css';
-import DummyPage from "./components/templates/DummyPage";
+// import DummyPage from "./components/templates/DummyPage";
 import VerifyEmailPage from "./components/templates/VerifyEmailPage";
 import NotFoundPage from "./components/templates/NotFoundPage";
 import HomePage from "./components/templates/HomePage";
@@ -24,8 +24,6 @@ import StudentAuthenticate from "./components/templates/StudentAuthenticate";
 import StudentProfilePage from "./components/templates/StudentProfilePage";
 import SingleCourseOverviewPage from "./components/templates/SingleCourseOverviewPage";
 import CreateLessonMolecule from "./components/molecules/CreateLessonMolecule";
-
-type Props = {}
 
 function App() {
   // const auth = useSelector((state: { auth: { username: string; email: string; _id: string; token: string } }) => state.auth);
@@ -44,7 +42,7 @@ function App() {
           <Route path="/courses" element={<AllCoursesPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route path="/dummy" element={<DummyPage />} />
+          {/* <Route path="/dummy" element={<DummyPage />} /> */}
           <Route path="/home" element={<HomePage />} />
           <Route path="/single-course/:courseId" element={<SingleCourseOverviewPage />} />
           <Route element={<LoginAuthenticate />}>

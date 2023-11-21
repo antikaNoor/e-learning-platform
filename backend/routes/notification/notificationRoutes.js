@@ -7,6 +7,7 @@ const { isUserLoggedIn,
     isUserAdmin,
     isUserStudent,
     isUserTeacher } = require('../../middleware/auth')
+const courseApproval = require('../../controller/notification/courseApproval')
 
 // course approval
 routes.post("/publish-course", isUserLoggedIn, isUserTeacher, CourseApprovalController.publishCourse)
@@ -22,5 +23,7 @@ routes.post("/teacher-approval", isUserLoggedIn, isUserAdmin, TeacherApprovalCon
 
 // view
 routes.get("/show-all-subscription-request", isUserLoggedIn, isUserAdmin, SubscriptionApprovalController.showAllSubscriptionRequest)
+routes.get("/show-all-notification", isUserLoggedIn, isUserAdmin, CourseApprovalController.showAllNotification)
+routes.get("/show-teachers-notification", isUserLoggedIn, isUserTeacher, CourseApprovalController.showATeachersNotification)
 
 module.exports = routes 

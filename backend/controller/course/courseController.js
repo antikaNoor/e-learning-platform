@@ -1,6 +1,7 @@
 const courseModel = require("../../model/courseModel/course")
 const authModel = require("../../model/authModel/auth")
 const topicModel = require("../../model/courseModel/topic")
+const studentModel = require("../../model/authModel/student")
 const { success, failure } = require("../../utils/successError")
 const { uploadFile, deleteFile, deleteFolder } = require("../../config/files")
 const express = require('express')
@@ -267,6 +268,79 @@ class CourseController {
             return res.status(500).send(failure("Internal server error"))
         }
     }
+
+    // show a student's enrolled courses
+    async getEnrolledCourses(req, res) {
+        try {
+            const studentID = req.user._id
+
+            if (!studentID) {
+                return res.status(400).send(failure("User not found"))
+            }
+
+            const existingStudent = await authModel.findOne({ _id: new mongoose.Types.ObjectId(studentID) })
+
+            if (!existingStudent) {
+                return res.status(400).send(failure("User not found"))
+            }
+
+            const student = await studentModel.findOne({ email: existingStudent.email })
+
+            if (!student) {
+                return res.status(400).send(failure("User not found"))
+            }
+
+            const enrolledCourses = student.enrolledCourses
+
+            // look for these courses in the course model
+
+            if (!enrolledCourses) {
+                return res.status(400).send(failure("No courses found"))
+            }
+
+            const courses = await courseModel.find({ _id: { $in: enrolledCourses } })
+
+            // Extract course IDs
+            const courseIds = courses.map((course) => course._id);
+
+            // Populate lessons for each course
+            const coursesWithLessons = await courseModel.find({ _id: { $in: courseIds } })
+                .populate({
+                    path: "lessonID",
+                })
+                .exec();
+
+            // Create a map for quick lookup
+            const courseMap = new Map(coursesWithLessons.map((course) => [course._id.toString(), course]));
+
+            // Map the populated lessons and reviews to the original result
+            const result = courses.map((course) => {
+                const courseIdString = course._id.toString();
+                return {
+                    ...course.toObject(),
+                    lessons: courseMap.has(courseIdString) ? courseMap.get(courseIdString).lessonID : [],
+                    reviewsPopulated: course.reviews,
+                };
+            });
+
+            if (result.length > 0) {
+                // const enrolledCourses = {
+                //     courses: result,
+                //     totalInCurrentPage: result.length,
+                //     currentPage: parseInt(page),
+                //     totalRecords: totalRecords,
+                // };
+                return res.status(200).send(success("All courses", result));
+            }
+
+            return res.status(400).send(failure("No course was found"));
+
+        } catch (error) {
+            console.log("error", error)
+            return res.status(500).send(failure("Internal server error"))
+        }
+    }
 }
+
 
 module.exports = new CourseController()

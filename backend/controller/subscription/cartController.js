@@ -52,6 +52,21 @@ class CartController {
             const existingWish = await wishListModel.findOne({ studentID: new mongoose.Types.ObjectId(req.user._id) });
 
             if (!existingCart) {
+                // check if student is enrolled in the course
+                if (
+                    existingStudent.enrolledCourses &&
+                    existingStudent.enrolledCourses.length > 0
+                ) {
+                    if (
+                        existingStudent.enrolledCourses.some((course) =>
+                            course._id.equals(existingCourse._id)
+                        )
+                    ) {
+                        return res
+                            .status(400)
+                            .send(failure("You are already enrolled in this course."));
+                    }
+                }
                 // create a new cart
                 const cart = new cartModel({
                     studentID: new mongoose.Types.ObjectId(req.user._id),
@@ -60,6 +75,7 @@ class CartController {
                 await cart.save()
 
                 if (existingWish) {
+
                     // Use equals for ObjectId comparison
                     existingWish.courseID = existingWish.courseID.filter(course => !course.equals(courseID));
 
@@ -79,6 +95,20 @@ class CartController {
             if (existingCourseInCart) {
                 return res.status(400).send(failure("Course already added to cart."))
             }
+            if (
+                existingStudent.enrolledCourses &&
+                existingStudent.enrolledCourses.length > 0
+            ) {
+                if (
+                    existingStudent.enrolledCourses.some((course) =>
+                        course._id.equals(existingCourse._id)
+                    )
+                ) {
+                    return res
+                        .status(400)
+                        .send(failure("You are already enrolled in this course."));
+                }
+            }
 
             if (existingWish) {
                 // Use equals for ObjectId comparison
@@ -92,21 +122,11 @@ class CartController {
                 }
             }
 
-            //check if student is enrolled in this course
-            const enrolledCourse = existingStudent.enrolledCourses && existingStudent.enrolledCourses.find(course => course._id.equals(existingCourse._id));
-
-            if (enrolledCourse) {
-                return res.status(400).send(failure("You are already enrolled in this course."))
-            }
-
-
-
             // if there is already a cart against the student, just push into the array
             existingCart.courseID.push(existingCourse._id)
             await existingCart.save()
 
             return res.status(200).send(success("Course added to cart successfully."))
-
 
         } catch (error) {
             console.error("Error", error);

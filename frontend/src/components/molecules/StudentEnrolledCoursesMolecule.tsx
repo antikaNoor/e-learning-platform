@@ -2,10 +2,10 @@ import React from 'react'
 
 type Props = {}
 
-const StudentCoursesMolecule = (props: Props) => {
+const StudentEnrolledCoursesMolecule = (props: Props) => {
     return (
         <div>StudentCoursesMolecule</div>
     )
 }
 
-export default StudentCoursesMolecule
+export default StudentEnrolledCoursesMolecule

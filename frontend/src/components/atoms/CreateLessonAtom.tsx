@@ -9,6 +9,10 @@ import Button from '../atoms/Button';
 import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
+import AddVideoToLessonAtom from './AddVideoToLessonAtom';
+import AddNoteToLessonAtom from './AddNotesToLessonsAtom';
+import { FaPlus } from 'react-icons/fa6';
+import { FaMinus } from 'react-icons/fa6';
 
 type FormData = {
     _id?: string;
@@ -17,32 +21,41 @@ type FormData = {
 };
 
 type Props = {
-    onLessonCreated: (newLessonID: string) => void;
-};
+    onLessonRemove: () => void;
+}
 
-// type FormVideoData={
-//     _id?: string;
-//     videoTitle?: string;
-//     videoLink?: FileList;
-// }
-
-// type FormNodeData={
-//     _id?: string;
-//     nodeTitle?: string;
-//     nodeLink?: FileList;
-// }
-
-const CreateLessonAtom = ({ onLessonCreated }: Props) => {
+const CreateLessonAtom = ({ onLessonRemove }: Props) => {
     const location = useLocation();
     const pathArray = location.pathname.split('/');
     const courseID = pathArray[pathArray.length - 1];
-    // console.log("courseID", courseID);
-
 
     const { addLesson, getTeachersLesson } = useCourse();
 
     const state = useSelector((state: any) => state.user);
     const checkString = state.token;
+
+    const [videoDivs, setVideoDivs] = useState<number[]>([1]);
+    const [NoteDivs, setNoteDivs] = useState<number[]>([1]);
+
+    const addDivVideo = () => {
+        setVideoDivs([...videoDivs, videoDivs.length + 1]);
+    };
+
+    const removeDivVideo = (index: number) => {
+        const updatedDivs = videoDivs.filter((_, i) => i !== index);
+        setVideoDivs(updatedDivs);
+    };
+
+    const addDivNote = () => {
+        setNoteDivs([...NoteDivs, NoteDivs.length + 1]);
+    };
+
+    const removeDivNote = (index: number) => {
+        const updatedDivs = NoteDivs.filter((_, i) => i !== index);
+        setNoteDivs(updatedDivs);
+    };
+
+    const [lessonid, setLessonid] = useState<string | undefined>(undefined);
 
     const {
         handleSubmit,
@@ -70,18 +83,13 @@ const CreateLessonAtom = ({ onLessonCreated }: Props) => {
 
         // Check if the array has at least one element before accessing the last one
         if (createdLessonResponse.length > 0) {
-            const newLessonID = createdLessonResponse[createdLessonResponse.length - 1];
-            console.log("lesson id from lesson atom:", newLessonID);
+            setLessonid(createdLessonResponse[createdLessonResponse.length - 1]);
+            // console.log("lesson id from lesson atom:", newLessonID);
 
-            // Call the callback function with the newLessonID
-            onLessonCreated(newLessonID);
+            // onLessonCreated(newLessonID);
         } else {
             console.log("The array is empty.");
         }
-        // get the last item of the array
-
-        // Add the ID after the link in navigate
-        // navigate(`create-lesson/${newCourseId}`);
 
     };
 
@@ -107,6 +115,7 @@ const CreateLessonAtom = ({ onLessonCreated }: Props) => {
 
     return (
         <div className="w-md mx-auto">
+            <FaMinus onClick={onLessonRemove} />
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div>
                     <label>Title</label>
@@ -168,6 +177,15 @@ const CreateLessonAtom = ({ onLessonCreated }: Props) => {
                     </Button>
                 </div>
             </form>
+
+            <FaPlus onClick={addDivVideo} />
+            {videoDivs.map((_, index) => (
+                <AddVideoToLessonAtom key={index} onRemove={() => removeDivVideo(index)} lessonID={lessonid} />
+            ))}
+            <FaPlus onClick={addDivNote} />
+            {NoteDivs.map((_, index) => (
+                <AddNoteToLessonAtom key={index} onRemove={() => removeDivNote(index)} lessonID={lessonid} />
+            ))}
         </div>
     )
 }

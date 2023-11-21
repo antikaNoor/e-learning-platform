@@ -34,6 +34,7 @@ const ADD_TO_WISHLIST = `${BASE_URL}/wishlist/add-to-wishlist`;
 
 //subscribe
 const SUBSCRIBE = `${BASE_URL}/notification/request-for-subscription`;
+const APPROVE_SUBSCRIBE = `${BASE_URL}/notification/subscription-approval/:notificationID`;
 
 export {
     BASE_URL,
@@ -63,5 +64,6 @@ export {
 
     ADD_TO_WISHLIST,
 
-    SUBSCRIBE
+    SUBSCRIBE,
+    APPROVE_SUBSCRIBE
 }

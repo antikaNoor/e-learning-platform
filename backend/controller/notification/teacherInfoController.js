@@ -129,7 +129,7 @@ class TeacherController {
                 await existingTeacher.save()
 
                 // Create an email
-                const teacherApprovalEmailURL = path.join(process.env.BACKEND_AUTH_URL, "teacher-approval");
+                const teacherApprovalEmailURL = path.join(process.env.FRONTEND_URL, "teacher-approval");
 
                 // Compose the email
                 const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/teacherApprovalEmail.ejs'), {
@@ -150,7 +150,7 @@ class TeacherController {
 
             if (action === 'reject') {
                 // Create an email
-                const teacherApprovalEmailURL = path.join(process.env.BACKEND_AUTH_URL, "teacher-approval");
+                const teacherApprovalEmailURL = path.join(process.env.FRONTEND_URL, "teacher-approval");
 
                 // Compose the email
                 const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/teacherApprovalEmail.ejs'), {

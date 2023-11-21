@@ -98,7 +98,7 @@ class SubscriptionApprovalController {
 
       // if the student has already requested for subscription
       const existingRequest = await notificationModel.findOne({
-        userID: student._id,
+        from: student._id,
         courseID: existingCourse._id,
       });
       if (existingRequest) {
@@ -215,10 +215,22 @@ class SubscriptionApprovalController {
         return res.status(400).send(failure("Student not found"));
       }
 
-      if (existingStudent.enrolledCourses.includes(existingCourse._id)) {
-        return res
-          .status(400)
-          .send(failure("You are already enrolled in this course."));
+      // check if student is already enrolled in the course
+      if (
+        existingStudent.enrolledCourses &&
+        existingStudent.enrolledCourses.length > 0
+      ) {
+        if (
+          existingStudent.enrolledCourses.some((course) =>
+            course._id.equals(existingCourse._id)
+          )
+        ) {
+          return res
+            .status(400)
+            .send(failure("Already enrolled."));
+        }
+      } else {
+        existingStudent.enrolledCourses = [];
       }
 
       if (existingNotification.status === "read") {
@@ -226,9 +238,6 @@ class SubscriptionApprovalController {
           .status(400)
           .send(failure("This notification has already been read."));
       }
-
-      existingNotification.status = "read";
-      await existingNotification.save();
 
       if (action === "approve") {
         // add the course to the enrolledCourses of the student
@@ -241,6 +250,9 @@ class SubscriptionApprovalController {
           courseID: existingCourse._id,
           percentage: 0,
         });
+
+        existingNotification.status = "read";
+        await existingNotification.save();
 
         await progress.save();
 
@@ -268,7 +280,7 @@ class SubscriptionApprovalController {
 
         // Create an email
         const SubscriptionApprovalEmailURL = path.join(
-          process.env.BACKEND_AUTH_URL,
+          process.env.FRONTEND_URL,
           "subscription-approval"
         );
 
@@ -315,9 +327,12 @@ class SubscriptionApprovalController {
       } else if (action === "reject") {
         // Create an email
         const SubscriptionApprovalEmailURL = path.join(
-          process.env.BACKEND_AUTH_URL,
+          process.env.FRONTEND_URL,
           "subscription-approval"
         );
+
+        existingNotification.status = "read";
+        await existingNotification.save();
 
         // Compose the email
         const htmlBody = await ejsRenderFile(
@@ -349,6 +364,7 @@ class SubscriptionApprovalController {
             )
           );
       }
+
       return res
         .status(400)
         .send(failure("Invalid action. Please provide 'approve' or 'reject'."));

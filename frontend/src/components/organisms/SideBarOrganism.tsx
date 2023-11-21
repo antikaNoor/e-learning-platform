@@ -13,7 +13,8 @@ import { LuPlusSquare } from "react-icons/lu";
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { HiOutlineHeart } from "react-icons/hi";
 import StudentDashboardMolecule from '../molecules/StudentDashboardMolecule';
-import StudentCoursesMolecule from '../molecules/StudentCoursesMolecule';
+import StudentEnrolledCoursesMolecule from '../molecules/StudentEnrolledCoursesMolecule';
+import StudentCompletedCoursesMolecule from '../molecules/StudentCompletedCoursesMolecule';
 import StudentCartMolecule from '../molecules/StudentCartMolecule';
 import StudentWishListMolecule from '../molecules/StudentWishListMolecule';
 import CreateCourseMolecule from '../molecules/CreateCourseMolecule';
@@ -24,7 +25,14 @@ import AdminAnalyticsMolecule from '../molecules/AdminAnalyticsMolecule';
 import AdminTeacherRequestsMolecule from '../molecules/AdminTeacherRequestsMolecule';
 import AdminCourseApprovalRequestsMolecule from '../molecules/AdminCourseApprovalMolecule';
 import { LuCopyPlus } from "react-icons/lu";
+import { TiTick } from "react-icons/ti";
+import { LuPaperclip } from "react-icons/lu";
+import { PiStudent } from "react-icons/pi";
+import { LiaChalkboardTeacherSolid } from "react-icons/lia";
+import { BsBookmarkCheck } from "react-icons/bs";
 import AdminSubscriptionRequestsMolecule from '../molecules/AdminSubscriptionRequestsMolecule';
+import { useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 
 type MyToken = {
     _id: string;
@@ -44,6 +52,8 @@ type Props = {
 
 const SideBarOrganism = (props: Props) => {
     const navigate = useNavigate();
+
+
 
     const state = useSelector((state: any) => state.user);
 
@@ -81,19 +91,19 @@ const SideBarOrganism = (props: Props) => {
                     <hr className='w-40'></hr>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
                         onClick={() => handleTabClick(3)}>
-                        <RiTodoLine className='font-bold text-xl' />
+                        <PiStudent className='font-bold text-xl' />
                         Student Requests
                     </div>
                     <hr className='w-40'></hr>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
                         onClick={() => handleTabClick(4)}>
-                        <RiTodoLine className='font-bold text-xl' />
+                        <LiaChalkboardTeacherSolid className='font-bold text-xl' />
                         Teacher Requests
                     </div>
                     <hr className='w-40'></hr>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
                         onClick={() => handleTabClick(5)}>
-                        <RiTodoLine className='font-bold text-xl' />
+                        <BsBookmarkCheck className='font-bold text-xl' />
                         Course Requests
                     </div>
                     <hr className='w-40'></hr>
@@ -177,7 +187,7 @@ const SideBarOrganism = (props: Props) => {
     if (decodedToken.role === "student") {
         return (
             <div className='flex pt-10 px-10 gap-20'>
-                <div className='flex flex-col gap-3 w-[13rem] p-7 rounded-lg h-[60vh] shadow-md'>
+                <div className='flex flex-col gap-3 w-[19rem] p-7 rounded-lg h-[60vh] shadow-md'>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
                         onClick={() => handleTabClick(1)}>
                         <LuLayoutDashboard className='font-bold text-xl' />
@@ -186,18 +196,24 @@ const SideBarOrganism = (props: Props) => {
                     <hr className='w-40'></hr>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
                         onClick={() => handleTabClick(2)}>
-                        <FiBookOpen className='font-bold text-xl' />
-                        My Courses
+                        <LuPaperclip className='font-bold text-xl' />
+                        Enrolled Courses
                     </div>
                     <hr className='w-40'></hr>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
                         onClick={() => handleTabClick(3)}>
+                        <TiTick className='font-bold text-xl' />
+                        Completed Courses
+                    </div>
+                    <hr className='w-40'></hr>
+                    <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
+                        onClick={() => handleTabClick(4)}>
                         <MdOutlineShoppingCart className='font-bold text-xl' />
                         My Cart
                     </div>
                     <hr className='w-40'></hr>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
-                        onClick={() => handleTabClick(4)}>
+                        onClick={() => handleTabClick(5)}>
                         <HiOutlineHeart className='font-bold text-xl' />
                         My Wish-list
                     </div>
@@ -213,12 +229,15 @@ const SideBarOrganism = (props: Props) => {
                         <StudentDashboardMolecule />
                     </div>}
                     {activeTab === 2 && <div>
-                        <StudentCoursesMolecule />
+                        <StudentEnrolledCoursesMolecule />
                     </div>}
                     {activeTab === 3 && <div>
-                        <StudentCartMolecule />
+                        <StudentCompletedCoursesMolecule />
                     </div>}
                     {activeTab === 4 && <div>
+                        <StudentCartMolecule />
+                    </div>}
+                    {activeTab === 5 && <div>
                         <StudentWishListMolecule />
                     </div>}
                 </div>
