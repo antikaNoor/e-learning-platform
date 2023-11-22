@@ -8,9 +8,9 @@ import { BiPowerOff } from "react-icons/bi";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { IoAnalyticsOutline } from "react-icons/io5";
 import { RiTodoLine } from "react-icons/ri";
+import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { FiBookOpen } from "react-icons/fi";
 import { LuPlusSquare } from "react-icons/lu";
-import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { HiOutlineHeart } from "react-icons/hi";
 import StudentDashboardMolecule from '../molecules/StudentDashboardMolecule';
@@ -29,11 +29,13 @@ import { LuCopyPlus } from "react-icons/lu";
 import { TiTick } from "react-icons/ti";
 import { LuPaperclip } from "react-icons/lu";
 import { PiStudent } from "react-icons/pi";
+import { VscGraph } from "react-icons/vsc";
 import { LiaChalkboardTeacherSolid } from "react-icons/lia";
 import { BsBookmarkCheck } from "react-icons/bs";
 import AdminSubscriptionRequestsMolecule from '../molecules/AdminSubscriptionRequestsMolecule';
 import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
+import SingleCourseStudentMolecule from '../molecules/SingleCourseStudentMolecule';
 
 type MyToken = {
     _id: string;
@@ -51,10 +53,8 @@ type Props = {
     tabNumber?: Number
 }
 
-const SideBarOrganism = (props: Props) => {
+const SideBarLessonOrganism = (props: Props) => {
     const navigate = useNavigate();
-
-
 
     const state = useSelector((state: any) => state.user);
 
@@ -190,15 +190,15 @@ const SideBarOrganism = (props: Props) => {
             <div className='flex pt-10 px-10 gap-20'>
                 <div className='flex flex-col gap-3 w-[19rem] p-7 rounded-lg h-[60vh] shadow-md'>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
-                        onClick={() => handleTabClick(1)}>
+                        onClick={() => handleTabClick(2)}>
                         <LuLayoutDashboard className='font-bold text-xl' />
                         Dashboard
                     </div>
                     <hr className='w-40'></hr>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
-                        onClick={() => handleTabClick(2)}>
-                        <LuPaperclip className='font-bold text-xl' />
-                        Enrolled Courses
+                        onClick={() => handleTabClick(1)}>
+                        <VscGraph className='font-bold text-xl' />
+                        Track Progress
                     </div>
                     <hr className='w-40'></hr>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
@@ -226,11 +226,11 @@ const SideBarOrganism = (props: Props) => {
                 </div>
 
                 <div className='flex flex-col justify-center items-center w-full'>
-                    {activeTab === 1 && <div>
+                    {activeTab === 2 && <div>
                         <StudentDashboardMolecule />
                     </div>}
-                    {activeTab === 2 && <div>
-                        <StudentEnrolledCoursesMolecule />
+                    {activeTab === 1 && <div>
+                        <SingleCourseStudentMolecule />
                     </div>}
                     {activeTab === 3 && <div>
                         <StudentCompletedCoursesMolecule />
@@ -247,4 +247,4 @@ const SideBarOrganism = (props: Props) => {
     }
 }
 
-export default SideBarOrganism
+export default SideBarLessonOrganism

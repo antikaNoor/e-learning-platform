@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = import.meta.env.VITE_SERVER_URL;
 
 // auth
 const LOGIN_URL = `${BASE_URL}/auth/login`;
@@ -23,6 +23,8 @@ const GET_TEACHERS_COURSES = `/course/get-teachers-courses`;
 const ADD_VIDEO = `/lesson/add-video`;
 const ADD_LESSON = `/lesson/create-lesson/:courseID`;
 const GET_TEACHERS_LESSONS = `/lesson/get-teachers-lesson`;
+const GET_ENROLLED_COURSES = `${BASE_URL}/course/get-enrolled-courses`;
+const GET_COMPLETED_COURSES = `${BASE_URL}/course/get-completed-courses`;
 
 // cart 
 const ADD_TO_CART = `${BASE_URL}/cart/add-to-cart`;
@@ -57,6 +59,8 @@ export {
     ADD_LESSON,
     GET_TEACHERS_LESSONS,
     ADD_VIDEO,
+    GET_ENROLLED_COURSES,
+    GET_COMPLETED_COURSES,
 
     ADD_TO_CART,
     GET_YOUR_CART,

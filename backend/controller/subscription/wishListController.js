@@ -58,6 +58,21 @@ class wishListController {
             const existingWish = await wishListModel.findOne({ studentID: new mongoose.Types.ObjectId(req.user._id) })
 
             if (!existingWish) {
+                // check if student is enrolled in the course
+                if (
+                    existingStudent.enrolledCourses &&
+                    existingStudent.enrolledCourses.length > 0
+                ) {
+                    if (
+                        existingStudent.enrolledCourses.some((course) =>
+                            course._id.equals(existingCourse._id)
+                        )
+                    ) {
+                        return res
+                            .status(400)
+                            .send(failure("You are already enrolled in this course."));
+                    }
+                }
                 // create a new wish-list
                 const wishlist = new wishListModel({
                     studentID: new mongoose.Types.ObjectId(req.user._id),
@@ -75,10 +90,20 @@ class wishListController {
             }
 
             //check if student is enrolled in this course
-            const enrolledCourse = existingStudent.enrolledCourses.find(course => course._id.equals(existingCourse._id))
 
-            if (enrolledCourse) {
-                return res.status(400).send(failure("You are already enrolled in this course."))
+            if (
+                existingStudent.enrolledCourses &&
+                existingStudent.enrolledCourses.length > 0
+            ) {
+                if (
+                    existingStudent.enrolledCourses.some((course) =>
+                        course._id.equals(existingCourse._id)
+                    )
+                ) {
+                    return res
+                        .status(400)
+                        .send(failure("You are already enrolled in this course."));
+                }
             }
 
             // if there is already a wish-list against the student, just push into the array

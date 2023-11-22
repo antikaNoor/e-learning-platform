@@ -3,7 +3,13 @@
 // import { ADD_CATEOGRY} from '../utils/constants';
 import { toast } from 'react-toastify';
 import { axiosInstance, axiosInstanceToken } from '../utils/axiosInstance';
-import { ADD_COURSE, GET_ALL_COURSES, GET_TEACHERS_COURSES, ADD_LESSON, ADD_VIDEO, GET_TEACHERS_LESSONS } from '../utils/constants';
+import {
+    ADD_COURSE, GET_ALL_COURSES,
+    GET_TEACHERS_COURSES,
+    GET_ENROLLED_COURSES,
+    GET_COMPLETED_COURSES,
+    GET_TEACHERS_LESSONS
+} from '../utils/constants';
 // import { ALL_COURSES_URL } from "../utils/constants";
 
 // type Category = {
@@ -42,6 +48,44 @@ export const GetCoursesApi = async () => {
         .then((response) => {
             console.log(response.data.data.courses)
             return response.data.data.courses;
+        })
+        .catch((error) => {
+            console.error("Other Error:", error);
+            throw error;
+        })
+}
+
+export const GetEnrolledCoursesApi = async (token: string) => {
+    // Fetch data from API
+    return axiosInstance
+        .get(GET_ENROLLED_COURSES, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+
+        })
+        .then((response) => {
+            console.log(response.data)
+            return response.data;
+        })
+        .catch((error) => {
+            console.error("Other Error:", error);
+            throw error;
+        })
+}
+
+export const GetCompletedCoursesApi = async (token: string) => {
+    // Fetch data from API
+    return axiosInstance
+        .get(GET_COMPLETED_COURSES, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+
+        })
+        .then((response) => {
+            console.log(response.data)
+            return response.data;
         })
         .catch((error) => {
             console.error("Other Error:", error);

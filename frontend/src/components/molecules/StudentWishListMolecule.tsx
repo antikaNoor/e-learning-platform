@@ -142,11 +142,11 @@ const StudentWishListMolecule = () => {
                     </div>
                 </div>
             ) : (
-                <div>
+                <div className='ml-[-200px] flex flex-col gap-2 justify-center items-center'>
                     <img
                         className='w-[100px] h-[100px] mx-auto opacity-50'
                         src='/public/broken-heart.png'></img>
-                    <p>No courses in wishlist</p>
+                    <p className='text-xl font-bold text-gray-600'>No courses in wishlist</p>
                 </div>
             )}
         </div>

@@ -144,11 +144,11 @@ const StudentCartMolecule = () => {
                     </div>
                 </div>
             ) : (
-                <div>
+                <div className='flex flex-col items-center ml-[-200px]'>
                     <img
                         className='w-[100px] h-[100px] mx-auto opacity-50'
                         src='/public/empty-cart.png'></img>
-                    <p>No courses in cart</p>
+                    <p className='text-xl font-bold text-gray-600'>No courses in cart</p>
                 </div>
             )}
         </div>

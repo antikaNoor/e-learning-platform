@@ -1,27 +1,39 @@
 import React, { useState } from 'react';
+import Modal from 'react-modal';
 
-const DynamicInputField = () => {
-    const [inputFields, setInputFields] = useState([]);
+type Props = {};
 
-    const addInputField = () => {
-        setInputFields([...inputFields, { id: inputFields.length }]);
+const DummyPage = (props: Props) => {
+    // State to manage modal visibility
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // Function to open the modal
+    const openModal = () => {
+        setIsModalOpen(true);
     };
 
-    const removeInputField = (id) => {
-        setInputFields(inputFields.filter(field => field.id !== id));
+    // Function to close the modal
+    const closeModal = () => {
+        setIsModalOpen(false);
     };
 
     return (
         <div>
-            <div onClick={addInputField}>Add Input Field</div>
-            {inputFields.map((field) => (
-                <div key={field.id}>
-                    <input type="text" name={`input_${field.id}`} />
-                    <div onClick={() => removeInputField(field.id)}>Remove Input Field</div>
-                </div>
-            ))}
+            <button onClick={openModal}>Open Modal</button>
+
+            {/* The Modal component from react-modal */}
+            <Modal
+                isOpen={isModalOpen}
+                onRequestClose={closeModal}
+                contentLabel="Example Modal"
+            >
+                <div>Modal Content</div>
+                <button onClick={closeModal}>Close Modal</button>
+            </Modal>
+
+            StudentDashboardMolecule
         </div>
     );
 };
 
-export default DynamicInputField;
+export default DummyPage;

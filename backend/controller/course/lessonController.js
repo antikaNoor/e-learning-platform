@@ -249,7 +249,7 @@ class LessonController {
             // existingStudent.completedLessons.push(existingLesson._id)
             // await existingStudent.save()
 
-            const existingProgress = await progressModel.findOne({ studentID: new mongoose.Types.ObjectId(req.user._id) })
+            const existingProgress = await progressModel.findOne({ studentID: new mongoose.Types.ObjectId(req.user._id), courseID: new mongoose.Types.ObjectId(existingLesson.courseID) })
 
             if (!existingProgress) {
                 return res.status(400).send(failure("Progress not found"))
@@ -271,6 +271,14 @@ class LessonController {
             //compute progress (2 for quiz and assignment)
             const progress = (completedLessons / (totalLessons)) * 100
 
+            // add the course into the student model
+            if (progress === 100) {
+                existingStudent.completedCourses.push(existingLesson.courseID)
+                await existingStudent.save()
+                existingStudent.enrolledCourses.pull(existingLesson.courseID)
+                await existingStudent.save()
+            }
+
             existingProgress.percentage = progress
             await existingProgress.save()
 
@@ -282,37 +290,43 @@ class LessonController {
     }
 
     // delete a video
-    // async deleteVideo(req, res) {
-    //     try {
-    //         const { lessonID } = req.params
-    //         const { videoURL } = req.body
+    async deleteVideo(req, res) {
+        try {
+            const { lessonID } = req.params
+            const { videoURL } = req.body
 
-    //         if (!lessonID || !videoURL) {
+            if (!lessonID || !videoURL) {
 
-    //             return res.status(400).send(failure("Please enter the video url and lesson ID."))
-    //         }
+                return res.status(400).send(failure("Please enter the video url and lesson ID."))
+            }
 
-    //         const existingLesson = await lessonModel.findOne({ _id: new mongoose.Types.ObjectId(lessonID) })
-    //         if (!existingLesson) {
-    //             return res.status(400).send(failure("The specified lesson does not exist. Please enter a valid lesson."))
-    //         }
+            const existingLesson = await lessonModel.findOne({ _id: new mongoose.Types.ObjectId(lessonID) })
+            if (!existingLesson) {
+                return res.status(400).send(failure("The specified lesson does not exist. Please enter a valid lesson."))
+            }
 
-    //         // search the url inside the videos array
-    //         // const existingVideo = existingLesson.videos.filter(video => )
+            // search the url inside the videos array
+            const existingVideo = existingLesson.videos.filter(video => video.videoURL !== videoURL)
 
-    //         // if (!existingVideo) {
-    //         //     return res.status(400).send(failure("The specified video does not exist. Please enter a valid video."))
-    //         // }
+            if (!existingVideo) {
+                return res.status(400).send(failure("The specified video does not exist. Please enter a valid video."))
+            }
 
-    //         // console.log(existingVideo)
+            existingLesson.videos = existingVideo
 
-    //         // delete associated video from bucket
-    //     } catch (error) {
-    //         console.log("error", error)
-    //         return res.status(500).send(failure("Internal server error"))
-    //     }
+            console.log(existingVideo)
 
-    // }
+            await existingLesson.save()
+
+            return res.status(200).send(success("Video deleted successfully."))
+
+            // delete associated video from bucket
+        } catch (error) {
+            console.log("error", error)
+            return res.status(500).send(failure("Internal server error"))
+        }
+
+    }
 
     // delete a lesson
     async deleteLesson(req, res) {

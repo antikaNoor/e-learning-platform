@@ -402,7 +402,8 @@ class reviewClass {
             const student = await authModel.findOne({ _id: new mongoose.Types.ObjectId(req.user._id) })
 
             const review = await reviewModel.findOne({ courseID: new mongoose.Types.ObjectId(courseID), userID: new mongoose.Types.ObjectId(student._id) })
-                .select("-__v -createdAt -updatedAt")
+                .select("-__v")
+                .populate("userID", "_id username email")
 
             if (!review) {
                 return res.status(400).send(failure("Review not found."))

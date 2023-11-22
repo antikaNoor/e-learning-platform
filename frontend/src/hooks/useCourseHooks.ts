@@ -1,4 +1,10 @@
-import { GetCoursesApi, AddCourseApi, AddVideoApi, AddLessonApi, GetTopicApi, GetTeachersCoursesApi, GetTeachersLessonsApi, AddNoteApi } from "../ApiCalls/CourseApi";
+import {
+    GetCoursesApi, AddCourseApi,
+    AddVideoApi, AddLessonApi, GetTopicApi,
+    GetTeachersCoursesApi, GetTeachersLessonsApi,
+    AddNoteApi, GetEnrolledCoursesApi,
+    GetCompletedCoursesApi
+} from "../ApiCalls/CourseApi";
 import { useCallback } from 'react';
 
 const useCourse = () => {
@@ -70,6 +76,26 @@ const useCourse = () => {
         }
     };
 
+    const getEnrolledCourses = async (token: string) => {
+        try {
+            const data = await GetEnrolledCoursesApi(token);
+            console.log("data from hook", data.data)
+            return data.data
+        } catch (error) {
+            console.error('Error fetching courses:', error);
+        }
+    };
+
+    const getCompletedCourses = async (token: string) => {
+        try {
+            const data = await GetCompletedCoursesApi(token);
+            console.log("data from hook", data.data)
+            return data.data
+        } catch (error) {
+            console.error('Error fetching courses:', error);
+        }
+    };
+
     const getTeachersCourse = useCallback(
         async (token: string) => {
             try {
@@ -105,7 +131,9 @@ const useCourse = () => {
         getTeachersLesson,
         addLesson,
         addVideo,
-        addNote
+        addNote,
+        getEnrolledCourses,
+        getCompletedCourses
     };
 };
 
