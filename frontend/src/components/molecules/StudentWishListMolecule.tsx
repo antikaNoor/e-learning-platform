@@ -86,7 +86,7 @@ const StudentWishListMolecule = () => {
                                         <h3
                                             className="text-xl font-bold mb-2 cursor-pointer"
                                             onClick={() => {
-                                                console.log("kuddus");
+                                                console.log("wishlist");
                                                 // Handle click event if needed
                                             }}
                                         >

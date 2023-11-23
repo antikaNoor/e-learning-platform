@@ -1,4 +1,4 @@
-import { AddToCartApi, RemoveFromCartApi, AddToWishlistApi, RemoveFromWishlistApi, SubscribeApi, RespondToSubscribeApi } from "../ApiCalls/SubscriptionApi";
+import { AddToCartApi, RemoveFromCartApi, AddToWishlistApi, RemoveFromWishlistApi, SubscribeApi, RespondToTeacherReqApi } from "../ApiCalls/SubscriptionApi";
 import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -24,8 +24,6 @@ const useSubscription = () => {
             try {
                 await AddToCartApi(data, token);
                 console.log("response from hook");
-                // After adding to the cart, you might want to update the cart again
-                // You can call fetchCart here or any other logic to update the cart
             } catch (error: any) {
                 console.log(error);
             }
@@ -39,8 +37,6 @@ const useSubscription = () => {
             try {
                 await AddToWishlistApi(data, token);
                 console.log("response from hook");
-                // After adding to the cart, you might want to update the cart again
-                // You can call fetchCart here or any other logic to update the cart
             } catch (error: any) {
                 console.log(error);
             }
@@ -54,8 +50,6 @@ const useSubscription = () => {
             try {
                 await SubscribeApi(data, token);
                 console.log("response from hook");
-                // After adding to the cart, you might want to update the cart again
-                // You can call fetchCart here or any other logic to update the cart
             } catch (error: any) {
                 console.log(error);
             }
@@ -69,8 +63,6 @@ const useSubscription = () => {
             try {
                 await RemoveFromCartApi(cartID, courseID, token);
                 console.log("response from hook");
-                // After removing from the cart, you might want to update the cart again
-                // You can call fetchCart here or any other logic to update the cart
             } catch (error: any) {
                 console.log(error);
             }
@@ -82,10 +74,21 @@ const useSubscription = () => {
         async (data: string, notificationID: string, token: string) => {
             console.log("token from hook", token);
             try {
-                await RespondToSubscribeApi(data, notificationID, token);
+                await RespondToTeacherReqApi(data, notificationID, token);
                 console.log("response from hook");
-                // After removing from the cart, you might want to update the cart again
-                // You can call fetchCart here or any other logic to update the cart
+            } catch (error: any) {
+                console.log(error);
+            }
+        },
+        []
+    )
+
+    const respondToTeacherReq = useCallback(
+        async (data: string, notificationID: string, token: string) => {
+            console.log("token from hook", token);
+            try {
+                await RespondToTeacherReqApi(data, notificationID, token);
+                console.log("response from hook");
             } catch (error: any) {
                 console.log(error);
             }
@@ -99,8 +102,6 @@ const useSubscription = () => {
             try {
                 await RemoveFromWishlistApi(cartID, courseID, token);
                 console.log("response from hook");
-                // After removing from the cart, you might want to update the cart again
-                // You can call fetchCart here or any other logic to update the cart
             } catch (error: any) {
                 console.log(error);
             }
@@ -115,7 +116,8 @@ const useSubscription = () => {
         addToWishlist,
         removeFromWishlist,
         subscribe,
-        respondToSubscribe
+        respondToSubscribe,
+        respondToTeacherReq
     };
 };
 

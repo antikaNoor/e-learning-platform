@@ -50,7 +50,7 @@ const LoginBoxMolecule = ({ className }: BoxProps) => {
         const response = await LoginApi(data)
         if (response) {
             dispatch(saveLogin(response));
-            navigate('/home');
+            navigate('/');
         }
     };
 

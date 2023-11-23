@@ -6,8 +6,40 @@ import {
     GetCompletedCoursesApi
 } from "../ApiCalls/CourseApi";
 import { useCallback } from 'react';
+import { useState, useEffect, ChangeEvent } from 'react';
+
+type Course = {
+    _id?: string;
+    title?: string;
+    description?: string;
+    teacherID?: string;
+    language?: string;
+    learingOutcome?: string;
+    requirement?: string[];
+    isApproved?: boolean;
+    isPublished?: boolean;
+    isDeleted?: boolean;
+    topicID?: string;
+    rating?: number;
+    reviews?: string[];
+    createdAt?: string;
+    updatedAt?: string;
+    lessonID?: string[];
+    thumbnail?: string;
+};
 
 const useCourse = () => {
+
+    //search
+    const [searchQuery, setSearchQuery] = useState<string>('');
+    const [courses, setCourses] = useState<Course[]>([]);
+
+
+    // Search query handler
+    const handleSearchQuery = (e: ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value);
+    };
+
     const getTopic = async () => {
         try {
             const data = await GetTopicApi(); // Await the promise
@@ -68,13 +100,28 @@ const useCourse = () => {
 
     const getAllCourses = async () => {
         try {
-            const data = await GetCoursesApi();
+            const data = await GetCoursesApi(searchQuery);
             return data
             // console.log("data from hook", data)
         } catch (error) {
             console.error('Error fetching courses:', error);
         }
     };
+
+    useEffect(() => {
+        const timeOutFunc = setTimeout(() => {
+            console.log("changed")
+            getAllCourses().then((data: Course[] | void) => {
+                if (Array.isArray(data)) {
+                    setCourses(data);
+                }
+            })
+        }, 2000);
+
+        return () => clearTimeout(timeOutFunc);
+    }, [searchQuery]);
+
+    console.log("courses from hook", courses)
 
     const getEnrolledCourses = async (token: string) => {
         try {
@@ -133,7 +180,10 @@ const useCourse = () => {
         addVideo,
         addNote,
         getEnrolledCourses,
-        getCompletedCourses
+        getCompletedCourses,
+        handleSearchQuery,
+        searchQuery,
+        courses
     };
 };
 

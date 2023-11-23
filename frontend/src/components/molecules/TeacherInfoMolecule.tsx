@@ -3,6 +3,7 @@ import { CgAddR, CgCloseR } from "react-icons/cg";
 import useAuth from "../../hooks/useAuthHooks";
 import Button from "../atoms/Button";
 import { useSelector } from "react-redux/es/hooks/useSelector";
+import NavBarOrganism from "../organisms/NavBarOrganism";
 
 type FormValues = {
     educationalBackground: {
@@ -53,115 +54,121 @@ export default function App() {
 
     return (
         <div>
-            <form onSubmit={handleSubmit(onSubmit)}>
-                {eduFields.map((field, index) => (
-                    <div key={field.id}>
+            <NavBarOrganism />
+            <div className="mx-auto ml-[80px] mt-[80px]">
+                <form onSubmit={handleSubmit(onSubmit)}>
+                    {eduFields.map((field, index) => (
+                        <div key={field.id} className="flex flex-col gap-10">
 
-                        <section className="section flex items-center space-x-2" key={field.id}>
+                            <section className="section flex items-center space-x-5 space-y-5" key={field.id}>
 
-                            <input
-                                placeholder="University"
-                                {...register(`educationalBackground.${index}.university` as const, {
-                                    required: true
-                                })}
-                                className={`border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:border-blue-500 ${errors?.educationalBackground?.[index]?.university ? "border-red-500" : ""}`}
-                            />
-                            <input
-                                placeholder="Major"
-                                {...register(`educationalBackground.${index}.major` as const, {
-                                    required: true
-                                })}
-                                className={`border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:border-blue-500 ${errors?.educationalBackground?.[index]?.major ? "border-red-500" : ""}`}
-                            />
-                            <input
-                                placeholder="CGPA"
-                                type="number"
-                                {...register(`educationalBackground.${index}.cgpa` as const, {
-                                    valueAsNumber: true,
-                                    required: true
-                                })}
-                                className={`border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:border-blue-500 ${errors?.educationalBackground?.[index]?.cgpa ? "border-red-500" : ""}`}
-                            />
-                            <button
-                                type="button"
-                                onClick={() => removeEdu(index)}
-                                className="text-red-500 hover:text-red-700 transition-all"
-                            >
-                                <CgCloseR className="text-xl" />
-                            </button>
-                        </section>
-                    </div>
-                ))}
+                                <input
+                                    placeholder="University"
+                                    {...register(`educationalBackground.${index}.university` as const, {
+                                        required: true
+                                    })}
+                                    className={`border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:border-blue-500 ${errors?.educationalBackground?.[index]?.university ? "border-red-500" : ""}`}
+                                />
+                                <input
+                                    placeholder="Major"
+                                    {...register(`educationalBackground.${index}.major` as const, {
+                                        required: true
+                                    })}
+                                    className={`border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:border-blue-500 ${errors?.educationalBackground?.[index]?.major ? "border-red-500" : ""}`}
+                                />
+                                <input
+                                    placeholder="CGPA"
+                                    {...register(`educationalBackground.${index}.cgpa` as const, {
+                                        required: true,
+                                        pattern: {
+                                            value: /^[0-9]+(\.[0-9]+)?$/,
+                                            message: "Enter a valid CGPA"
+                                        }
+                                    })}
+                                    className={`border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:border-blue-500 ${errors?.educationalBackground?.[index]?.cgpa ? "border-red-500" : ""}`}
+                                />
 
-                {expFields.map((field, index) => (
-                    <div key={field.id}>
+                                <button
+                                    type="button"
+                                    onClick={() => removeEdu(index)}
+                                    className="text-red-500 hover:text-red-700 transition-all"
+                                >
+                                    <CgCloseR className="text-xl" />
+                                </button>
+                            </section>
+                        </div>
+                    ))}
 
-                        <section className="section flex items-center space-x-2" key={field.id}>
+                    {expFields.map((field, index) => (
+                        <div key={field.id}>
 
-                            <input
-                                placeholder="Institution"
-                                {...register(`teachingExperience.${index}.institution` as const, {
-                                    required: true
-                                })}
-                                className={`border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:border-blue-500 ${errors?.teachingExperience?.[index]?.institution ? "border-red-500" : ""}`}
-                            />
-                            <input
-                                placeholder="Duration"
-                                {...register(`teachingExperience.${index}.duration` as const, {
-                                    required: true
-                                })}
-                                className={`border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:border-blue-500 ${errors?.teachingExperience?.[index]?.duration ? "border-red-500" : ""}`}
-                            />
-                            <input
-                                placeholder="Description"
-                                {...register(`teachingExperience.${index}.description` as const, {
-                                    required: true
-                                })}
-                                className={`border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:border-blue-500 ${errors?.teachingExperience?.[index]?.description ? "border-red-500" : ""}`}
-                            />
-                            <button
-                                type="button"
-                                onClick={() => removeExp(index)}
-                                className="text-red-500 hover:text-red-700 transition-all"
-                            >
-                                <CgCloseR className="text-xl" />
-                            </button>
-                        </section>
-                    </div>
-                ))}
+                            <section className="section flex items-center space-x-5 space-y-5" key={field.id}>
 
-                <button
-                    type="button"
-                    onClick={() =>
-                        appendEdu({
-                            university: "",
-                            major: "",
-                            cgpa: 0
-                        })
-                    }
-                    className="px-3 py-1 rounded-md transition-all"
-                >
-                    <CgAddR className="text-xl" />
-                    Add another educational background
-                </button>
-                <button
-                    type="button"
-                    onClick={() =>
-                        appendExp({
-                            institution: "",
-                            duration: "",
-                            description: ""
-                        })
-                    }
-                    className="px-3 py-1 rounded-md transition-all"
-                >
-                    <CgAddR className="text-xl" />
-                    Add another teaching experience
-                </button>
+                                <input
+                                    placeholder="Institution"
+                                    {...register(`teachingExperience.${index}.institution` as const, {
+                                        required: true
+                                    })}
+                                    className={`border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:border-blue-500 ${errors?.teachingExperience?.[index]?.institution ? "border-red-500" : ""}`}
+                                />
+                                <input
+                                    placeholder="Duration"
+                                    {...register(`teachingExperience.${index}.duration` as const, {
+                                        required: true
+                                    })}
+                                    className={`border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:border-blue-500 ${errors?.teachingExperience?.[index]?.duration ? "border-red-500" : ""}`}
+                                />
+                                <input
+                                    placeholder="Description"
+                                    {...register(`teachingExperience.${index}.description` as const, {
+                                        required: true
+                                    })}
+                                    className={`border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:border-blue-500 ${errors?.teachingExperience?.[index]?.description ? "border-red-500" : ""}`}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => removeExp(index)}
+                                    className="text-red-500 hover:text-red-700 transition-all"
+                                >
+                                    <CgCloseR className="text-xl" />
+                                </button>
+                            </section>
+                        </div>
+                    ))}
 
-                <Button type="submit" value="Submit" additionalStyles="bg-gray-500 hover:bg-gray-700 text-white font-bold w-30 mt-4" />
+                    <button
+                        type="button"
+                        onClick={() =>
+                            appendEdu({
+                                university: "",
+                                major: "",
+                                cgpa: 0
+                            })
+                        }
+                        className="px-3 py-1 rounded-md transition-all"
+                    >
+                        <CgAddR className="text-xl" />
+                        Add another educational background
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() =>
+                            appendExp({
+                                institution: "",
+                                duration: "",
+                                description: ""
+                            })
+                        }
+                        className="px-3 py-1 rounded-md transition-all"
+                    >
+                        <CgAddR className="text-xl" />
+                        Add another teaching experience
+                    </button>
 
-            </form>
+                    <Button type="submit" value="Submit" additionalStyles="bg-gray-500 hover:bg-gray-700 text-white font-bold w-30 mt-4" />
+
+                </form>
+            </div>
         </div>
     );
 }

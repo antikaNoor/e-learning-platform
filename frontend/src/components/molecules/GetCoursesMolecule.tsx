@@ -9,6 +9,8 @@ import { jwtDecode } from "jwt-decode"
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from 'react-router-dom';
 import { FaCheck } from 'react-icons/fa6';
+import { FaStar, FaRegStar } from 'react-icons/fa';
+
 type Course = {
     _id?: string;
     title?: string;
@@ -33,35 +35,29 @@ type MyToken = {
     _id: string;
     username: string;
     email: string;
-    role: string; // Replace with actual roles
+    role: string;
     isVerified: boolean;
     isBanned: boolean;
-    teacherID?: string; // This is optional, as it may not exist for all users
+    teacherID?: string;
     iat: number;
     exp: number;
 }
 
-const CourseList = () => {
+type Props = {
+    courses: Course[]
+}
+
+const CourseList = ({ courses }: Props) => {
     const navigate = useNavigate();
-    const { getAllCourses } = useCourse();
+    // const { getAllCourses } = useCourse();
 
     const state = useSelector((state: any) => state.user);
 
     const checkString = state.token;
 
-    const [courses, setCourses] = useState<Course[]>([]);
+    // const [courses, setCourses] = useState<Course[]>([]);
     const [singleCourse, setSingleCourse] = useState<Course>();
     const { truncateText } = helper()
-
-    useEffect(() => {
-        getAllCourses().then((data: Course[] | void) => {
-            if (Array.isArray(data)) {
-                setCourses(data);
-            }
-        });
-    }, []);
-
-    console.log(courses)
 
     if (checkString) {
 
@@ -77,7 +73,7 @@ const CourseList = () => {
                                         <img
                                             src={course.thumbnail}
                                             alt={course?.title}
-                                            className="w-full h-54 object-cover transition-transform transform hover:scale-105 duration-300"
+                                            className="w-full h-40 object-cover transition-transform transform hover:scale-105 duration-300"
                                         />
                                     )}
                                     <div className="p-4">
@@ -109,18 +105,19 @@ const CourseList = () => {
                                         <span className="text-gray-700">
                                             {course?.lessonID && `Lessons: ${course.lessonID.length}`}
                                         </span>
-                                        <div className="mt-1">
+                                        <div className="mt-1 flex gap-1 items-center">
                                             <Rating
                                                 count={5}
-                                                value={course?.rating || 0}
-                                                size={32}
+                                                value={course.rating || 0}
                                                 edit={false}
-                                                activeColor="#FFD700"
-                                                color="#A0A0A0"
-                                                className="rounded-full"
+                                                size={24}
+                                                emptyIcon={<FaRegStar />}
+                                                fullIcon={<FaStar />}
+                                                color1={'#f2f2f2'}
+                                                color2={'#FFD700'}
                                             />
                                             <span className="text-gray-700">
-                                                {course?.reviews && `(${course.reviews.length} reviews)`}
+                                                {course?.reviews && `(${course.reviews.length})`}
                                             </span>
                                         </div>
                                     </div>
@@ -143,7 +140,7 @@ const CourseList = () => {
                                 <img
                                     src={course.thumbnail}
                                     alt={course?.title}
-                                    className="w-full h-54 object-cover transition-transform transform hover:scale-105 duration-300"
+                                    className="w-full h-40 object-cover transition-transform transform hover:scale-105 duration-300"
                                 />
                             )}
                             <div className="p-4">
@@ -170,18 +167,19 @@ const CourseList = () => {
                                 <span className="text-gray-700">
                                     {course?.lessonID && `Lessons: ${course.lessonID.length}`}
                                 </span>
-                                <div className="mt-1">
+                                <div className="mt-1 flex gap-1 items-center">
                                     <Rating
                                         count={5}
-                                        value={course?.rating || 0}
-                                        size={32}
+                                        value={course.rating || 0}
                                         edit={false}
-                                        activeColor="#FFD700"
-                                        color="#A0A0A0"
-                                        className="rounded-full"
+                                        size={24}
+                                        emptyIcon={<FaRegStar />}
+                                        fullIcon={<FaStar />}
+                                        color1={'#f2f2f2'}
+                                        color2={'#FFD700'}
                                     />
                                     <span className="text-gray-700">
-                                        {course?.reviews && `(${course.reviews.length} reviews)`}
+                                        {course?.reviews && `(${course.reviews.length})`}
                                     </span>
                                 </div>
                             </div>

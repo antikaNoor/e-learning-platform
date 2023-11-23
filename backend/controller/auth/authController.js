@@ -388,6 +388,25 @@ class AuthController {
             return res.status(500).send(failure("Internal server error"))
         }
     }
+
+    // check if teacher is approved
+    async isTeacherApproved(req, res) {
+        try {
+            const teacher = await teacherModel.findOne({ email: req.user.email });
+
+            if (!teacher || !teacher.isApproved) {
+                return res.status(200).send(false); // Send boolean value true if the teacher is not approved
+            }
+
+            console.log("teacher", teacher);
+            return res.status(200).send(true);
+
+        } catch (error) {
+            console.log(error);
+            return res.status(500).send(failure("Internal server error"));
+        }
+    }
+
 }
 
 module.exports = new AuthController()

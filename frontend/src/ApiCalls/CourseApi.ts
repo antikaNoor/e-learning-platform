@@ -4,7 +4,7 @@
 import { toast } from 'react-toastify';
 import { axiosInstance, axiosInstanceToken } from '../utils/axiosInstance';
 import {
-    ADD_COURSE, GET_ALL_COURSES,
+    ADD_COURSE,
     GET_TEACHERS_COURSES,
     GET_ENROLLED_COURSES,
     GET_COMPLETED_COURSES,
@@ -41,12 +41,12 @@ export const GetTopicApi = async () => {
         })
 }
 
-export const GetCoursesApi = async () => {
+export const GetCoursesApi = async (searchQuery: string) => {
     // Fetch data from API
     return axiosInstance
-        .get(GET_ALL_COURSES)
+        .get(`/course/get-courses?search=${searchQuery}`)
         .then((response) => {
-            console.log(response.data.data.courses)
+            console.log("courses from api", response.data.data.courses)
             return response.data.data.courses;
         })
         .catch((error) => {

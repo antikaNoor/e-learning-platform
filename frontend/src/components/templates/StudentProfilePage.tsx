@@ -1,19 +1,3 @@
-// import NavBarOrganism from '../organisms/NavBarOrganism'
-// import SideBarOrganism from '../organisms/SideBarOrganism'
-
-// type Props = {}
-
-// const StudentProfilePage = (props: Props) => {
-//     return (
-//         <div>
-//             <NavBarOrganism />
-//             <SideBarOrganism />
-//         </div>
-//     )
-// }
-
-// export default StudentProfilePage
-
 import React, { useEffect, useState } from 'react';
 import NavBarOrganism from '../organisms/NavBarOrganism';
 import GetCoursesOrganism from '../organisms/GetCoursesOrganism';
@@ -27,7 +11,7 @@ const StudentProfilePage = (props: Props) => {
 
     useEffect(() => {
         const fetchData = async () => {
-            await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulating a 2-second delay
+            await new Promise((resolve) => setTimeout(resolve, 1000));
             setLoading(false);
         };
 

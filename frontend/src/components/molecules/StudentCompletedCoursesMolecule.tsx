@@ -205,7 +205,6 @@ const StudentCompletedCoursesMolecule = () => {
                                                                         className="rounded-full"
                                                                         onChange={(value: number) => {
                                                                             field.onChange(value);
-
                                                                         }}
                                                                     />
                                                                 )}

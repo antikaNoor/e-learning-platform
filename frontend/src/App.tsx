@@ -23,7 +23,6 @@ import TeacherAuthenticate from "./components/templates/TeacherAuthenticate";
 import StudentAuthenticate from "./components/templates/StudentAuthenticate";
 import StudentProfilePage from "./components/templates/StudentProfilePage";
 import SingleCourseOverviewPage from "./components/templates/SingleCourseOverviewPage";
-
 import CreateLessonMolecule from "./components/molecules/CreateLessonMolecule";
 import SingleCourseStudentPage from "./components/templates/SingleCourseStudentPage";
 
@@ -45,7 +44,7 @@ function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/dummy" element={<DummyPage />} />
-          <Route path="/home" element={<HomePage />} />
+          {/* <Route path="/home" element={<HomePage />} /> */}
           <Route path="/single-course/:courseId" element={<SingleCourseOverviewPage />} />
           <Route element={<LoginAuthenticate />}>
             <Route path="login/teacher" element={<TeacherInfoMolecule />} />

@@ -54,8 +54,8 @@ class TeacherController {
 
             // Create an array of education background
             const formattedTeachingEducation = educationalBackground.map(edu => {
-                const { univesity, major, cgpa } = edu;
-                return { univesity, major, cgpa };
+                const { university, major, cgpa } = edu;
+                return { university, major, cgpa };
             });
 
             // Create an array of teaching experiences
@@ -91,7 +91,8 @@ class TeacherController {
     // admin accept or rejects teacher
     async acceptOrRejectTeacher(req, res) {
         try {
-            const { notificationID, action } = req.body;
+            const { notificationID } = req.params;
+            const { action } = req.body;
 
             if (!notificationID || !action) {
                 return res.status(400).send(failure("Please provide all the fields."));
@@ -102,7 +103,7 @@ class TeacherController {
             const existingNotification = await notificationModel
                 .findOne({ _id: new mongoose.Types.ObjectId(notificationID) })
                 .populate({
-                    path: "userID",
+                    path: "from",
                     select: "username email",
                 });
 
@@ -110,7 +111,7 @@ class TeacherController {
                 return res.status(400).send(failure("This notification does not exist. Please enter a valid notification."));
             }
 
-            const existingTeacher = await teacherModel.findOne({ email: existingNotification.userID.email });
+            const existingTeacher = await teacherModel.findOne({ email: existingNotification.from.email });
 
             if (!existingTeacher) {
                 return res.status(400).send(failure("This teacher does not exist. Please enter a valid teacher."));
@@ -133,13 +134,13 @@ class TeacherController {
 
                 // Compose the email
                 const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/teacherApprovalEmail.ejs'), {
-                    name: existingNotification.userID.username,
+                    name: existingNotification.from.username,
                     isTeacherApproved: isTeacherApproved,
                     teacherApprovalEmailURL: teacherApprovalEmailURL,
                 });
 
                 // Send the email
-                const emailResult = await sendMail(existingNotification.userID.email, "Teacher Approval", htmlBody);
+                const emailResult = await sendMail(existingNotification.from.email, "Teacher Approval", htmlBody);
 
                 if (!emailResult) {
                     return res.status(400).send(failure("Failed to send email."));
@@ -154,13 +155,13 @@ class TeacherController {
 
                 // Compose the email
                 const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/teacherApprovalEmail.ejs'), {
-                    name: existingNotification.userID.username,
+                    name: existingNotification.from.username,
                     isTeacherApproved: isTeacherApproved,
                     teacherApprovalEmailURL: teacherApprovalEmailURL,
                 });
 
                 // Send the email
-                const emailResult = await sendMail(existingNotification.userID.email, "Teacher Approval", htmlBody);
+                const emailResult = await sendMail(existingNotification.from.email, "Teacher Approval", htmlBody);
 
                 if (!emailResult) {
                     return res.status(400).send(failure("Failed to send email."));
@@ -176,6 +177,38 @@ class TeacherController {
             return res.status(500).send(failure("Internal server error"));
         }
     }
+    // show all teacher request notification (for admin)
+    async showAllTeacherRequest(req, res) {
+        try {
+            const user = await authModel.findOne({ _id: req.user._id });
+
+            if (!user) {
+                return res.status(400).send(failure("User not found"));
+            }
+
+            if (user.role !== "admin") {
+                return res
+                    .status(400)
+                    .send(failure("You are not authorized to perform this action"));
+            }
+
+            const notifications = await notificationModel
+                .find({ type: "teacher_approval" })
+                .populate({
+                    path: "from",
+                    select: "username email",
+                })
+                .sort({ createdAt: -1 });
+
+            return res
+                .status(200)
+                .send(success("All teacher requests", notifications));
+        } catch (error) {
+            console.log("error", error);
+            return res.status(500).send(failure("Internal server error"));
+        }
+    }
+
 }
 
 module.exports = new TeacherController();

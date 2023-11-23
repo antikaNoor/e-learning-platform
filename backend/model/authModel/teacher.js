@@ -31,7 +31,7 @@ const teacherSchema = new mongoose.Schema({
             type: String,
         },
         cgpa: {
-            type: Number,
+            type: String,
         }
     }],
     teachingExperience: [{
