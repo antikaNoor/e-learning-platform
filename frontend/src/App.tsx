@@ -25,6 +25,7 @@ import StudentProfilePage from "./components/templates/StudentProfilePage";
 import SingleCourseOverviewPage from "./components/templates/SingleCourseOverviewPage";
 import CreateLessonMolecule from "./components/molecules/CreateLessonMolecule";
 import SingleCourseStudentPage from "./components/templates/SingleCourseStudentPage";
+import CreateQuizMolecule from "./components/molecules/CreateQuizMolecule";
 
 function App() {
   // const auth = useSelector((state: { auth: { username: string; email: string; _id: string; token: string } }) => state.auth);
@@ -52,6 +53,7 @@ function App() {
               <Route path="login/teacher/create-course" element={<CreateCourseMolecule />} />
               <Route path="login/teacher/teacher-profile" element={<TeacherProfilePage />} />
               <Route path="/login/teacher/teacher-profile/create-lesson/:courseId" element={<CreateLessonMolecule />} />
+              <Route path="/login/teacher/teacher-profile/create-lesson/create-quiz/:courseId" element={<CreateQuizMolecule />} />
             </Route>
             <Route element={<StudentAuthenticate />}>
               <Route path="login/student/student-profile" element={<StudentProfilePage />} />

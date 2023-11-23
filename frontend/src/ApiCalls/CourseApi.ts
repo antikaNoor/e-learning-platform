@@ -223,6 +223,28 @@ export const AddNoteApi = async (lessonID: string, data: any, token: string) => 
         })
 }
 
+// add lesson api
+export const AddQuizApi = async (courseID: string, data: any, token: string) => {
+    // Fetch data from API
+    return axiosInstance
+        .post(`/quiz/create-quiz/${courseID}`, data, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then((response) => {
+            console.log(response.data)
+            toast.success(response.data.message)
+            return response.data
+        })
+        .catch((error) => {
+            toast.error(error.response.data.message)
+            console.error("Other Error:", error);
+            throw error;
+        })
+}
+
 // export const GetCoursesApi = async ({ page, selectedSortOption, selectedOrderOption, searchQuery }: Course) => {
 //   // Fetch data from API
 //   try {

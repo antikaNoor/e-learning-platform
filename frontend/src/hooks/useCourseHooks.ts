@@ -1,193 +1,201 @@
 import {
-    GetCoursesApi, AddCourseApi,
-    AddVideoApi, AddLessonApi, GetTopicApi,
-    GetTeachersCoursesApi, GetTeachersLessonsApi,
-    AddNoteApi, GetEnrolledCoursesApi,
-    GetCompletedCoursesApi
+  GetCoursesApi,
+  AddCourseApi,
+  AddVideoApi,
+  AddLessonApi,
+  GetTopicApi,
+  GetTeachersCoursesApi,
+  GetTeachersLessonsApi,
+  AddNoteApi,
+  GetEnrolledCoursesApi,
+  GetCompletedCoursesApi,
+  AddQuizApi,
 } from "../ApiCalls/CourseApi";
-import { useCallback } from 'react';
-import { useState, useEffect, ChangeEvent } from 'react';
+import { useCallback } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 
 type Course = {
-    _id?: string;
-    title?: string;
-    description?: string;
-    teacherID?: string;
-    language?: string;
-    learingOutcome?: string;
-    requirement?: string[];
-    isApproved?: boolean;
-    isPublished?: boolean;
-    isDeleted?: boolean;
-    topicID?: string;
-    rating?: number;
-    reviews?: string[];
-    createdAt?: string;
-    updatedAt?: string;
-    lessonID?: string[];
-    thumbnail?: string;
+  _id?: string;
+  title?: string;
+  description?: string;
+  teacherID?: string;
+  language?: string;
+  learingOutcome?: string;
+  requirement?: string[];
+  isApproved?: boolean;
+  isPublished?: boolean;
+  isDeleted?: boolean;
+  topicID?: string;
+  rating?: number;
+  reviews?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+  lessonID?: string[];
+  thumbnail?: string;
 };
 
 const useCourse = () => {
+  //search
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [courses, setCourses] = useState<Course[]>([]);
 
-    //search
-    const [searchQuery, setSearchQuery] = useState<string>('');
-    const [courses, setCourses] = useState<Course[]>([]);
+  // Search query handler
+  const handleSearchQuery = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
 
+  const getTopic = async () => {
+    try {
+      const data = await GetTopicApi(); // Await the promise
+      return data;
+    } catch (error) {
+      console.error("Error fetching topics:", error);
+      // Handle the error or re-throw it if necessary
+    }
+  };
 
-    // Search query handler
-    const handleSearchQuery = (e: ChangeEvent<HTMLInputElement>) => {
-        setSearchQuery(e.target.value);
-    };
+  const addCourse = useCallback(async (data: any, token: string) => {
+    try {
+      await AddCourseApi(data, token);
+      // Optionally, update the user state or perform other actions
+    } catch (error: any) {
+      console.log(error);
+    }
+  }, []);
 
-    const getTopic = async () => {
-        try {
-            const data = await GetTopicApi(); // Await the promise
-            return data;
-        } catch (error) {
-            console.error('Error fetching topics:', error);
-            // Handle the error or re-throw it if necessary
+  const addVideo = useCallback(
+    async (lessonID: string, data: any, token: string) => {
+      try {
+        await AddVideoApi(lessonID, data, token);
+        // Optionally, update the user state or perform other actions
+      } catch (error: any) {
+        console.log(error);
+      }
+    },
+    []
+  );
+
+  const addNote = useCallback(
+    async (lessonID: string, data: any, token: string) => {
+      try {
+        await AddNoteApi(lessonID, data, token);
+        // Optionally, update the user state or perform other actions
+      } catch (error: any) {
+        console.log(error);
+      }
+    },
+    []
+  );
+
+  const addLesson = useCallback(
+    async (courseID: string, data: any, token: string) => {
+      try {
+        await AddLessonApi(courseID, data, token);
+        // Optionally, update the user state or perform other actions
+      } catch (error: any) {
+        console.log(error);
+      }
+    },
+    []
+  );
+
+  const addQuiz = useCallback(
+    async (courseID: string, data: any, token: string) => {
+      try {
+        await AddQuizApi(courseID, data, token);
+        // Optionally, update the user state or perform other actions
+      } catch (error: any) {
+        console.log(error);
+      }
+    },
+    []
+  );
+
+  const getAllCourses = async () => {
+    try {
+      const data = await GetCoursesApi(searchQuery);
+      return data;
+      // console.log("data from hook", data)
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+    }
+  };
+
+  useEffect(() => {
+    const timeOutFunc = setTimeout(() => {
+      console.log("changed");
+      getAllCourses().then((data: Course[] | void) => {
+        if (Array.isArray(data)) {
+          setCourses(data);
         }
-    };
+      });
+    }, 2000);
 
-    const addCourse = useCallback(
-        async (data: any, token: string) => {
-            try {
-                await AddCourseApi(data, token);
-                // Optionally, update the user state or perform other actions
-            } catch (error: any) {
-                console.log(error)
-            }
-        },
-        []
-    );
+    return () => clearTimeout(timeOutFunc);
+  }, [searchQuery]);
 
-    const addVideo = useCallback(
-        async (lessonID: string, data: any, token: string) => {
-            try {
-                await AddVideoApi(lessonID, data, token);
-                // Optionally, update the user state or perform other actions
-            } catch (error: any) {
-                console.log(error)
-            }
-        },
-        []
-    );
+  console.log("courses from hook", courses);
 
-    const addNote = useCallback(
-        async (lessonID: string, data: any, token: string) => {
-            try {
-                await AddNoteApi(lessonID, data, token);
-                // Optionally, update the user state or perform other actions
-            } catch (error: any) {
-                console.log(error)
-            }
-        },
-        []
-    );
+  const getEnrolledCourses = async (token: string) => {
+    try {
+      const data = await GetEnrolledCoursesApi(token);
+      console.log("data from hook", data.data);
+      return data.data;
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+    }
+  };
 
-    const addLesson = useCallback(
-        async (courseID: string, data: any, token: string) => {
-            try {
-                await AddLessonApi(courseID, data, token);
-                // Optionally, update the user state or perform other actions
-            } catch (error: any) {
-                console.log(error)
-            }
-        },
-        []
-    );
+  const getCompletedCourses = async (token: string) => {
+    try {
+      const data = await GetCompletedCoursesApi(token);
+      console.log("data from hook", data.data);
+      return data.data;
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+    }
+  };
 
-    const getAllCourses = async () => {
-        try {
-            const data = await GetCoursesApi(searchQuery);
-            return data
-            // console.log("data from hook", data)
-        } catch (error) {
-            console.error('Error fetching courses:', error);
-        }
-    };
+  const getTeachersCourse = useCallback(async (token: string) => {
+    try {
+      const response = await GetTeachersCoursesApi(token);
+      return response;
+      // Optionally, update the user state or perform other actions
+    } catch (error: any) {
+      console.log(error);
+    }
+  }, []);
 
-    useEffect(() => {
-        const timeOutFunc = setTimeout(() => {
-            console.log("changed")
-            getAllCourses().then((data: Course[] | void) => {
-                if (Array.isArray(data)) {
-                    setCourses(data);
-                }
-            })
-        }, 2000);
+  const getTeachersLesson = useCallback(async (token: string) => {
+    try {
+      const response = await GetTeachersLessonsApi(token);
+      console.log("response from hook", response.data);
+      return response.data;
+      // Optionally, update the user state or perform other actions
+    } catch (error: any) {
+      console.log(error);
+    }
+  }, []);
 
-        return () => clearTimeout(timeOutFunc);
-    }, [searchQuery]);
-
-    console.log("courses from hook", courses)
-
-    const getEnrolledCourses = async (token: string) => {
-        try {
-            const data = await GetEnrolledCoursesApi(token);
-            console.log("data from hook", data.data)
-            return data.data
-        } catch (error) {
-            console.error('Error fetching courses:', error);
-        }
-    };
-
-    const getCompletedCourses = async (token: string) => {
-        try {
-            const data = await GetCompletedCoursesApi(token);
-            console.log("data from hook", data.data)
-            return data.data
-        } catch (error) {
-            console.error('Error fetching courses:', error);
-        }
-    };
-
-    const getTeachersCourse = useCallback(
-        async (token: string) => {
-            try {
-                const response = await GetTeachersCoursesApi(token);
-                return response
-                // Optionally, update the user state or perform other actions
-            } catch (error: any) {
-                console.log(error)
-            }
-        },
-        []
-    );
-
-    const getTeachersLesson = useCallback(
-        async (token: string) => {
-            try {
-                const response = await GetTeachersLessonsApi(token);
-                console.log("response from hook", response.data)
-                return response.data
-                // Optionally, update the user state or perform other actions
-            } catch (error: any) {
-                console.log(error)
-            }
-        },
-        []
-    );
-
-    return {
-        getAllCourses,
-        getTopic,
-        addCourse,
-        getTeachersCourse,
-        getTeachersLesson,
-        addLesson,
-        addVideo,
-        addNote,
-        getEnrolledCourses,
-        getCompletedCourses,
-        handleSearchQuery,
-        searchQuery,
-        courses
-    };
+  return {
+    getAllCourses,
+    getTopic,
+    addCourse,
+    getTeachersCourse,
+    getTeachersLesson,
+    addLesson,
+    addVideo,
+    addNote,
+    getEnrolledCourses,
+    getCompletedCourses,
+    handleSearchQuery,
+    searchQuery,
+    courses,
+    addQuiz
+  };
 };
 
-export default useCourse
+export default useCourse;
 
 // // useCourseHook.tsx
 // import { useState, useEffect } from 'react';

@@ -157,12 +157,6 @@ const SideBarOrganism = (props: Props) => {
                         Create Course
                     </div>
                     <hr className='w-40'></hr>
-                    <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
-                        onClick={() => handleTabClick(4)}>
-                        <LuCopyPlus className='font-bold text-xl' />
-                        Create Lesson
-                    </div>
-                    <hr className='w-40'></hr>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'>
                         <BiPowerOff className='font-bold text-xl' />
                         <div onClick={logout}>Log out</div>
@@ -179,7 +173,6 @@ const SideBarOrganism = (props: Props) => {
                     {activeTab === 3 && <div>
                         <CreateCourseMolecule />
                     </div>}
-                    {activeTab === 4 && <>{navigate(`/login/teacher/teacher-profile/create-lesson/6559df0a57fce2e6fc969da0`)}</>}
                 </div>
             </div>
         )

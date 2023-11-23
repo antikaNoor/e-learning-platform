@@ -22,9 +22,10 @@ type FormData = {
 
 type Props = {
     onLessonRemove: () => void;
+    onLessonIdChange: (lessonId: string | undefined) => void;
 }
 
-const CreateLessonAtom = ({ onLessonRemove }: Props) => {
+const CreateLessonAtom = ({ onLessonRemove, onLessonIdChange  }: Props) => {
     const location = useLocation();
     const pathArray = location.pathname.split('/');
     const courseID = pathArray[pathArray.length - 1];
@@ -57,6 +58,7 @@ const CreateLessonAtom = ({ onLessonRemove }: Props) => {
 
     const [lessonid, setLessonid] = useState<string | undefined>(undefined);
 
+    console.log("lesson id from lesson atom:", lessonid);
     const {
         handleSubmit,
         control,
@@ -83,7 +85,10 @@ const CreateLessonAtom = ({ onLessonRemove }: Props) => {
 
         // Check if the array has at least one element before accessing the last one
         if (createdLessonResponse.length > 0) {
-            setLessonid(createdLessonResponse[createdLessonResponse.length - 1]);
+            const newLessonID = createdLessonResponse[createdLessonResponse.length - 1]
+            setLessonid(newLessonID);
+            onLessonIdChange(newLessonID);
+
             // console.log("lesson id from lesson atom:", newLessonID);
 
             // onLessonCreated(newLessonID);
