@@ -127,10 +127,43 @@ class courseApprovalController {
         }
     }
 
+    // show all course requests
+    async showAllCourseRequest(req, res) {
+        try {
+            const user = await authModel.findOne({ _id: req.user._id });
+
+            if (!user) {
+                return res.status(400).send(failure("User not found"));
+            }
+
+            if (user.role !== "admin") {
+                return res
+                    .status(400)
+                    .send(failure("You are not authorized to perform this action"));
+            }
+
+            const notifications = await notificationModel
+                .find({ type: "course_approval" })
+                .populate({
+                    path: "from",
+                    select: "username email",
+                })
+                .sort({ createdAt: -1 });
+
+            return res
+                .status(200)
+                .send(success("All course requests", notifications));
+        } catch (error) {
+            console.log("error", error);
+            return res.status(500).send(failure("Internal server error"));
+        }
+    }
+
     // accept or reject a course
     async acceptOrRejectCourse(req, res) {
         try {
-            const { notificationID, action } = req.body;
+            const { notificationID } = req.params;
+            const { action } = req.body;
 
             if (!notificationID || !action) {
                 return res.status(400).send(failure("Please provide all the fields."));
@@ -141,7 +174,7 @@ class courseApprovalController {
             const existingNotification = await notificationModel
                 .findOne({ _id: new mongoose.Types.ObjectId(notificationID) })
                 .populate({
-                    path: "userID",
+                    path: "from",
                     select: "username email",
                 });
 
@@ -163,7 +196,7 @@ class courseApprovalController {
                 return res.status(400).send(failure("This course has already been approved."));
             }
 
-            const existingTeacher = await teacherModel.findOne({ email: existingNotification.userID.email });
+            const existingTeacher = await teacherModel.findOne({ email: existingNotification.from.email });
 
             if (!existingTeacher && existingTeacher.isApproved !== true) {
                 return res.status(400).send(failure("Teacher not found"))
@@ -184,14 +217,14 @@ class courseApprovalController {
 
                 // Compose the email
                 const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/courseApprovalEmail.ejs'), {
-                    name: existingNotification.userID.username,
+                    name: existingNotification.from.username,
                     courseName: existingCourse.title,
                     isCourseApproved: isCourseApproved,
                     courseApprovalEmailURL: courseApprovalEmailURL,
                 });
 
                 // Send the email
-                const emailResult = await sendMail(existingNotification.userID.email, "Course Approval", htmlBody);
+                const emailResult = await sendMail(existingNotification.from.email, "Course Approval", htmlBody);
 
                 if (!emailResult) {
                     return res.status(400).send(failure("Failed to send email."));
@@ -205,14 +238,14 @@ class courseApprovalController {
 
                 // Compose the email
                 const htmlBody = await ejsRenderFile(path.join(__dirname, '../../views/courseApprovalEmail.ejs'), {
-                    name: existingNotification.userID.username,
+                    name: existingNotification.from.username,
                     courseName: existingCourse.title,
                     isCourseApproved: isCourseApproved,
                     courseApprovalEmailURL: courseApprovalEmailURL,
                 });
 
                 // Send the email
-                const emailResult = await sendMail(existingNotification.userID.email, "Course Approval", htmlBody);
+                const emailResult = await sendMail(existingNotification.from.email, "Course Approval", htmlBody);
 
                 if (!emailResult) {
                     return res.status(400).send(failure("Failed to send email."));

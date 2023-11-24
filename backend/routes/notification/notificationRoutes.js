@@ -12,7 +12,7 @@ const teacherInfoController = require('../../controller/notification/teacherInfo
 
 // course approval
 routes.post("/publish-course", isUserLoggedIn, isUserTeacher, CourseApprovalController.publishCourse)
-routes.post("/course-approval", isUserLoggedIn, isUserAdmin, CourseApprovalController.acceptOrRejectCourse)
+routes.post("/course-approval/:notificationID", isUserLoggedIn, isUserAdmin, CourseApprovalController.acceptOrRejectCourse)
 
 // subscription approval
 routes.post("/request-for-subscription", isUserLoggedIn, isUserStudent, SubscriptionApprovalController.requestForSubscription)
@@ -26,6 +26,7 @@ routes.post("/teacher-approval/:notificationID", isUserLoggedIn, isUserAdmin, Te
 routes.get("/show-all-subscription-request", isUserLoggedIn, isUserAdmin, SubscriptionApprovalController.showAllSubscriptionRequest)
 routes.get("/show-all-notification", isUserLoggedIn, isUserAdmin, CourseApprovalController.showAllNotification)
 routes.get("/show-teachers-notification", isUserLoggedIn, isUserTeacher, CourseApprovalController.showATeachersNotification)
+routes.get("/show-all-course-request", isUserLoggedIn, isUserAdmin, CourseApprovalController.showAllCourseRequest)
 
 routes.get("/show-all-teacher-request", isUserLoggedIn, isUserAdmin, teacherInfoController.showAllTeacherRequest)
 

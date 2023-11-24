@@ -8,7 +8,8 @@ import {
     GET_TEACHERS_COURSES,
     GET_ENROLLED_COURSES,
     GET_COMPLETED_COURSES,
-    GET_TEACHERS_LESSONS
+    GET_TEACHERS_LESSONS,
+    // GET_COURSE_ASSIGNMENT,
 } from '../utils/constants';
 // import { ALL_COURSES_URL } from "../utils/constants";
 
@@ -133,6 +134,24 @@ export const GetTeachersLessonsApi = async (token: string) => {
         })
 }
 
+export const GetAssignmentForCourseApi = async (token: string, courseID: string) => {
+    // Fetch data from API
+    return axiosInstance
+        .get(`/assignment/get-assignment/${courseID}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        })
+        .then((response) => {
+            console.log("ass data from api", response.data)
+            return response.data;
+        })
+        .catch((error) => {
+            console.error("Other Error:", error);
+            throw error;
+        })
+}
+
 // add course api
 export const AddCourseApi = async (data: any, token: string) => {
     // Fetch data from API
@@ -161,6 +180,29 @@ export const AddLessonApi = async (courseID: string, data: any, token: string) =
     // Fetch data from API
     return axiosInstance
         .post(`/lesson/create-lesson/${courseID}`, data, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then((response) => {
+            console.log(response.data)
+            toast.success(response.data.message)
+            return response.data
+        })
+        .catch((error) => {
+            // Handle other errors (network error, timeout, etc.) here.
+            toast.error(error.response.data.message)
+            console.error("Other Error:", error);
+            throw error;
+        })
+}
+
+// add assignment api
+export const AddAssignmentApi = async (courseID: string, data: any, token: string) => {
+    // Fetch data from API
+    return axiosInstance
+        .post(`/assignment/create-assignment/${courseID}`, data, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
@@ -239,6 +281,28 @@ export const AddQuizApi = async (courseID: string, data: any, token: string) => 
             return response.data
         })
         .catch((error) => {
+            toast.error(error.response.data.message)
+            console.error("Other Error:", error);
+            throw error;
+        })
+}
+
+export const AddDocToAssignmentApi = async (assignmentID: string, data: any, token: string) => {
+    // Fetch data from API
+    return axiosInstance
+        .post(`/assignment/upload-docs/${assignmentID}`, data, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data',
+            },
+        })
+        .then((response) => {
+            console.log("response from api", response.data)
+            toast.success(response.data.message)
+            return response.data
+        })
+        .catch((error) => {
+            // Handle other errors (network error, timeout, etc.) here.
             toast.error(error.response.data.message)
             console.error("Other Error:", error);
             throw error;

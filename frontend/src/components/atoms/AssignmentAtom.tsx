@@ -13,52 +13,37 @@ import AddVideoToLessonAtom from './AddVideoToLessonAtom';
 import AddNoteToLessonAtom from './AddNotesToLessonsAtom';
 import { FaPlus } from 'react-icons/fa6';
 import { FaMinus } from 'react-icons/fa6';
+import AddDocToAssignmentAtom from '../atoms/AddDocToAssignmentAtom';
 
 type FormData = {
     _id?: string;
     title?: string;
-    description?: string;
+    totalMarks?: number;
 };
 
-type Props = {
-    onLessonRemove: () => void;
-    onLessonIdChange: (lessonId: string | undefined) => void;
-}
+// type Props = {
+//     // onLessonRemove: () => void;
+//     onAssignmentIdChange: (assignmentId: string | undefined) => void;
+// }
 
-const CreateLessonAtom = ({ onLessonRemove, onLessonIdChange }: Props) => {
+const AssignmentAtom = () => {
     const location = useLocation();
     const pathArray = location.pathname.split('/');
     const courseID = pathArray[pathArray.length - 1];
 
-    const { addLesson, getTeachersLesson } = useCourse();
+    // instead of getTeacherLesson, add getCourseAssignment api
+    const { addAssignment, getAssignmentForCourse } = useCourse();
 
     const state = useSelector((state: any) => state.user);
     const checkString = state.token;
 
-    const [videoDivs, setVideoDivs] = useState<number[]>([1]);
-    const [NoteDivs, setNoteDivs] = useState<number[]>([1]);
+    // const addDivNote = () => {
+    //     setNoteDivs([...NoteDivs, NoteDivs.length + 1]);
+    // };
 
-    const addDivVideo = () => {
-        setVideoDivs([...videoDivs, videoDivs.length + 1]);
-    };
+    const [assignmentid, setAssignmentid] = useState<string | undefined>(undefined);
 
-    const removeDivVideo = (index: number) => {
-        const updatedDivs = videoDivs.filter((_, i) => i !== index);
-        setVideoDivs(updatedDivs);
-    };
-
-    const addDivNote = () => {
-        setNoteDivs([...NoteDivs, NoteDivs.length + 1]);
-    };
-
-    const removeDivNote = (index: number) => {
-        const updatedDivs = NoteDivs.filter((_, i) => i !== index);
-        setNoteDivs(updatedDivs);
-    };
-
-    const [lessonid, setLessonid] = useState<string | undefined>(undefined);
-
-    console.log("lesson id from lesson atom:", lessonid);
+    console.log("ass id from ass atom:", courseID);
     const {
         handleSubmit,
         control,
@@ -67,36 +52,33 @@ const CreateLessonAtom = ({ onLessonRemove, onLessonIdChange }: Props) => {
         mode: 'onChange',
         defaultValues: {
             title: '',
-            description: '',
+            totalMarks: '',
         },
     });
-    const onSubmit = async (data: FormData) => {
+    const onSubmit = async (data: { title: string; totalMarks: string }) => {
         const formData = new FormData();
 
         formData.append('title', data.title ?? '');
-        formData.append('description', data.description ?? '');
+        formData.append('totalMarks', String(Number(data.totalMarks ?? '')));
 
-        console.log({ ...data })
+        // console.log({ ...data })
 
-        await addLesson(courseID, formData, checkString);
+        await addAssignment(courseID, formData, checkString);
 
-        const createdLessonResponse = await getTeachersLesson(checkString);
-        console.log("createdLessonResponse", createdLessonResponse)
+        const createdAssignmentResponse = await getAssignmentForCourse(checkString, courseID);
+        console.log("createdAssignmentResponse", createdAssignmentResponse)
 
-        // Check if the array has at least one element before accessing the last one
-        if (createdLessonResponse.length > 0) {
-            const newLessonID = createdLessonResponse[createdLessonResponse.length - 1]
-            setLessonid(newLessonID);
-            onLessonIdChange(newLessonID);
-
-            // console.log("lesson id from lesson atom:", newLessonID);
-
-            // onLessonCreated(newLessonID);
+        if (createdAssignmentResponse) {
+            const newAssignmentID = createdAssignmentResponse.data._id;
+            setAssignmentid(newAssignmentID);
+            console.log("ASS ID", newAssignmentID);
+            // onAssignmentIdChange(newAssignmentID);
         } else {
             console.log("The array is empty.");
         }
-
     };
+
+    // console.log("courseID", courseID);
 
     useEffect(() => {
         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
@@ -120,7 +102,7 @@ const CreateLessonAtom = ({ onLessonRemove, onLessonIdChange }: Props) => {
 
     return (
         <div className="w-md mx-auto">
-            <FaMinus onClick={onLessonRemove} />
+            {/* <FaMinus onClick={onLessonRemove} /> */}
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div>
                     <label>Title</label>
@@ -150,29 +132,29 @@ const CreateLessonAtom = ({ onLessonRemove, onLessonIdChange }: Props) => {
                 </div>
 
                 <div>
-                    <label>Description</label>
+                    <label>Total Marks</label>
                     <Controller
-                        name="description"
+                        name="totalMarks"
                         control={control}
                         rules={{
-                            required: 'Description is required',
+                            required: 'Total marks is required',
                             maxLength: {
                                 value: 500,
                                 message: 'Maximum length must be 500',
                             },
                         }}
                         render={({ field }) => (
-                            <textarea
-                                placeholder="Enter lesson description"
+                            <input
+                                placeholder="Enter total marks"
                                 {...field}
-                                className={`w-full px-4 py-2 border rounded ${errors.description ? 'border-red-500' : ''}`}
+                                className={`w-full px-4 py-2 border rounded ${errors.totalMarks ? 'border-red-500' : ''}`}
                             />
                         )}
                     />
-                    {errors.description && <h5 className="text-red-500">{String(errors.description.message)}</h5>}
+                    {errors.totalMarks && <h5 className="text-red-500">{String(errors.totalMarks.message)}</h5>}
                 </div>
 
-                <div className="mb-4">
+                <div className="mt-4">
                     <Button
                         type="submit"
                         value="Submit"
@@ -183,16 +165,17 @@ const CreateLessonAtom = ({ onLessonRemove, onLessonIdChange }: Props) => {
                 </div>
             </form>
 
-            <FaPlus onClick={addDivVideo} />
+            {/* <FaPlus onClick={addDivVideo} />
             {videoDivs.map((_, index) => (
                 <AddVideoToLessonAtom key={index} onRemove={() => removeDivVideo(index)} lessonID={lessonid} />
-            ))}
-            <FaPlus onClick={addDivNote} />
-            {NoteDivs.map((_, index) => (
-                <AddNoteToLessonAtom key={index} onRemove={() => removeDivNote(index)} lessonID={lessonid} />
-            ))}
+            ))} */}
+            {/* <FaPlus onClick={addDivNote} /> */}
+            {/* {NoteDivs.map((_, index) => (
+                <AddDocToAssignmentAtom key={index} assignmentID={assignmentid} />
+            ))} */}
+            <AddDocToAssignmentAtom assignmentID={assignmentid} />
         </div>
     )
 }
 
-export default CreateLessonAtom
+export default AssignmentAtom

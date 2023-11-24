@@ -50,11 +50,12 @@ class QuizController {
             }
 
             // check if teacher teacher this course
-            const authorizedCourses = teacher.coursesTaught.map(courseId => courseId.toString());
+            // const authorizedCourses = teacher.coursesTaught.map(courseId => courseId.toString());
+            // console.log("authorizedCourses", courseID)
 
-            if (!authorizedCourses.includes(courseID.toString())) {
-                return res.status(400).send(failure("You are not authorized to create quiz for this course."));
-            }
+            // if (!authorizedCourses.includes(courseID.toString())) {
+            //     return res.status(400).send(failure("You are not authorized to create quiz for this course."));
+            // }
 
             // if there is a quiz against the course, throw error
             const existingQuiz = await quizModel.findOne({ courseID })

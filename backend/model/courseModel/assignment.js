@@ -10,15 +10,8 @@ const assignmentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    question: {
+    documents: {
         type: String,
-    },
-    document: {
-        type: String
-    },
-    duration: {
-        type: Number,
-        required: true
     },
     totalMarks: {
         type: Number,

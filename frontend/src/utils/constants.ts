@@ -20,6 +20,7 @@ const ADD_CATEOGRY = `/course/add-category`;
 const ADD_COURSE = `/course/create-course`;
 // const GET_ALL_COURSES = `${BASE_URL}/course/get-courses?page=${page}&limit=${limit}&sortParam=${sortParam}&sortOrder=${sortOrder}`;
 const GET_TEACHERS_COURSES = `/course/get-teachers-courses`;
+// const GET_COURSE_ASSIGNMENT = `/assignment/get-assignment/:courseID`;
 const ADD_VIDEO = `/lesson/add-video`;
 const ADD_LESSON = `/lesson/create-lesson/:courseID`;
 const GET_TEACHERS_LESSONS = `/lesson/get-teachers-lesson`;
@@ -58,6 +59,7 @@ export {
     GET_TEACHERS_COURSES,
     ADD_LESSON,
     GET_TEACHERS_LESSONS,
+    // GET_COURSE_ASSIGNMENT,
     ADD_VIDEO,
     GET_ENROLLED_COURSES,
     GET_COMPLETED_COURSES,

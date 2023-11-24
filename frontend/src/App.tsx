@@ -2,30 +2,31 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { ToastContainer } from "react-toastify";
 import './App.css'
-import LoginOrganism from "./components/templates/LoginPage";
-import SignUpOrganism from "./components/templates/SignUpPage";
-import ForgotPasswordOrganism from "./components/organisms/ForgotPasswordOrganism";
-import ResetPasswordOrganism from "./components/organisms/ResetPasswordOrganism";
+import LoginOrganism from "./components/templates/CommonPages/LoginPage";
+import SignUpOrganism from "./components/templates/CommonPages/SignUpPage";
+import ForgotPasswordOrganism from "./components/organisms/CommonOrganisms/ForgotPasswordOrganism";
+import ResetPasswordOrganism from "./components/organisms/CommonOrganisms/ResetPasswordOrganism";
 import 'react-toastify/dist/ReactToastify.css';
-import DummyPage from "./components/templates/DummyPage";
-import VerifyEmailPage from "./components/templates/VerifyEmailPage";
-import NotFoundPage from "./components/templates/NotFoundPage";
-import HomePage from "./components/templates/HomePage";
-import AboutPage from "./components/templates/AboutPage";
-import ContactPage from "./components/templates/ContactPage";
-import AllCoursesPage from "./components/templates/AllCoursesPage";
-import TeacherInfoMolecule from "./components/molecules/TeacherInfoMolecule";
-import LoginAuthenticate from "./components/templates/LoginAuthenticate";
-import CreateCourseMolecule from "./components/molecules/CreateCourseMolecule";
-import TeacherProfilePage from "./components/templates/TeacherProfilePage";
-import AdminAuthenticate from "./components/templates/AdminAuthenticate";
-import TeacherAuthenticate from "./components/templates/TeacherAuthenticate";
-import StudentAuthenticate from "./components/templates/StudentAuthenticate";
-import StudentProfilePage from "./components/templates/StudentProfilePage";
-import SingleCourseOverviewPage from "./components/templates/SingleCourseOverviewPage";
-import CreateLessonMolecule from "./components/molecules/CreateLessonMolecule";
-import SingleCourseStudentPage from "./components/templates/SingleCourseStudentPage";
-import CreateQuizMolecule from "./components/molecules/CreateQuizMolecule";
+import DummyPage from "./components/templates/CommonPages/DummyPage";
+import VerifyEmailPage from "./components/templates/CommonPages/VerifyEmailPage";
+import NotFoundPage from "./components/templates/CommonPages/NotFoundPage";
+import HomePage from "./components/templates/CommonPages/HomePage";
+import AboutPage from "./components/templates/CommonPages/AboutPage";
+import ContactPage from "./components/templates/CommonPages/ContactPage";
+import AllCoursesPage from "./components/templates/CommonPages/AllCoursesPage";
+import TeacherInfoMolecule from "./components/molecules/TeacherMolecules/TeacherInfoMolecule";
+import LoginAuthenticate from "./components/templates/CommonPages/LoginAuthenticate";
+import CreateCourseMolecule from "./components/molecules/TeacherMolecules/CreateCourseMolecule";
+import TeacherProfilePage from "./components/templates/TeacherPages/TeacherProfilePage";
+import AdminAuthenticate from "./components/templates/AdminPages/AdminAuthenticate";
+import TeacherAuthenticate from "./components/templates/TeacherPages/TeacherAuthenticate";
+import StudentAuthenticate from "./components/templates/StudentPages/StudentAuthenticate";
+import StudentProfilePage from "./components/templates/StudentPages/StudentProfilePage";
+import SingleCourseOverviewPage from "./components/templates/CommonPages/SingleCourseOverviewPage";
+import CreateLessonMolecule from "./components/molecules/TeacherMolecules/CreateLessonMolecule";
+import SingleCourseStudentPage from "./components/templates/StudentPages/SingleCourseStudentPage";
+import CreateQuizMolecule from "./components/molecules/TeacherMolecules/CreateQuizMolecule";
+import CreateAssignmentMolecule from "./components/molecules/TeacherMolecules/CreateAssignmentMolecule";
 
 function App() {
   // const auth = useSelector((state: { auth: { username: string; email: string; _id: string; token: string } }) => state.auth);
@@ -54,6 +55,7 @@ function App() {
               <Route path="login/teacher/teacher-profile" element={<TeacherProfilePage />} />
               <Route path="/login/teacher/teacher-profile/create-lesson/:courseId" element={<CreateLessonMolecule />} />
               <Route path="/login/teacher/teacher-profile/create-lesson/create-quiz/:courseId" element={<CreateQuizMolecule />} />
+              <Route path="/login/teacher/teacher-profile/create-lesson/create-quiz/create-assignment/:courseId" element={<CreateAssignmentMolecule />} />
             </Route>
             <Route element={<StudentAuthenticate />}>
               <Route path="login/student/student-profile" element={<StudentProfilePage />} />

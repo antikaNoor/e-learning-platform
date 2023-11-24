@@ -268,7 +268,7 @@ class AuthController {
             delete responseAuth.resetPasswordExpired
 
             const generatedToken = jwt.sign(responseAuth, process.env.JWT_SECRET, {
-                expiresIn: "60d"
+                expiresIn: "30d"
             })
 
             responseAuth.token = generatedToken
