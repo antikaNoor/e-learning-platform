@@ -31,6 +31,13 @@ type Course = {
     thumbnail?: string;
 };
 
+type CourseDetails={
+    courses: Course[],
+    totalRecords: number,
+    currentPage: number,
+    totalInCurrentPage: number
+}
+
 type MyToken = {
     _id: string;
     username: string;
@@ -47,7 +54,7 @@ type Props = {
     courses: Course[]
 }
 
-const CourseList = ({ courses }: Props) => {
+const CourseList = ({ courses }: CourseDetails) => {
     const navigate = useNavigate();
     // const { getAllCourses } = useCourse();
 
@@ -80,7 +87,6 @@ const CourseList = ({ courses }: Props) => {
                                         <div className='flex justify-between items-center'>
                                             <h3 className="text-xl font-bold mb-2"
                                                 onClick={() => {
-                                                    console.log("kuddus")
                                                     setSingleCourse(course)
                                                     navigate(`/single-course/${course?._id}`, { state: { singleCourse: course } });
                                                 }}>{course?.title}</h3>
@@ -128,7 +134,6 @@ const CourseList = ({ courses }: Props) => {
                 </div>
             );
         }
-
     }
     return (
         <div>
@@ -144,7 +149,7 @@ const CourseList = ({ courses }: Props) => {
                                 />
                             )}
                             <div className="p-4">
-                                <div className='flex justify-between items-center'>
+                                <div className='flex justify-between items-center cursor-pointer'>
                                     <h3 className="text-xl font-bold mb-2"
                                         onClick={() => {
                                             navigate(`/single-course/${course?._id}`, { state: { singleCourse: course } });

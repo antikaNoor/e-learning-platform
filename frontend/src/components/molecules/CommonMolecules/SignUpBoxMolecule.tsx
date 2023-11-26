@@ -205,7 +205,7 @@ const SignUpBoxMolecule = ({ className }: SignUpBoxProps) => {
 
                 <div className="text-center flex flex-col justify-center">
                     <Button type="submit" value="Sign Up" additionalStyles="bg-gray-500 hover:bg-gray-700 text-white font-bold w-full mt-4" />
-                    <p className='text-grey-700'>Already have an account? <Link to="/login">Login</Link></p>
+                    <p className='text-grey-700'>Already have an account? <Link to="/login" className='text-blue-700'>Login</Link></p>
                 </div>
             </form>
         </div>

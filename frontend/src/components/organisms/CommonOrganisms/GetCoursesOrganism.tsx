@@ -3,6 +3,7 @@ import FilterCourseMolecule from '../../molecules/CommonMolecules/FilterCourseMo
 import GetCoursesMolecule from '../../molecules/CommonMolecules/GetCoursesMolecule';
 import SearchAndDropdownMolecule from '../../molecules/CommonMolecules/SearchAndDropdownMolecule';
 import useCourse from '../../../hooks/useCourseHooks';
+import Pagination from '../../atoms/Pagination';
 
 type Course = {
     _id?: string;
@@ -31,6 +32,7 @@ const optionsData = [
 
 const GetCoursesOrganism = () => {
     const [courses, setCourses] = useState<Course[]>([]);
+    console.log("courses", courses.length);
 
     return (
         <div>
@@ -39,6 +41,7 @@ const GetCoursesOrganism = () => {
                 <FilterCourseMolecule data={optionsData} />
                 <GetCoursesMolecule courses={courses} />
             </div>
+            {/* <Pagination totalRecords={courses.length} currentPage={1} onPageChange={() => {console.log("onPageChange")}} /> */}
         </div>
     );
 };

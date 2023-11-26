@@ -6,6 +6,11 @@ const evaluationSchema = new mongoose.Schema({
         ref: "Student",
         required: true
     },
+    courseID: {
+        type: mongoose.Types.ObjectId,
+        ref: "Course",
+        required: true
+    },
     endQuizTime: {
         type: Date
     },

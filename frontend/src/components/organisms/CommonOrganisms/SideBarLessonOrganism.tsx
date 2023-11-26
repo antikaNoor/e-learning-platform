@@ -35,7 +35,11 @@ import { BsBookmarkCheck } from "react-icons/bs";
 import AdminSubscriptionRequestsMolecule from '../../molecules/AdminMolecules/AdminSubscriptionRequestsMolecule';
 import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
+import { MdOutlineQuiz } from "react-icons/md";
+import { MdOutlineAssignment } from "react-icons/md";
 import SingleCourseStudentMolecule from '../../molecules/StudentMolecules/SingleCourseStudentMolecule';
+import GetQuizMolecule from '../../molecules/StudentMolecules/GetQuizMolecule';
+import GetAssignmentMolecule from '../../molecules/StudentMolecules/GetAssignmentMolecule';
 
 type MyToken = {
     _id: string;
@@ -189,12 +193,7 @@ const SideBarLessonOrganism = (props: Props) => {
         return (
             <div className='flex pt-10 px-10 gap-20'>
                 <div className='flex flex-col gap-3 w-[19rem] p-7 rounded-lg h-[60vh] shadow-md'>
-                    <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
-                        onClick={() => handleTabClick(2)}>
-                        <LuLayoutDashboard className='font-bold text-xl' />
-                        Dashboard
-                    </div>
-                    <hr className='w-40'></hr>
+                    
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
                         onClick={() => handleTabClick(1)}>
                         <VscGraph className='font-bold text-xl' />
@@ -202,22 +201,17 @@ const SideBarLessonOrganism = (props: Props) => {
                     </div>
                     <hr className='w-40'></hr>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
+                        onClick={() => handleTabClick(2)}>
+                        <MdOutlineQuiz className='font-bold text-xl' />
+                        Attend Quiz
+                    </div>
+                    <hr className='w-40'></hr>
+                    <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
                         onClick={() => handleTabClick(3)}>
-                        <IoMdCheckmarkCircleOutline className='font-bold text-xl' />
-                        Completed Courses
+                        <MdOutlineAssignment className='font-bold text-xl' />
+                        Assignment
                     </div>
-                    <hr className='w-40'></hr>
-                    <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
-                        onClick={() => handleTabClick(4)}>
-                        <MdOutlineShoppingCart className='font-bold text-xl' />
-                        My Cart
-                    </div>
-                    <hr className='w-40'></hr>
-                    <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
-                        onClick={() => handleTabClick(5)}>
-                        <HiOutlineHeart className='font-bold text-xl' />
-                        My Wish-list
-                    </div>
+                    
                     <hr className='w-40'></hr>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'>
                         <BiPowerOff className='font-bold text-xl' />
@@ -226,20 +220,14 @@ const SideBarLessonOrganism = (props: Props) => {
                 </div>
 
                 <div className='flex flex-col justify-center items-center w-full'>
-                    {activeTab === 2 && <div>
-                        <StudentDashboardMolecule />
-                    </div>}
                     {activeTab === 1 && <div>
                         <SingleCourseStudentMolecule />
                     </div>}
+                    {activeTab === 2 && <div>
+                        <GetQuizMolecule />
+                    </div>}
                     {activeTab === 3 && <div>
-                        <StudentCompletedCoursesMolecule />
-                    </div>}
-                    {activeTab === 4 && <div>
-                        <StudentCartMolecule />
-                    </div>}
-                    {activeTab === 5 && <div>
-                        <StudentWishListMolecule />
+                        <GetAssignmentMolecule />
                     </div>}
                 </div>
             </div>

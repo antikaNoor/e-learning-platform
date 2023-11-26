@@ -157,6 +157,16 @@ class AssignmentController {
                 }
             }
 
+            if (user.role === "student") {
+                const student = await studentModel.findOne({ email: user.email });
+                if (!student) {
+                    return res.status(400).send(failure("You are not authorized to access this course."));
+                }
+                if(!student.enrolledCourses?.find(course => course._id.toString() === courseID.toString())) {
+                    return res.status(400).send(failure("You are not authorized to access this course."));
+                }
+            }
+
             const assignment = await assignmentModel.findOne({ courseID: courseID });
 
             if (!assignment) {
@@ -176,56 +186,56 @@ class AssignmentController {
     }
 
     // get quiz
-    async getQuiz(req, res) {
-        try {
-            const { courseID } = req.params;
-            const existingCourse = await courseModel.findOne({ _id: new mongoose.Types.ObjectId(courseID) });
+    // async getQuiz(req, res) {
+    //     try {
+    //         const { courseID } = req.params;
+    //         const existingCourse = await courseModel.findOne({ _id: new mongoose.Types.ObjectId(courseID) });
 
-            if (!existingCourse || existingCourse.isDeleted === true) {
-                return res.status(400).send(failure("The specified course does not exist. Please enter a valid course."));
-            }
+    //         if (!existingCourse || existingCourse.isDeleted === true) {
+    //             return res.status(400).send(failure("The specified course does not exist. Please enter a valid course."));
+    //         }
 
-            const user = req.user;
-            const quiz = await quizModel.findOne({ courseID: courseID });
+    //         const user = req.user;
+    //         const quiz = await quizModel.findOne({ courseID: courseID });
 
-            if (!quiz) {
-                return res.status(400).send(failure("Quiz not found"));
-            }
+    //         if (!quiz) {
+    //             return res.status(400).send(failure("Quiz not found"));
+    //         }
 
-            // Check if the user is a teacher and matches the courseID with coursesTaught
-            if (user.role === "teacher") {
-                const teacher = await teacherModel.findOne({ email: user.email });
-                if (!teacher || !teacher.coursesTaught.includes(courseID)) {
-                    return res.status(400).send(failure("You are not authorized to view this quiz."));
-                }
-            }
+    //         // Check if the user is a teacher and matches the courseID with coursesTaught
+    //         if (user.role === "teacher") {
+    //             const teacher = await teacherModel.findOne({ email: user.email });
+    //             if (!teacher || !teacher.coursesTaught.includes(courseID)) {
+    //                 return res.status(400).send(failure("You are not authorized to view this quiz."));
+    //             }
+    //         }
 
-            // Check if the user is a student and enrolled in the course
-            if (user.role === "student") {
-                const student = await studentModel.findOne({ email: user.email });
-                if (!student || !student.enrolledCourses.find(course => course._id.toString() === courseID.toString())) {
-                    return res.status(400).send(failure("You are not enrolled in this course."));
-                }
-            }
+    //         // Check if the user is a student and enrolled in the course
+    //         if (user.role === "student") {
+    //             const student = await studentModel.findOne({ email: user.email });
+    //             if (!student || !student.enrolledCourses.find(course => course._id.toString() === courseID.toString())) {
+    //                 return res.status(400).send(failure("You are not enrolled in this course."));
+    //             }
+    //         }
 
-            const response = quiz.toObject();
+    //         const response = quiz.toObject();
 
-            // Remove the correctOption property from each question if user is a student
-            if (user.role === "student" && response.questions && response.questions.length > 0) {
-                response.questions = response.questions.map(({ correctOption, ...rest }) => rest);
-            }
+    //         // Remove the correctOption property from each question if user is a student
+    //         if (user.role === "student" && response.questions && response.questions.length > 0) {
+    //             response.questions = response.questions.map(({ correctOption, ...rest }) => rest);
+    //         }
 
-            delete response._id;
-            delete response.__v;
-            delete response.updatedAt;
-            delete response.createdAt;
+    //         delete response._id;
+    //         delete response.__v;
+    //         delete response.updatedAt;
+    //         delete response.createdAt;
 
-            return res.status(200).send(success("Quiz fetched successfully", response));
-        } catch (error) {
-            console.error("Error", error);
-            return res.status(500).send(failure("Internal server error"));
-        }
-    }
+    //         return res.status(200).send(success("Quiz fetched successfully", response));
+    //     } catch (error) {
+    //         console.error("Error", error);
+    //         return res.status(500).send(failure("Internal server error"));
+    //     }
+    // }
 
 }
 

@@ -119,7 +119,7 @@ const LoginBoxMolecule = ({ className }: BoxProps) => {
 
                 <div className='text-center flex flex-col justify-center'>
                     <Button type="submit" value="Log in" additionalStyles="bg-gray-500 hover:bg-gray-700 text-white font-bold w-full mt-4" />
-                    <p className='text-grey-700'>Not Registered? <Link to="/" className='text-blue-700'>Sign Up</Link></p>
+                    <p className='text-grey-700'>Not Registered? <Link to="/signup" className='text-blue-700'>Sign Up</Link></p>
                 </div>
 
                 <hr />

@@ -27,6 +27,8 @@ import CreateLessonMolecule from "./components/molecules/TeacherMolecules/Create
 import SingleCourseStudentPage from "./components/templates/StudentPages/SingleCourseStudentPage";
 import CreateQuizMolecule from "./components/molecules/TeacherMolecules/CreateQuizMolecule";
 import CreateAssignmentMolecule from "./components/molecules/TeacherMolecules/CreateAssignmentMolecule";
+import SignUpPage from "./components/templates/CommonPages/SignUpPage";
+import LoginPage from "./components/templates/CommonPages/LoginPage";
 
 function App() {
   // const auth = useSelector((state: { auth: { username: string; email: string; _id: string; token: string } }) => state.auth);
@@ -36,9 +38,9 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/signup" element={<SignUpOrganism />} />
+          <Route path="/signup" element={<SignUpPage />} />
           <Route path="verify-email/:userId/:token" element={<VerifyEmailPage />} />
-          <Route path="login" element={<LoginOrganism />} />
+          <Route path="login" element={<LoginPage />} />
           <Route path="forgot-password" element={<ForgotPasswordOrganism />} />
           <Route path="reset-password/:userId/:token" element={<ResetPasswordOrganism />} />
           <Route path="*" element={<NotFoundPage />} />

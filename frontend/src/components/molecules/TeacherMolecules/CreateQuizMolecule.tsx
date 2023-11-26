@@ -65,6 +65,10 @@ const CreateQuizMolecule = (props: Props) => {
   const onSubmit = async (data: FormValues) => {
     console.log(data);
     await addQuiz(courseID, data, checkString);
+    if (isValid) {
+      // Only navigate if the form is valid
+      await navigate(`${joinedPath}/create-assignment/${courseID}`);
+    }
 
   };
 
@@ -176,10 +180,10 @@ const CreateQuizMolecule = (props: Props) => {
             type="submit"
             additionalStyles="bg-blue-500 text-white p-2 rounded mt-4"
             onClick={async () => {
-              if (isValid) {
-                // Only navigate if the form is valid
-                await navigate(`${joinedPath}/create-assignment/${courseID}`);
-              }
+              // if (isValid) {
+              //   // Only navigate if the form is valid
+              //   await navigate(`${joinedPath}/create-assignment/${courseID}`);
+              // }
             }}
           />
         </form>

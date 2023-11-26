@@ -108,7 +108,7 @@ class CourseController {
     // get all courses
     async getCourses(req, res) {
         try {
-            let { page, limit, sortParam, sortOrder, search } = req.query;
+            let { page, limit, sortParam, search } = req.query;
 
             let result = 0;
             // Total number of records in the whole collection
@@ -131,12 +131,11 @@ class CourseController {
 
             // sorting
             if (
-                (sortParam && !sortOrder) ||
-                (!sortParam && sortOrder) ||
                 (sortParam &&
-                    sortParam !== "rating" &&
-                    sortParam !== "createdAt") ||
-                (sortOrder && sortOrder !== "asc" && sortOrder !== "desc")
+                    sortParam !== "ratingAsc" &&
+                    sortParam !== "updatedAtAsc" &&
+                    sortParam !== "updatedAtDesc" &&
+                    sortParam !== "ratingDesc")
             ) {
                 return res.status(400).send(failure("Invalid sort parameters provided."));
             }
@@ -157,11 +156,12 @@ class CourseController {
                 .sort(
                     sortParam
                         ? {
-                            [sortParam]: sortOrder === "asc" ? 1 : -1,
-                        }
-                        : {
-                            _id: 1,
-                        }
+                            ratingAsc: { rating: 1 },
+                            updatedAtAsc: { updatedAt: 1 },
+                            updatedAtDesc: { updatedAt: -1 },
+                            ratingDesc: { rating: -1 },
+                        }[sortParam]
+                        : { _id: 1 }
                 )
                 .skip((page - 1) * limit)
                 .limit(limit)
@@ -177,6 +177,7 @@ class CourseController {
                     },
                 })
                 .select("-__v");
+
 
             // Check if courses are found
             if (result.length > 0) {
@@ -203,17 +204,16 @@ class CourseController {
                     };
                 });
 
-                if (result.length > 0) {
-                    const paginationResult = {
-                        courses: result,
-                        totalInCurrentPage: result.length,
-                        currentPage: parseInt(page),
-                        totalRecords: totalRecords,
-                    };
-                    return res.status(200).send(success("All courses", paginationResult));
-                }
-                return res.status(400).send(failure("No course was found"));
+                const paginationResult = {
+                    courses: result,
+                    totalInCurrentPage: result.length,
+                    currentPage: parseInt(page),
+                    totalRecords: totalRecords,
+                };
+                return res.status(200).send(success("All courses", paginationResult));
+
             }
+            return res.status(400).send(failure("No course was found"));
         } catch (error) {
             console.error("Error:", error);
             return res.status(500).send(failure("Internal server error"));

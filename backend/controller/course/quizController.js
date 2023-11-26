@@ -140,7 +140,6 @@ class QuizController {
                 response.questions = response.questions.map(({ correctOption, ...rest }) => rest);
             }
 
-            delete response._id;
             delete response.__v;
             delete response.updatedAt;
             delete response.createdAt;
@@ -193,7 +192,7 @@ class QuizController {
             const { quizID } = req.params;
             const { quizAnswer } = req.body;
 
-            if (!quizAnswer) {
+            if (!quizAnswer || !quizID) {
                 return res.status(400).send(failure("Provide a valid answer"));
             }
 
@@ -203,25 +202,30 @@ class QuizController {
                 return res.status(400).send(failure("Quiz not found"));
             }
 
-            const evaluation = await evaluationModel.findOne({ quizID: existingQuiz.quizID, studentID: req.user._id });
+            const existingCourse = await courseModel.findOne({ _id: existingQuiz.courseID });
+
+            if (!existingCourse) {
+                return res.status(400).send(failure("Course not found"));
+            }
+
+            const evaluation = await evaluationModel.findOne({ quizID: existingQuiz.quizID, studentID: req.user._id, courseID: existingQuiz.courseID });
 
             if (!evaluation) {
                 return res.status(400).send(failure("Start the countdown first."));
             }
 
             // Check if the quiz has expired
-            if (Date.now() > evaluation.endQuizTime) {
+            const endQuizTime = new Date(evaluation.endQuizTime).getTime(); // Convert ISO timestamp to Unix timestamp in milliseconds
+            console.log(new Date(endQuizTime).toLocaleString(), new Date(Date.now()).toLocaleString());
+
+            if (Date.now() > endQuizTime) {
                 return res.status(400).send(failure("Quiz expired. You cannot attempt it again."));
             }
 
             const correctAnsArray = existingQuiz.questions.map(question => question.correctOption);
 
             if (evaluation.isPassedInQuiz) {
-                return res.status(200).send(success("You have already passed this quiz. You cannot attempt it again.", {
-                    score: evaluation.quizScore,
-                    answer: evaluation.quizAnswer,
-                    correctAns: correctAnsArray
-                }));
+                return res.status(400).send(failure("You have already passed this quiz. You cannot attempt it again."));
             }
 
             // Calculate student's mark and update evaluation model
@@ -236,6 +240,22 @@ class QuizController {
 
             await evaluation.save();
 
+            // If the student has not passed and has chances left
+            if (evaluation.chance < 1) {
+                evaluation.chance++;
+                await evaluation.save();
+                return res.status(400).send(failure("You have not passed. You have one more chance to attend the quiz.", {
+                    score
+                }));
+            }
+
+            // If the student has not passed and has no more chances left
+            // evaluation.isPassedInQuiz = false;
+            // await evaluation.save();
+            // return res.status(400).send(failure("You have not passed. Your chances are gone.", {
+            //     score
+            // }));
+
             // Check if the student has passed
             if (score >= existingQuiz.passMarks) {
                 evaluation.isPassedInQuiz = true;
@@ -244,22 +264,6 @@ class QuizController {
                     score
                 }));
             }
-
-            // If the student has not passed and has chances left
-            if (evaluation.chance < 1) {
-                evaluation.chance++;
-                await evaluation.save();
-                return res.status(200).send(success("You have not passed. You have one more chance to attend the quiz.", {
-                    score
-                }));
-            }
-
-            // If the student has not passed and has no more chances left
-            evaluation.isPassedInQuiz = false;
-            await evaluation.save();
-            return res.status(200).send(failure("You have not passed. Your chances are gone.", {
-                score
-            }));
 
         } catch (error) {
             console.error("Error", error);

@@ -73,6 +73,8 @@ const ReviewMolecule = () => {
     fetchReviewData();
   }, [checkString, singleCourse._id]);
 
+  console.log("singleCourse", singleCourse.reviews);
+
   useEffect(() => {
     // Filter out user's review from all reviews
     const filteredReviews =

@@ -31,6 +31,7 @@ class courseApprovalController {
     async publishCourse(req, res) {
         try {
             const { courseID } = req.body
+            console.log("courseID", courseID)
 
             const existingCourse = await courseModel.findOne({ _id: new mongoose.Types.ObjectId(courseID) })
             if (!existingCourse || existingCourse.isDeleted === true) {
@@ -113,7 +114,7 @@ class courseApprovalController {
                     .send(failure("You are not authorized to perform this action"))
             }
 
-            const notifications = await notificationModel.find({ type: "course_subscribed" })
+            const notifications = await notificationModel.find({ type: "course_subscribed", to: user._id })
                 .populate({
                     path: "from",
                     select: "username email",

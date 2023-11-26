@@ -77,7 +77,7 @@ const SideBarOrganism = (props: Props) => {
     if (decodedToken.role === "admin") {
         return (
             <div className='flex pt-10 px-10 gap-20'>
-                <div className='flex flex-col gap-3 w-[18rem] p-7 rounded-lg h-[60vh] shadow-md'>
+                <div className='flex flex-col gap-3 w-[18rem] p-7 rounded-lg h-[60vh] shadow-md sticky top-[100px]'>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
                         onClick={() => handleTabClick(1)}>
                         <LuLayoutDashboard className='font-bold text-xl' />
@@ -138,7 +138,7 @@ const SideBarOrganism = (props: Props) => {
     if (decodedToken.role === "teacher") {
         return (
             <div className='flex pt-10 px-10 gap-20'>
-                <div className='flex flex-col gap-3 w-[13rem] p-7 rounded-lg h-[60vh] shadow-md'>
+                <div className='flex flex-col gap-3 w-[13rem] p-7 rounded-lg h-[60vh] shadow-md sticky top-[100px]'>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
                         onClick={() => handleTabClick(1)}>
                         <LuLayoutDashboard className='font-bold text-xl' />
@@ -181,7 +181,7 @@ const SideBarOrganism = (props: Props) => {
     if (decodedToken.role === "student") {
         return (
             <div className='flex pt-10 px-10 gap-20'>
-                <div className='flex flex-col gap-3 w-[19rem] p-7 rounded-lg h-[60vh] shadow-md'>
+                <div className='flex flex-col gap-3 w-[19rem] p-7 rounded-lg h-[60vh] shadow-md sticky top-[100px]'>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
                         onClick={() => handleTabClick(1)}>
                         <LuLayoutDashboard className='font-bold text-xl' />

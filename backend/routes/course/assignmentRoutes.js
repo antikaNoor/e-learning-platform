@@ -9,7 +9,7 @@ const { isUserLoggedIn,
 
 routes.post("/create-assignment/:courseID", isUserLoggedIn, isUserTeacher, AssignmentController.createAssignment)
 routes.post("/upload-docs/:assignmentID", isUserLoggedIn, isUserTeacher, upload.single('documents'), AssignmentController.addDocs)
-routes.get("/get-assignment/:courseID", isUserLoggedIn, isUserTeacher, AssignmentController.getAssignmentForCourse)
+routes.get("/get-assignment/:courseID", isUserLoggedIn, AssignmentController.getAssignmentForCourse)
 
 
 module.exports = routes 

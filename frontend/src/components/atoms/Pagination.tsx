@@ -1,14 +1,12 @@
-// Pagination.tsx
-import React from 'react';
-
-interface PaginationProps {
+type PaginationProps = {
   currentPage: number;
   totalRecords: number;
   onPageChange: (page: number) => void;
 }
 
-const Pagination: React.FC<PaginationProps> = ({ currentPage, totalRecords, onPageChange }) => {
-  const totalPages = Math.ceil(totalRecords / 10); // Assuming 10 records per page
+const Pagination = ({ currentPage, totalRecords, onPageChange }: PaginationProps) => {
+  const totalPages = Math.ceil(totalRecords / 2);
+  console.log(totalPages, totalRecords)
 
   return (
     <div className="flex items-center justify-center space-x-2">

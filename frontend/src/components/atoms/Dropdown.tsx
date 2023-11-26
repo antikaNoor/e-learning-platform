@@ -11,12 +11,11 @@ const Dropdown = ({ title, options, selectedOption, onChange }: DropdownProps) =
 
     return (
         <div>
-            <label>{title}</label>
+            <label className="mr-2">{title}</label>
             <select
                 value={selectedOption}
                 onChange={onChange}
-                className="w-[120px] p-2 border border-gray-300 rounded"
-            >
+                className="w-[217px] p-2 border border-gray-300 rounded focus:outline-none">
                 {updatedOptions.map((option) => (
                     <option key={option.value} value={option.value} className="w-[120px]">
                         {option.label}

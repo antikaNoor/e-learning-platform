@@ -70,7 +70,6 @@ const StudentEnrolledCoursesMolecule = () => {
                                 <div className='flex gap-3'>
                                     <IoPlayCircleOutline size={30} className="text-green-600 cursor-pointer"
                                         onClick={() => {
-                                            console.log("kuddus")
                                             setSingleCourse(course)
                                             navigate(`single-course-student/${course?._id}`, { state: { singleCourse: course } });
                                         }} />

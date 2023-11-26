@@ -201,7 +201,6 @@ const StudentCompletedCoursesMolecule = () => {
                                                                         edit={true}
                                                                         activeColor="#FFD700"
                                                                         color="#A0A0A0"
-                                                                        isHalf={true}
                                                                         className="rounded-full"
                                                                         onChange={(value: number) => {
                                                                             field.onChange(value);
