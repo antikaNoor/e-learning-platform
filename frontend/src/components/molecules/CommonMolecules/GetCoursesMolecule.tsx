@@ -31,7 +31,7 @@ type Course = {
     thumbnail?: string;
 };
 
-type CourseDetails={
+type CourseDetails = {
     courses: Course[],
     totalRecords: number,
     currentPage: number,

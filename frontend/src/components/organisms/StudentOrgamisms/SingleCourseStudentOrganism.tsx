@@ -1,5 +1,5 @@
 import React from 'react'
-// import StudentEnrolledCoursesMolecule from '../molecules/StudentMolecules/StudentEnrolledCoursesMolecule'
+import StudentEnrolledCoursesMolecule from '../../molecules/StudentMolecules/StudentEnrolledCoursesMolecule'
 import SingleCourseStudentMolecule from '../../molecules/StudentMolecules/SingleCourseStudentMolecule'
 
 type Props = {}

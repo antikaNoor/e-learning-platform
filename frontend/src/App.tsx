@@ -29,6 +29,7 @@ import CreateQuizMolecule from "./components/molecules/TeacherMolecules/CreateQu
 import CreateAssignmentMolecule from "./components/molecules/TeacherMolecules/CreateAssignmentMolecule";
 import SignUpPage from "./components/templates/CommonPages/SignUpPage";
 import LoginPage from "./components/templates/CommonPages/LoginPage";
+import CreateLessonOrganism from "./components/organisms/TeacherOrganisms/CreateLessonOrganism";
 
 function App() {
   // const auth = useSelector((state: { auth: { username: string; email: string; _id: string; token: string } }) => state.auth);

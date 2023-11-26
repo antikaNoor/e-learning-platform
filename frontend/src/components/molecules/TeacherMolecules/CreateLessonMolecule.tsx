@@ -1,13 +1,14 @@
-import React from "react";
+// import React from "react";
 import CreateLessonAtom from "../../atoms/CreateLessonAtom";
 import AddVideoToLessonAtom from "../../atoms/AddVideoToLessonAtom";
 import AddNotesToLessonsAtom from "../../atoms/AddNotesToLessonsAtom";
-import { FiPlusCircle } from "react-icons/fi";
-import { FiMinusCircle } from "react-icons/fi";
+// import { FiPlusCircle } from "react-icons/fi";
+// import { FiMinusCircle } from "react-icons/fi";
 import { useState } from "react";
-import { FaPlus } from "react-icons/fa6";
+import { FaPlus } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 import Button from "../../atoms/Button";
+import NavBarOrganism from "../../organisms/CommonOrganisms/NavBarOrganism";
 
 const CreateLessonMolecule = () => {
   const [lessonDivs, setLessonDivs] = useState<number[]>([1]);
@@ -37,7 +38,7 @@ const CreateLessonMolecule = () => {
     // Update the lessonId in the state
     setLessonIds((prevIds) => {
       const newIds = [...prevIds];
-      newIds[index] = lessonId || ''; // Ensure it's not undefined
+      newIds[index] = lessonId || '';
       return newIds;
     });
   };

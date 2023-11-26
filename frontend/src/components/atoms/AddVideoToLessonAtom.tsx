@@ -10,6 +10,9 @@ import { useNavigate } from 'react-router-dom';
 import { IoCloudUpload } from "react-icons/io5";
 import { toast } from 'react-toastify';
 import { FaMinus } from 'react-icons/fa6';
+import Modal from 'react-modal';
+import { CgCloseR } from "react-icons/cg";
+import ReacordVideoAtom from './ReacordVideoAtom';
 
 type FormData = {
     _id?: string;
@@ -26,10 +29,28 @@ const AddVideoToLessonAtom = ({ lessonID, onRemove }: LessonID) => {
 
     const { addVideo } = useCourse();
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // Function to open the modal
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
+
+    // Function to close the modal
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
     const state = useSelector((state: any) => state.user);
     const checkString = state.token;
 
     console.log("lessonid from video atom", lessonID);
+
+    const [recordedFile, setRecordedFile] = useState<{ videoTitle: string; videoLink: File } | null>(null);
+
+    const handleRecordingComplete = (recordedData: { videoTitle: string; videoLink: File }) => {
+        setRecordedFile(recordedData);
+    };
 
     const {
         handleSubmit,
@@ -68,13 +89,6 @@ const AddVideoToLessonAtom = ({ lessonID, onRemove }: LessonID) => {
         else {
             toast.error("Please submit the lesson first")
         }
-
-        // const createdCourseResponse = await getTeachersCourse(checkString);
-        // get the last item of the array
-        // const newCourseId = createdCourseResponse.data[createdCourseResponse.data.length - 1]._id;
-
-        // Add the ID after the link in navigate
-        // navigate(`create-lesson/${newCourseId}`);
 
     };
 
@@ -121,6 +135,35 @@ const AddVideoToLessonAtom = ({ lessonID, onRemove }: LessonID) => {
                             <p>Drag 'n' drop some files here, or click to select files</p>
                     }
                 </div>
+                <div
+                    onClick={async () => {
+                        openModal()
+                    }}
+                    className='text-lg text-blue-500 font-semibold cursor-pointer'>Or record a video</div>
+                <Modal
+                    isOpen={isModalOpen}
+                    onRequestClose={closeModal}
+                    ariaHideApp={false}
+                    contentLabel="Example Modal"
+                    style={{
+                        overlay: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        },
+                        content: {
+                            position: 'absolute',
+                            top: '0',
+                            bottom: '0',
+                            width: '80%',
+                            height: '95%',
+                            margin: 'auto',
+                            borderRadius: '10px',
+                            overflow: 'auto',
+
+                        },
+                    }}>
+                    <ReacordVideoAtom lessonID={lessonID} onRecordingComplete={handleRecordingComplete} />
+                    <CgCloseR className='text-2xl absolute top-3 right-3 text-gray-700 cursor-pointer' onClick={closeModal} />
+                </Modal>
 
                 <div className="mb-4">
                     <Button

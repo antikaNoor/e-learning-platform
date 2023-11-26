@@ -6,7 +6,8 @@ const { isUserLoggedIn,
     isUserStudent,
     isUserTeacher } = require('../../middleware/auth')
 
-routes.post("/create-question", isUserLoggedIn, isUserStudent, ForumController.postQuestion)
-routes.post("/post-answer", isUserLoggedIn, ForumController.postAnswer)
+routes.post("/create-question/:courseID", isUserLoggedIn, isUserStudent, ForumController.postQuestion)
+routes.post("/post-answer/:forumID", isUserLoggedIn, ForumController.postAnswer)
+routes.get("/get-forum/:courseID", ForumController.getForumForCourse)
 
 module.exports = routes 

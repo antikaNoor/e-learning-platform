@@ -11,8 +11,8 @@ import { useParams } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import AddVideoToLessonAtom from './AddVideoToLessonAtom';
 import AddNoteToLessonAtom from './AddNotesToLessonsAtom';
-import { FaPlus } from 'react-icons/fa6';
-import { FaMinus } from 'react-icons/fa6';
+import { FaPlus } from 'react-icons/fa';
+import { FaMinus } from 'react-icons/fa';
 
 type FormData = {
     _id?: string;

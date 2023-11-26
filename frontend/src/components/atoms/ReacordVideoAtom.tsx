@@ -1,10 +1,17 @@
-//@ts-nocheck
-import React from "react";
-import { useRecordWebcam } from "react-record-webcam";
-import "../../../App.css";
-import { BsBroadcast } from "react-icons/bs";
+// @ts-nocheck
+import React, { useState, useEffect } from 'react';
+import { useRecordWebcam, Recording } from 'react-record-webcam';
+import { BsBroadcast } from 'react-icons/bs';
+import { useForm, Controller } from 'react-hook-form';
+import useCourse from '../../hooks/useCourseHooks';
+import { useSelector } from 'react-redux';
 
-const Dummy = () => {
+type LessonID = {
+    lessonID?: string;
+    onRecordingComplete: (recordedData: { videoTitle: string; videoLink: File }) => void;
+};
+
+const ReacordVideoAtom: React.FC<LessonID> = ({ lessonID, onRecordingComplete }) => {
     const {
         activeRecordings,
         cancelRecording,
@@ -22,8 +29,15 @@ const Dummy = () => {
         stopRecording,
     } = useRecordWebcam();
 
-    const [videoDeviceId, setVideoDeviceId] = React.useState<string>("");
-    const [audioDeviceId, setAudioDeviceId] = React.useState<string>("");
+    const { addVideo } = useCourse();
+
+    const [videoDeviceId, setVideoDeviceId] = useState<string>('');
+    const [audioDeviceId, setAudioDeviceId] = useState<string>('');
+    const [stoped, setStoped] = useState(false);
+    const [recordedFiles, setRecordedFiles] = useState([]);
+
+    const state = useSelector((state: any) => state.user);
+    const checkString = state.token;
 
     const handleSelect = async (event: any) => {
         const { deviceid: deviceId } =
@@ -41,6 +55,36 @@ const Dummy = () => {
         if (recording) await openCamera(recording.id);
     };
 
+    const stop = async () => {
+        if (activeRecordings.length > 0) {
+            const recording = activeRecordings[0];
+            const chunks = [];
+            const mimeType = recording.mimeType;
+            recording.recorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    chunks.push(event.data);
+                }
+            };
+            recording.recorder.onstop = () => {
+                const blob = new Blob(chunks, { type: mimeType });
+                const file = new File([blob], `${recording.fileName}.${recording.fileType}`, {
+                    type: mimeType,
+                });
+
+                const recordedData = {
+                    videoTitle: `${recording.fileName}`,
+                    videoLink: file,
+                };
+
+                onRecordingComplete(recordedData);
+                setRecordedFiles([file]);
+                setStoped((prev) => !prev);
+                cancelRecording(recording.id);
+            };
+            recording.recorder.stop();
+        }
+    }
+
     const handlePreview = async (recordingId) => {
         const recording = activeRecordings.find((rec) => rec.id === recordingId);
         if (recording) {
@@ -50,6 +94,40 @@ const Dummy = () => {
             console.log("videoUrl", videoURL);
         }
     };
+
+    // console.log("recordings", recordedFiles);
+
+    const {
+        handleSubmit,
+        control,
+        formState: { errors },
+    } = useForm({
+        mode: 'onChange',
+        defaultValues: {
+            videoTitle: '',
+            videoLink: [] as unknown as FileList,
+        },
+    });
+
+    console.log("lessonid from video atom", lessonID);
+
+    const handleAddVideoApi = async () => {
+        const formData = new FormData();
+        formData.append("videoTitle", recordedFiles[0].name);
+        formData.append("videoLink", recordedFiles[0]);
+        if (lessonID) {
+            await addVideo(lessonID, formData, checkString);
+        }
+        else {
+            toast.error("Please submit the lesson first")
+        }
+    }
+
+    useEffect(() => {
+        //api call
+        handleAddVideoApi()
+    }, [lessonID, checkString]);
+
 
     return (
         <div>
@@ -133,7 +211,7 @@ const Dummy = () => {
 
                             <button
                                 disabled={recording.status !== "RECORDING"}
-                                onClick={() => stopRecording(recording.id)}
+                                onClick={() => stop()}
                                 className="bg-gray-300 text-gray-800 p-1 rounded"
                             >
                                 Stop
@@ -163,4 +241,4 @@ const Dummy = () => {
     );
 };
 
-export default Dummy;
+export default ReacordVideoAtom;

@@ -136,6 +136,7 @@ class LessonController {
 
             // push the video inside the videos array
             const uploadRes = await uploadFile(videoLink, "videos")
+            console.log("uploadRes", uploadRes)
 
             if (!uploadRes) {
                 return res.status(400).send(failure("Error uploading video."))

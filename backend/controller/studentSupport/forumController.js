@@ -3,7 +3,6 @@ const authModel = require("../../model/authModel/auth")
 const forumModel = require("../../model/studentSupport/forum")
 const studentModel = require("../../model/authModel/student")
 const teacherModel = require("../../model/authModel/teacher")
-
 const { success, failure } = require("../../utils/successError")
 const express = require('express')
 const mongoose = require("mongoose")
@@ -27,7 +26,8 @@ class ForumController {
     // post a question
     async postQuestion(req, res) {
         try {
-            const { courseID, question } = req.body
+            const { courseID } = req.params
+            const { question } = req.body
             if (!courseID || !question) {
                 return res.status(400).send(failure("Please fill all the fields."))
             }
@@ -63,7 +63,7 @@ class ForumController {
 
             await forum.save();
 
-            return res.status(200).send(success("Question posted successfully"))
+            return res.status(200).send(success("Question posted successfully", forum));
         } catch (error) {
             console.log("error", error)
             return res.status(500).send(failure("Internal server error"))
@@ -73,7 +73,8 @@ class ForumController {
     // post answer to a specific question
     async postAnswer(req, res) {
         try {
-            const { forumID, answer } = req.body
+            const { forumID } = req.params
+            const { answer } = req.body
             if (!forumID || !answer) {
                 return res.status(400).send(failure("Please fill all the fields."))
             }
@@ -133,6 +134,33 @@ class ForumController {
             return res.status(500).send(failure("Internal server error"))
         }
     }
+
+    // Assuming you have the User and Question models defined as shown in the previous example
+
+    async getForumForCourse(req, res) {
+        try {
+            const { courseID } = req.params;
+
+            if (!courseID) {
+                return res.status(400).send(failure("Please enter a valid course id."));
+            }
+
+            const forum = await forumModel.find({ courseID: courseID })
+                .populate('userWithQuestion', '_id email username')
+                .populate('answers.userWithAnswer', '_id email username')
+                .exec();
+
+            if (!forum) {
+                return res.status(400).send(failure("Forum not found"));
+            }
+
+            return res.status(200).send(success("Forum found successfully", forum));
+        } catch (error) {
+            console.log("error", error);
+            return res.status(500).send(failure("Internal server error"));
+        }
+    }
+
 }
 
 module.exports = new ForumController()
