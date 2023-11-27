@@ -1,4 +1,3 @@
-// import React from "react";
 import CreateLessonAtom from "../../atoms/CreateLessonAtom";
 import AddVideoToLessonAtom from "../../atoms/AddVideoToLessonAtom";
 import AddNotesToLessonsAtom from "../../atoms/AddNotesToLessonsAtom";
@@ -43,27 +42,36 @@ const CreateLessonMolecule = () => {
     });
   };
 
-  //   console.log("lesson id from lesson molecule:", lessonIds);
-
   return (
     <div>
-      {/* this is the child now */}
-      <FaPlus onClick={addDivLesson} />
-      {lessonDivs.map((_, index) => (
-        <CreateLessonAtom
-          key={index}
-          onLessonRemove={() => removeDivLesson(index)}
-          onLessonIdChange={(lessonId) => handleLessonIdChange(lessonId, index)}
-        />
+      <NavBarOrganism />
+      <div className="flex flex-col mt-10 justify-center items-center">
+        {/* this is the child now */}
+        <div className="flex gap-3">
+          <h1 className="text-3xl font-bold">Create Lesson</h1>
+          <FaPlus onClick={addDivLesson} className="bg-green-500 text-white rounded-full p-3 w-9 h-9 cursor-pointer" />
+        </div>
+        <div>
+          {lessonDivs.map((_, index) => (
+            <div className="mb-10">
+              <CreateLessonAtom
+                key={index}
+                onLessonRemove={() => removeDivLesson(index)}
+                onLessonIdChange={(lessonId) => handleLessonIdChange(lessonId, index)}
+              />
+            </div>
 
-      ))}
-      {lessonIds.length > 0 ? (
-        <Button
-          value="Add Quiz"
-          type="submit"
-          onClick={() => navigate(`${joinedPath}/create-quiz/${courseID}`)}
-        />
-      ) : null}
+          ))}
+          {lessonIds.length > 0 ? (
+            <Button
+              value="Add Quiz"
+              type="submit"
+              onClick={() => navigate(`${joinedPath}/create-quiz/${courseID}`)}
+            />
+          ) : null}
+        </div>
+
+      </div>
     </div>
   );
 };

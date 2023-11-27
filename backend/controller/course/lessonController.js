@@ -136,14 +136,14 @@ class LessonController {
 
             // push the video inside the videos array
             const uploadRes = await uploadFile(videoLink, "videos")
-            console.log("uploadRes", uploadRes)
+            console.log("uploadRes", (uploadRes))
 
             if (!uploadRes) {
                 return res.status(400).send(failure("Error uploading video."))
             }
 
             // push the title and link to videos
-            existingLesson.videos.push({
+            await existingLesson.videos.push({
                 videoTitle: videoTitle,
                 videoLink: uploadRes
             })
@@ -216,49 +216,53 @@ class LessonController {
     // complete a lesson
     async completeLesson(req, res) {
         try {
-            const { lessonID } = req.params
+            const { lessonID } = req.params;
 
             if (!lessonID) {
-                return res.status(400).send(failure("Please enter the lesson."))
+                return res.status(400).send(failure("Please enter the lesson."));
             }
 
-            const existingLesson = await lessonModel.findOne({ _id: new mongoose.Types.ObjectId(lessonID) })
+            const existingLesson = await lessonModel.findOne({ _id: new mongoose.Types.ObjectId(lessonID) });
 
             if (!existingLesson) {
-                return res.status(400).send(failure("The specified lesson does not exist. Please enter a valid lesson."))
+                return res.status(400).send(failure("The specified lesson does not exist. Please enter a valid lesson."));
             }
 
-            const existingStudent = await studentModel.findOne({ email: req.user.email })
+            const existingStudent = await studentModel.findOne({ email: req.user.email });
 
             if (!existingStudent) {
-                return res.status(400).send(failure("User not found"))
+                return res.status(400).send(failure("User not found"));
             }
 
-            const course = await courseModel.findOne({ _id: new mongoose.Types.ObjectId(existingLesson.courseID) })
+            const course = await courseModel.findOne({ _id: new mongoose.Types.ObjectId(existingLesson.courseID) });
 
             if (!course) {
-                return res.status(400).send(failure("Course not found"))
+                return res.status(400).send(failure("Course not found"));
             }
 
-            // check if student is enrolled in this course
+            // Check if student is enrolled in this course
+            if (!existingStudent.enrolledCourses || !existingStudent.enrolledCourses.length) {
+                return res.status(400).send(failure("You are not enrolled in any courses."));
+            }
+
             const authorizedCourses = existingStudent.enrolledCourses.map(courseId => courseId.toString());
 
             if (!authorizedCourses.includes(existingLesson.courseID.toString())) {
-                return res.status(400).send(failure("You are not authorized to complete this lesson."))
+                return res.status(400).send(failure("You are not authorized to complete this lesson."));
             }
 
-            // existingStudent.completedLessons.push(existingLesson._id)
-            // await existingStudent.save()
-
-            const existingProgress = await progressModel.findOne({ studentID: new mongoose.Types.ObjectId(req.user._id), courseID: new mongoose.Types.ObjectId(existingLesson.courseID) })
+            const existingProgress = await progressModel.findOne({ studentID: new mongoose.Types.ObjectId(req.user._id), courseID: new mongoose.Types.ObjectId(existingLesson.courseID) });
 
             if (!existingProgress) {
-                return res.status(400).send(failure("Progress not found"))
+                return res.status(400).send(failure("Progress not found"));
             }
 
-            // if lesson is found in the completedLessons array, return
+            // If completedLessons array is empty, initialize it
+            existingProgress.completedLessons = existingProgress.completedLessons || [];
+
+            // If lesson is found in the completedLessons array, return
             if (existingProgress.completedLessons.includes(existingLesson._id)) {
-                return res.status(400).send(failure("Lesson already completed"))
+                return res.status(400).send(failure("Lesson already completed"));
             }
 
             // get the array length of completed lessonID in student model
@@ -276,8 +280,6 @@ class LessonController {
             if (progress === 100) {
                 existingStudent.completedCourses.push(existingLesson.courseID)
                 await existingStudent.save()
-                existingStudent.enrolledCourses.pull(existingLesson.courseID)
-                await existingStudent.save()
             }
 
             existingProgress.percentage = progress
@@ -289,6 +291,40 @@ class LessonController {
             return res.status(500).send(failure("Internal server error"))
         }
     }
+
+    // track progress
+    async trackProgress(req, res) {
+        try {
+            const { courseID } = req.params;
+
+            if (!courseID) {
+                return res.status(400).send(failure("Please enter the course ID."));
+            }
+
+            const existingCourse = await courseModel.findOne({ _id: new mongoose.Types.ObjectId(courseID) });
+
+            if (!existingCourse || existingCourse.isDeleted === true) {
+                return res.status(400).send(failure("The specified course does not exist. Please enter a valid course."));
+            }
+
+            const progress = await progressModel
+                .findOne({ studentID: req.user._id, courseID: courseID })
+                .populate('completedLessons'); // Add this line to populate lessons
+
+            if (!progress) {
+                return res.status(400).send(failure("Progress not found"));
+            }
+
+            const response = progress.toObject();
+            delete response.__v;
+
+            return res.status(200).send(success("Progress tracked successfully", response));
+        } catch (error) {
+            console.log("error", error);
+            return res.status(500).send(failure("Internal server error"));
+        }
+    }
+
 
     // delete a video
     async deleteVideo(req, res) {

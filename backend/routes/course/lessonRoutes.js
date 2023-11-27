@@ -15,5 +15,6 @@ routes.post("/add-note/:lessonID", isUserLoggedIn, isUserTeacher, upload.single(
 routes.delete("/delete-lesson/:lessonID", isUserLoggedIn, isUserTeacher, LessonController.deleteLesson)
 routes.get("/complete-lesson/:lessonID", isUserLoggedIn, isUserStudent, LessonController.completeLesson)
 routes.get("/get-teachers-lesson", isUserLoggedIn, isUserTeacher, LessonController.getTeacherLessons)
+routes.get("/get-progress/:courseID", isUserLoggedIn, isUserStudent, LessonController.trackProgress)
 
 module.exports = routes 

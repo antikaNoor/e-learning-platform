@@ -88,10 +88,6 @@ const CreateLessonAtom = ({ onLessonRemove, onLessonIdChange }: Props) => {
             const newLessonID = createdLessonResponse[createdLessonResponse.length - 1]
             setLessonid(newLessonID);
             onLessonIdChange(newLessonID);
-
-            // console.log("lesson id from lesson atom:", newLessonID);
-
-            // onLessonCreated(newLessonID);
         } else {
             console.log("The array is empty.");
         }
@@ -119,10 +115,11 @@ const CreateLessonAtom = ({ onLessonRemove, onLessonIdChange }: Props) => {
     }, []);
 
     return (
-        <div className="w-md mx-auto">
-            <FaMinus onClick={onLessonRemove} />
+        <div className='flex flex-col gap-2 items-center shadow-lg w-[800px] rounded p-3 mx-auto'>
+            <FaMinus onClick={onLessonRemove}
+                className="bg-red-500 text-white rounded-full p-3 w-9 h-9 cursor-pointer" />
             <form onSubmit={handleSubmit(onSubmit)}>
-                <div>
+                <div className='flex flex-col w-[700px]'>
                     <label>Title</label>
                     <Controller
                         name="title"
@@ -142,7 +139,7 @@ const CreateLessonAtom = ({ onLessonRemove, onLessonIdChange }: Props) => {
                             <input
                                 placeholder="Enter lesson title"
                                 {...field}
-                                className={`w-full px-4 py-2 border rounded ${errors.title ? 'border-red-500' : ''}`}
+                                className={`w-full px-4 py-2 bg-gray-200 rounded ${errors.title ? 'border-red-500' : ''}`}
                             />
                         )}
                     />
@@ -165,7 +162,7 @@ const CreateLessonAtom = ({ onLessonRemove, onLessonIdChange }: Props) => {
                             <textarea
                                 placeholder="Enter lesson description"
                                 {...field}
-                                className={`w-full px-4 py-2 border rounded ${errors.description ? 'border-red-500' : ''}`}
+                                className={`w-full px-4 py-2 bg-gray-200 rounded ${errors.description ? 'border-red-500' : ''}`}
                             />
                         )}
                     />
@@ -183,11 +180,15 @@ const CreateLessonAtom = ({ onLessonRemove, onLessonIdChange }: Props) => {
                 </div>
             </form>
 
-            <FaPlus onClick={addDivVideo} />
+            <FaPlus onClick={addDivVideo}
+                className="bg-green-500 text-white rounded p-1 w-6 h-6 cursor-pointer" />
+            Add another video
             {videoDivs.map((_, index) => (
                 <AddVideoToLessonAtom key={index} onRemove={() => removeDivVideo(index)} lessonID={lessonid} />
             ))}
-            <FaPlus onClick={addDivNote} />
+            <FaPlus onClick={addDivNote}
+                className="bg-green-500 text-white rounded p-1 w-6 h-6 cursor-pointer" />
+            Add another note
             {NoteDivs.map((_, index) => (
                 <AddNoteToLessonAtom key={index} onRemove={() => removeDivNote(index)} lessonID={lessonid} />
             ))}

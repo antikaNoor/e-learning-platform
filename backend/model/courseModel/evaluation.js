@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const evaluationSchema = new mongoose.Schema({
     studentID: {
         type: mongoose.Types.ObjectId,
-        ref: "Student",
+        ref: "Auth",
         required: true
     },
     courseID: {
@@ -20,6 +20,10 @@ const evaluationSchema = new mongoose.Schema({
     quizScore: {
         type: Number,
         default: 0,
+    },
+    assignmentAnswer: {
+        type: String,
+        default: "",
     },
     assignmentScore: {
         type: Number,

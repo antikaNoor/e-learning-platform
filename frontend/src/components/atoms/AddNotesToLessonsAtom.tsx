@@ -78,10 +78,10 @@ const AddNoteToLessonAtom = ({ lessonID, onRemove }: LessonID) => {
     };
 
     return (
-        <div className='flex flex-col gap-2 items-center border w-[400px] rounded p-3 mx-auto'>
-            <FaMinus onClick={onRemove} />
+        <div className='flex flex-col gap-2 border w-[700px] rounded p-3 mx-auto'>
+
             <form onSubmit={handleSubmit(onSubmit)}>
-                <div>
+                <div className='flex flex-col w-[600px] gap-2'>
                     <label>Title</label>
                     <Controller
                         name="noteTitle"
@@ -101,7 +101,7 @@ const AddNoteToLessonAtom = ({ lessonID, onRemove }: LessonID) => {
                             <input
                                 placeholder="Enter note title"
                                 {...field}
-                                className={`w-full px-4 py-2 border rounded ${errors.noteTitle ? 'border-red-500' : ''}`}
+                                className={`w-full px-4 py-2 bg-gray-200 rounded ${errors.noteTitle ? 'border-red-500' : ''}`}
                             />
                         )}
                     />
@@ -130,6 +130,8 @@ const AddNoteToLessonAtom = ({ lessonID, onRemove }: LessonID) => {
                     </Button>
                 </div>
             </form>
+            <FaMinus onClick={onRemove}
+                className="bg-red-500 text-white rounded p-1 w-6 h-6 cursor-pointer" />
         </div>
     )
 }

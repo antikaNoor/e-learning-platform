@@ -17,7 +17,12 @@ import {
   GetQuizApi,
   StartQuizCountdownApi,
   SubmitQuizApi,
-  GetAssignmentApi
+  GetAssignmentApi,
+  CompleteLessonApi,
+  TrackProgressApi,
+  GetAssignmentEvaluationApi,
+  SubmitAssignmentApi,
+  EvaluateAssignmentApi
 } from "../ApiCalls/CourseApi";
 import { useCallback } from "react";
 import { useState, useEffect, ChangeEvent } from "react";
@@ -156,6 +161,17 @@ const useCourse = () => {
     []
   );
 
+  const submitAssignment = useCallback(
+    async (courseID: string, data: any, token: string) => {
+      try {
+        await SubmitAssignmentApi(courseID, data, token);
+      } catch (error: any) {
+        console.log(error);
+      }
+    },
+    []
+  );
+
   const getAllCourses = async () => {
     try {
       const data = await GetCoursesApi(searchQuery, sortParam);
@@ -200,9 +216,39 @@ const useCourse = () => {
     }
   };
 
+  const completeLesson = async (lessonID: string, token: string) => {
+    try {
+      const data = await CompleteLessonApi(lessonID, token);
+      console.log("data from hook", data);
+      return data;
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+    }
+  }
+
   const getAssignment = async (courseID: string, token: string) => {
     try {
       const data = await GetAssignmentApi(courseID, token);
+      console.log("data from hook", data);
+      return data;
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+    }
+  };
+
+  const evaluateAssignment = async (courseID: string, studentID: string, data: any, token: string) => {
+    try {
+      const response = await EvaluateAssignmentApi(courseID, studentID, data, token);
+      console.log("data from hook", response);
+      return response;
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+    }
+  };
+
+  const getAssignmentEvaluation = async (token: string) => {
+    try {
+      const data = await GetAssignmentEvaluationApi(token);
       console.log("data from hook", data);
       return data;
     } catch (error) {
@@ -223,6 +269,7 @@ const useCourse = () => {
   const submitQuiz = async (quizID: string, data: any, token: string) => {
     try {
       await SubmitQuizApi(quizID, data, token);
+      console.log("quizID from hook", quizID);
     } catch (error) {
       console.error("Error fetching courses:", error);
     }
@@ -270,6 +317,16 @@ const useCourse = () => {
     }
   }, []);
 
+  const trackProgress = useCallback(async (courseID: string, token: string) => {
+    try {
+      const response = await TrackProgressApi(courseID, token);
+      console.log("response from hook", response.data);
+      return response.data;
+    } catch (error: any) {
+      console.log(error);
+    }
+  }, []);
+
   return {
     getAllCourses,
     getTopic,
@@ -295,7 +352,12 @@ const useCourse = () => {
     getQuiz,
     StartQuizCountdown,
     submitQuiz,
-    getAssignment
+    getAssignment,
+    completeLesson,
+    trackProgress,
+    submitAssignment,
+    getAssignmentEvaluation,
+    evaluateAssignment
   };
 };
 

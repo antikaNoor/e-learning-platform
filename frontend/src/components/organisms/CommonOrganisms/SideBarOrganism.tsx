@@ -8,6 +8,7 @@ import { BiPowerOff } from "react-icons/bi";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { IoAnalyticsOutline } from "react-icons/io5";
 import { RiTodoLine } from "react-icons/ri";
+import { IoShieldCheckmarkOutline } from "react-icons/io5";
 import { FiBookOpen } from "react-icons/fi";
 import { LuPlusSquare } from "react-icons/lu";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
@@ -34,6 +35,7 @@ import { BsBookmarkCheck } from "react-icons/bs";
 import AdminSubscriptionRequestsMolecule from '../../molecules/AdminMolecules/AdminSubscriptionRequestsMolecule';
 import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
+import EvaluateAssignmentsMolecule from '../../molecules/TeacherMolecules/EvaluateAssignmentsMolecule';
 
 type MyToken = {
     _id: string;
@@ -138,7 +140,7 @@ const SideBarOrganism = (props: Props) => {
     if (decodedToken.role === "teacher") {
         return (
             <div className='flex pt-10 px-10 gap-20'>
-                <div className='flex flex-col gap-3 w-[13rem] p-7 rounded-lg h-[60vh] shadow-md sticky top-[100px]'>
+                <div className='flex flex-col gap-3 w-[19rem] p-7 rounded-lg h-[60vh] shadow-md sticky top-[100px]'>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
                         onClick={() => handleTabClick(1)}>
                         <LuLayoutDashboard className='font-bold text-xl' />
@@ -157,6 +159,12 @@ const SideBarOrganism = (props: Props) => {
                         Create Course
                     </div>
                     <hr className='w-40'></hr>
+                    <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'
+                        onClick={() => handleTabClick(4)}>
+                        <IoShieldCheckmarkOutline className='font-bold text-xl' />
+                        Evaluate Assignments
+                    </div>
+                    <hr className='w-40'></hr>
                     <div className='flex gap-2 flex-wrap cursor-pointer hover:scale-105'>
                         <BiPowerOff className='font-bold text-xl' />
                         <div onClick={logout}>Log out</div>
@@ -172,6 +180,9 @@ const SideBarOrganism = (props: Props) => {
                     </div>}
                     {activeTab === 3 && <div>
                         <CreateCourseMolecule />
+                    </div>}
+                    {activeTab === 4 && <div>
+                        <EvaluateAssignmentsMolecule />
                     </div>}
                 </div>
             </div>

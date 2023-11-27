@@ -114,12 +114,19 @@ class courseApprovalController {
                     .send(failure("You are not authorized to perform this action"))
             }
 
-            const notifications = await notificationModel.find({ type: "course_subscribed", to: user._id })
+            const notifications = await notificationModel
+                .find({
+                    $or: [
+                        { type: "course_subscribed", to: user._id },
+                        { type: "assignment_submitted", to: user._id }
+                    ]
+                })
                 .populate({
                     path: "from",
                     select: "username email",
                 })
                 .sort({ createdAt: -1 });
+
 
             return res.status(200).send(success("All notifications", notifications))
         } catch (error) {

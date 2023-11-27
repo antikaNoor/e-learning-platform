@@ -158,21 +158,11 @@ const AssignmentAtom = () => {
                     <Button
                         type="submit"
                         value="Submit"
-                        additionalStyles="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                    >
+                        additionalStyles="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                         Submit
                     </Button>
                 </div>
             </form>
-
-            {/* <FaPlus onClick={addDivVideo} />
-            {videoDivs.map((_, index) => (
-                <AddVideoToLessonAtom key={index} onRemove={() => removeDivVideo(index)} lessonID={lessonid} />
-            ))} */}
-            {/* <FaPlus onClick={addDivNote} /> */}
-            {/* {NoteDivs.map((_, index) => (
-                <AddDocToAssignmentAtom key={index} assignmentID={assignmentid} />
-            ))} */}
             <AddDocToAssignmentAtom assignmentID={assignmentid} />
         </div>
     )

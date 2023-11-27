@@ -94,16 +94,18 @@ const CreateQuizMolecule = (props: Props) => {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col">
       <NavBarOrganism />
-      <div className="mx-auto ml-[80px] mt-[80px]">
+      <h1 className="text-3xl font-bold mt-5 ml-[130px]">Create Quiz</h1>
+      <div className="mx-auto ml-[130px] mt-[30px] p-5 flex flex-col items-center justify-center">
+
         <form onSubmit={handleSubmit(onSubmit)}>
           {quizFields.map((field, index) => (
-            <div key={field.id} className="flex flex-col space-y-4">
+            <div key={field.id} className="flex flex-col space-y-4 w-[400px]">
               <input
                 {...register(`questions.${index}.question` as const)}
                 placeholder={`Question ${index + 1}`}
-                className="border border-gray-300 p-2 rounded w-96"
+                className="bg-gray-200 border-gray-300 p-2 rounded w-[800px] h-[100px]"
               />
 
               {/* Options */}
@@ -145,10 +147,23 @@ const CreateQuizMolecule = (props: Props) => {
                 onClick={() => removeQuiz(index)}
                 className="text-red-500 cursor-pointer"
               >
-                Remove
+                Remove Question
               </button>
             </div>
           ))}
+          <div className="flex items-center gap-3 cursor-pointer"
+            onClick={() =>
+              appendQuiz({
+                question: "",
+                options: ["", "", "", ""],
+                correctOption: 0,
+              })
+            }>
+            <CgAddR
+              className="text-green-500 w-5 h-5"
+            />
+            <p>Add another question</p>
+          </div>
           {/* Duration input */}
           <label>Quiz Duration (in minutes)</label>
           <input
@@ -165,16 +180,7 @@ const CreateQuizMolecule = (props: Props) => {
             <p className="text-red-500">{errors?.duration.message}</p>
           )}
 
-          <CgAddR
-            onClick={() =>
-              appendQuiz({
-                question: "",
-                options: ["", "", "", ""],
-                correctOption: 0,
-              })
-            }
-            className="text-green-500 cursor-pointer"
-          />
+
           <Button
             value="Submit"
             type="submit"

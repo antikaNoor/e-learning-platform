@@ -153,7 +153,7 @@ const LoginSignUpNavMolecule = () => {
         const hasUnreadNotifications =
           response.data.data.length > 0 &&
           response.data.data.some(
-            (notification: any) => notification.type === "course_subscribed"
+            (notification: any) => notification.type === "course_subscribed" || notification.type === "assignment_submitted"
           );
 
         setIsUnread(hasUnreadNotifications);

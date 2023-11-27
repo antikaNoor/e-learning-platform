@@ -4,6 +4,7 @@ const teacherModel = require("../../model/authModel/teacher")
 const courseModel = require("../../model/courseModel/course")
 const assignmentModel = require("../../model/courseModel/assignment")
 const evaluationModel = require("../../model/courseModel/evaluation")
+const notificationModel = require("../../model/notificationModel/notification")
 
 const { success, failure } = require("../../utils/successError")
 const express = require('express')
@@ -162,7 +163,7 @@ class AssignmentController {
                 if (!student) {
                     return res.status(400).send(failure("You are not authorized to access this course."));
                 }
-                if(!student.enrolledCourses?.find(course => course._id.toString() === courseID.toString())) {
+                if (!student.enrolledCourses?.find(course => course._id.toString() === courseID.toString())) {
                     return res.status(400).send(failure("You are not authorized to access this course."));
                 }
             }
@@ -178,6 +179,185 @@ class AssignmentController {
             delete response.__v
 
             return res.status(200).send(success("Assignment found successfully", response))
+
+        } catch (error) {
+            console.log("error", error)
+            return res.status(500).send(failure("Internal server error"))
+        }
+    }
+
+    // submit assignment
+
+    async submitAssignment(req, res) {
+        try {
+            const { courseID } = req.params
+            const documents = req.file
+
+            if (!courseID || !documents) {
+                return res.status(400).send(failure("Please enter a document."))
+            }
+
+            const student = await studentModel.findOne({ email: req.user.email })
+
+            if (!student) {
+                return res.status(400).send(failure("User not found"))
+            }
+
+            const assignment = await evaluationModel.findOne({ studentID: req.user._id, courseID: courseID })
+
+            if (!assignment) {
+                return res.status(400).send(failure("Assignment not found"))
+            }
+
+            const score = await assignmentModel.findOne({ _id: new mongoose.Types.ObjectId(courseID) })
+            // console.log("score", score)
+            // if (!score) {
+            //     return res.status(400).send(failure("Attend the quiz first."))
+            // }
+
+            if (assignment.assignmentAnswer !== "") {
+                return res.status(400).send(failure("Assignment already submitted"))
+            }
+
+            const uploadRes = await uploadFile(documents, "assignment_docs")
+
+            if (!uploadRes) {
+                return res.status(400).send(failure("Error uploading note."))
+            }
+
+            assignment.assignmentAnswer = uploadRes
+            await assignment.save()
+
+            // send notification to the teacher
+            const existingCourse = await courseModel.findOne({ _id: new mongoose.Types.ObjectId(courseID) })
+
+            if (!existingCourse) {
+                return res.status(400).send(failure("Course not found"))
+            }
+
+            const notification = {
+                type: "assignment_submitted",
+                to: existingCourse.teacherID,
+                from: req.user._id,
+                courseID: existingCourse._id,
+                message: `${req.user.username} has submitted the assignment for, ${existingCourse.title}.`,
+            };
+
+            await notificationModel.create(notification);
+
+            return res.status(200).send(success("Assignment submitted successfully", assignment))
+
+        } catch (error) {
+            console.log("error", error)
+            return res.status(500).send(failure("Internal server error"))
+        }
+    }
+
+    // fetch assignment
+
+    async fetchAssignment(req, res) {
+        try {
+            const teacher = await authModel.findOne({ _id: req.user._id })
+
+            if (!teacher) {
+                return res.status(400).send(failure("User not found"))
+            }
+
+            // find the teacher in the course
+            const course = await courseModel.find({ teacherID: teacher._id })
+
+            if (!course) {
+                return res.status(400).send(failure("Course not found"))
+            }
+
+            const response = course.map(async (course) => {
+
+                const assignment = await evaluationModel.findOne({ courseID: course._id })
+                    .populate("studentID")
+                    .populate("courseID")
+
+                if (!assignment) {
+                    return res.status(400).send(failure("Assignment not found"))
+                }
+
+                return assignment
+            })
+
+            const assignments = await Promise.all(response)
+
+            return res.status(200).send(success("Assignment found successfully", assignments))
+
+            // console.log(course)
+        } catch (error) {
+            console.log("error", error)
+            return res.status(500).send(failure("Internal server error"))
+        }
+    }
+    // evaluate assignment 
+    async evaluateAssignment(req, res) {
+        try {
+
+            const { courseID, studentID } = req.params
+            const { assignmentScore } = req.body
+
+            if (!courseID || !studentID || !assignmentScore) {
+                return res.status(400).send(failure("Please enter a score."))
+            }
+
+            const teacher = await authModel.findOne({ _id: req.user._id })
+
+            if (!teacher) {
+                return res.status(400).send(failure("User not found"))
+            }
+
+            const course = await courseModel.findOne({ _id: new mongoose.Types.ObjectId(courseID) })
+
+            if (!course) {
+                return res.status(400).send(failure("Course not found"))
+            }
+
+            // check if course.teacherID is the same as req.user._id
+
+            if (!course.teacherID.equals(teacher._id)) {
+                return res.status(400).send(failure("Only the teacher who created the course can evaluate the course."))
+            }
+
+            const student = await evaluationModel.findOne({ studentID: studentID, courseID: courseID })
+
+            if (!student) {
+                return res.status(400).send(failure("User not found"))
+            }
+
+            const assignment = await evaluationModel.findOne({ studentID: studentID, courseID: courseID })
+
+            if (!assignment) {
+                return res.status(400).send(failure("Assignment not found"))
+            }
+
+            const score = await assignmentModel.findOne({ courseID: courseID })
+
+            if (!score) {
+                return res.status(400).send(failure("assignment not found"))
+            }
+
+            if (assignment.assignmentScore !== 0) {
+
+                return res.status(400).send(failure("Assignment already evaluated"))
+            }
+
+            assignment.assignmentScore = assignmentScore
+            console.log(score)
+            if (assignmentScore < score.passMarks) {
+                assignment.isPassedInAssignment = false
+
+            }
+            else {
+                assignment.isPassedInAssignment = true
+            }
+            assignment.assignmentScore = assignmentScore
+            await assignment.save()
+
+            return res.status(200).send(success("Assignment evaluated successfully", assignment))
 
         } catch (error) {
             console.log("error", error)

@@ -341,13 +341,34 @@ export const GetQuizApi = async (courseID: string, token: string) => {
     })
     .then((response) => {
       console.log("response", response.data.data);
+      toast.success(response.data.message);
       return response.data.data;
     })
     .catch((error) => {
       console.error("Other Error:", error);
+      toast.error(error.response.data.message);
       throw error;
     });
 };
+
+export const CompleteLessonApi = async (lessonID: string, token: string) => {
+  return axiosInstance
+    .get(`/lesson/complete-lesson/${lessonID}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => {
+      console.log("response", response.data);
+      toast.success(response.data.message);
+      return response.data;
+    })
+    .catch((error) => {
+      console.error("Other Error:", error);
+      toast.error(error.response.data.message);
+      throw error;
+    });
+}
 
 export const GetAssignmentApi = async (courseID: string, token: string) => {
   // Fetch data from API
@@ -363,6 +384,47 @@ export const GetAssignmentApi = async (courseID: string, token: string) => {
     })
     .catch((error) => {
       console.error("Other Error:", error);
+      throw error;
+    });
+};
+
+export const GetAssignmentEvaluationApi = async (token: string) => {
+  // Fetch data from API
+  return axiosInstance
+    .get(`/assignment/get-assignment-answer`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => {
+      console.log("response", response.data.data);
+      // toast.success(response.data.message);
+      return response.data.data;
+    })
+    .catch((error) => {
+      console.error("Other Error:", error);
+      // toast.error(error.response.data.message);
+      throw error;
+    });
+};
+
+export const EvaluateAssignmentApi = async (courseID: string, studentID: string, data: any, token: string) => {
+  // Fetch data from API
+  return axiosInstance
+    .post(`/assignment/evaluate-assignment/${courseID}/${studentID}`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("response", response.data.data);
+      toast.success(response.data.message);
+      return response.data.data;
+    })
+    .catch((error) => {
+      console.error("Other Error:", error);
+      toast.error(error.response.data.message);
       throw error;
     });
 };
@@ -395,7 +457,7 @@ export const SubmitQuizApi = async (
 ) => {
   // Fetch data from API
   return axiosInstance
-    .post(`/quiz/submit-quiz/${quizID}`, {quizAnswer: data}, {
+    .post(`/quiz/submit-quiz/${quizID}`, { quizAnswer: data }, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -438,3 +500,47 @@ export const AddDocToAssignmentApi = async (
       throw error;
     });
 };
+
+export const SubmitAssignmentApi = async (
+  courseID: string,
+  data: any,
+  token: string
+) => {
+  // Fetch data from API
+  return axiosInstance
+    .post(`/assignment/submit-assignment/${courseID}`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    })
+    .then((response) => {
+      console.log("response from api", response.data);
+      toast.success(response.data.message);
+      return response.data;
+    })
+    .catch((error) => {
+      // Handle other errors (network error, timeout, etc.) here.
+      toast.error(error.response.data.message);
+      console.error("Other Error:", error);
+      throw error;
+    });
+};
+
+export const TrackProgressApi = async (courseID: string, token: string) => {
+
+  return axiosInstance
+    .get(`/lesson/get-progress/${courseID}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => {
+      console.log("response", response.data);
+      return response.data;
+    })
+    .catch((error) => {
+      console.error("Other Error:", error);
+      throw error;
+    });
+}

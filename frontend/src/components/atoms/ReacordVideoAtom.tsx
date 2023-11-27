@@ -5,13 +5,10 @@ import { BsBroadcast } from 'react-icons/bs';
 import { useForm, Controller } from 'react-hook-form';
 import useCourse from '../../hooks/useCourseHooks';
 import { useSelector } from 'react-redux';
+import Button from '../atoms/Button';
+import { toast } from 'react-toastify';
 
-type LessonID = {
-    lessonID?: string;
-    onRecordingComplete: (recordedData: { videoTitle: string; videoLink: File }) => void;
-};
-
-const ReacordVideoAtom: React.FC<LessonID> = ({ lessonID, onRecordingComplete }) => {
+const ReacordVideoAtom = ({ onRecordingComplete }: { onRecordingComplete: (recordedFiles: File[]) => void }) => {
     const {
         activeRecordings,
         cancelRecording,
@@ -76,10 +73,12 @@ const ReacordVideoAtom: React.FC<LessonID> = ({ lessonID, onRecordingComplete })
                     videoLink: file,
                 };
 
-                onRecordingComplete(recordedData);
+                onRecordingComplete([file]);
                 setRecordedFiles([file]);
                 setStoped((prev) => !prev);
                 cancelRecording(recording.id);
+
+                console.log("recordedData", recordedFiles);
             };
             recording.recorder.stop();
         }
@@ -94,40 +93,6 @@ const ReacordVideoAtom: React.FC<LessonID> = ({ lessonID, onRecordingComplete })
             console.log("videoUrl", videoURL);
         }
     };
-
-    // console.log("recordings", recordedFiles);
-
-    const {
-        handleSubmit,
-        control,
-        formState: { errors },
-    } = useForm({
-        mode: 'onChange',
-        defaultValues: {
-            videoTitle: '',
-            videoLink: [] as unknown as FileList,
-        },
-    });
-
-    console.log("lessonid from video atom", lessonID);
-
-    const handleAddVideoApi = async () => {
-        const formData = new FormData();
-        formData.append("videoTitle", recordedFiles[0].name);
-        formData.append("videoLink", recordedFiles[0]);
-        if (lessonID) {
-            await addVideo(lessonID, formData, checkString);
-        }
-        else {
-            toast.error("Please submit the lesson first")
-        }
-    }
-
-    useEffect(() => {
-        //api call
-        handleAddVideoApi()
-    }, [lessonID, checkString]);
-
 
     return (
         <div>
@@ -221,8 +186,7 @@ const ReacordVideoAtom: React.FC<LessonID> = ({ lessonID, onRecordingComplete })
                                 Cancel
                             </button>
                         </div>
-                        <div className="preview">
-                            {/* <p>Preview</p> */}
+                        {/* <div className="preview">
                             <button onClick={() => handlePreview(recording.id)}
                                 className="text-blue-800 rounded">Preview</button>
                             <video ref={recording.previewRef} loop playsInline />
@@ -233,10 +197,21 @@ const ReacordVideoAtom: React.FC<LessonID> = ({ lessonID, onRecordingComplete })
                                     Clear preview
                                 </button>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 ))}
             </div>
+            {/* <form onSubmit={handleSubmit(handleAddVideoApi)}>
+                <div className="mb-4">
+                    <Button
+                        type="submit"
+                        value="Submit"
+                        additionalStyles="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    >
+                        Submit
+                    </Button>
+                </div>
+            </form> */}
         </div >
     );
 };

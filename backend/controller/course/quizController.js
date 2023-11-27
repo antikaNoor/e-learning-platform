@@ -127,8 +127,8 @@ class QuizController {
                 if (!student || !student.enrolledCourses?.find(course => course._id.toString() === courseID.toString())) {
                     return res.status(400).send(failure("You are not enrolled in this course."));
                 }
-                const progress = await progressModel.findOne({ studentID: req.user._id });
-                if (!progress || progress.percentage < 100) {
+                const progress = await progressModel.findOne({ studentID: req.user._id, courseID: courseID });
+                if (!progress || progress.percentage !== 100) {
                     return res.status(400).send(failure("You have not completed the lessons."));
                 }
             }

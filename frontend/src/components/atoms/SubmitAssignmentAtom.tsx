@@ -10,22 +10,23 @@ import { useNavigate } from 'react-router-dom';
 import { IoCloudUpload } from "react-icons/io5";
 import { toast } from 'react-toastify';
 import { FaMinus } from 'react-icons/fa6';
+import { useLocation } from 'react-router-dom';
 
 type FormData = {
-    docLink?: FileList;
+    documents?: FileList;
 }
+const SubmitAssignmentAtom = () => {
 
-type AssignmentID = {
-    assignmentID?: string;
-}
-const AddDocToAssignmentAtom = ({ assignmentID }: AssignmentID) => {
+    const { submitAssignment } = useCourse();
 
-    const { addDocToAssignment } = useCourse();
+    const location = useLocation();
+    const pathArray = location.pathname.split('/');
+    const courseID = pathArray[pathArray.length - 1];
 
     const state = useSelector((state: any) => state.user);
     const checkString = state.token;
 
-    console.log("assignmentID from doc atom", assignmentID);
+    console.log("assignmentID from doc atom", courseID);
 
     const {
         handleSubmit,
@@ -34,15 +35,15 @@ const AddDocToAssignmentAtom = ({ assignmentID }: AssignmentID) => {
     } = useForm({
         mode: 'onChange',
         defaultValues: {
-            docLink: [] as unknown as FileList,
+            documents: [] as unknown as FileList,
         },
     });
 
-    const [docLink, setDocLink] = useState<any>([]);
+    const [documents, setDocuments] = useState<any>([]);
 
     const onDrop = useCallback((acceptedFiles: any) => {
         // Do something with the files
-        setDocLink(acceptedFiles);
+        setDocuments(acceptedFiles);
     }, [])
 
 
@@ -51,15 +52,15 @@ const AddDocToAssignmentAtom = ({ assignmentID }: AssignmentID) => {
     const onSubmit = async () => {
         const formData = new FormData();
 
-        formData.append('documents', docLink[0]);
+        formData.append('documents', documents[0]);
 
-        console.log({ docLink: docLink })
+        console.log({ documents: documents })
 
-        if (assignmentID) {
-            await addDocToAssignment(assignmentID, formData, checkString);
+        if (courseID) {
+            await submitAssignment(courseID, formData, checkString);
         }
         else {
-            toast.error("Please submit the title and description first")
+            toast.error("Course Not found")
         }
     };
 
@@ -69,7 +70,7 @@ const AddDocToAssignmentAtom = ({ assignmentID }: AssignmentID) => {
                 <div className='flex items-center gap-2 text-xl'>Upload Assignment
                 </div>
 
-                <div {...getRootProps()} className='flex items-center justify-center'>
+                <div {...getRootProps()} className='flex items-center justify-center z-10'>
                     <input {...getInputProps()} />
                     {
                         isDragActive ?
@@ -92,4 +93,4 @@ const AddDocToAssignmentAtom = ({ assignmentID }: AssignmentID) => {
     )
 }
 
-export default AddDocToAssignmentAtom
+export default SubmitAssignmentAtom
